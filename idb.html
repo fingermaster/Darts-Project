@@ -1,0 +1,127 @@
+﻿<html>
+<head>
+	<title>IDB</title>
+	<script lang="javascript" src="bootstrap.bundle.js"></script>
+	
+	<link rel="stylesheet" href="bootstrap.css"/>
+	<link rel="stylesheet" href="styles.css">	
+</head>
+<body class="">
+
+<div id="data"></div>
+
+<script>
+
+const dbName = "dartsStatsTest";
+var qr = indexedDB.open(dbName, 2);
+qr.onupgradeneeded = function() {
+	console.log('qr.onupgradeneeded ');
+	let db = qr.result;
+	
+	if (!db.objectStoreNames.contains('games')) { // если хранилище "games" не существует
+		db.createObjectStore('games', {keyPath: 'id', autoIncrement: true }); // создаем хранилище
+	}
+	//db.createObjectStore('games'); // удаление хранилища
+	/*
+	switch(db.version) { // существующая (старая) версия базы данных
+	case 0:
+	// версия 0 означает, что на клиенте нет базы данных
+	// выполнить инициализацию
+	case 1:
+	// на клиенте версия базы данных 1
+	// обновить
+	}*/
+};
+
+qr.onerror = function() {
+  console.error("Error", qr.error);
+};
+
+/**
+---------------------------
+***********Game************
+---------------------------
+id			autoIncrement
+begin 		new Date();
+end 		new Date();
+p1 			Jsus
+p2 			Smerti
+winner 		Jsus
+hits 		24
+lasthit 	1x2
+gamesource 	JSON 
+---------------------------
+*********Players***********
+---------------------------
+name 		Jsus		//unic player name primary
+games 		187			//how many games player has be
+won 		102			//how many games player won
+favend		1x2			//favorit ending
+average 	62			//how many shots needs player in average to won
+minwon		42			//min shots game
+maxwon		101			//max shots game
+---------------------------
+***********Hits************
+---------------------------
+id			24
+gameid		3
+shooter		Jsus
+sector		20		(milk)
+x			1
+summary		20
+status		passed/failed
+**/
+
+qr.onsuccess = function() {
+	console.log('qr.onsuccess ');
+	let db = qr.result;
+	let tx = db.transaction("games", "readwrite"); 
+	let games = tx.objectStore("games");
+	let game = {
+		data: JSON.parse("{\"next\":\"p1\",\"p1JSON\":\"[{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":1,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":2,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":3,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":1,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":2,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":3,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":1,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":2,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":3,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":1,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":2,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":3,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":1,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":2,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":3,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":13,\\\"x\\\":3,\\\"sx\\\":39,\\\"shotn\\\":1,\\\"yn\\\":true,\\\"calc\\\":false},{\\\"sector\\\":13,\\\"x\\\":2,\\\"sx\\\":26,\\\"shotn\\\":2,\\\"yn\\\":true,\\\"calc\\\":true}]\",\"winnershots\":\"17\",\"turn\":\"1\",\"p2\":\"Hidan Smerty\",\"p1score\":\"0\",\"p2JSON\":\"[{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":1,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":2,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":3,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":1,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":2,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":3,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":1,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":2,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":3,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":1,\\\"yn\\\":true,\\\"calc\\\":false},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":2,\\\"yn\\\":true,\\\"calc\\\":false},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":3,\\\"yn\\\":true,\\\"calc\\\":false},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":1,\\\"yn\\\":true,\\\"calc\\\":false},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":2,\\\"yn\\\":true,\\\"calc\\\":false},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":3,\\\"yn\\\":true,\\\"calc\\\":false}]\",\"winnerlasthit\":\"13x2\",\"Hidan Smerty\":\"7\",\"Jesus Christ\":\"12\",\"players\":\"[\\\"Hidan Smerty\\\",\\\"Jesus Christ\\\"]\",\"p2score\":\"126\",\"stopgame\":\"true\",\"winnername\":\"Jesus Christ\",\"p1\":\"Jesus Christ\"}"),
+		end: new Date()
+	};
+	/*let rq = games.add(game);
+	rq.onsuccess = function() { 
+		console.log("Игра записана", rq.result);
+	};
+	rq.onerror = function() {
+		console.log("Ошибка", rq.error);
+	};*/
+	let request = games.openCursor();
+
+var countRequest = games.count();
+countRequest.onsuccess = function() {
+	console.log(countRequest.result);
+}
+
+	// вызывается для каждой игры
+	request.onsuccess = function() {
+	  let cursor = request.result;
+	  if (cursor) {
+		let key = cursor.key;
+		let value = cursor.value;
+		document.getElementById('data').innerHTML += `${key} ${JSON.stringify(value)}`;
+		console.log(key, "Ирина ",value);
+		cursor.continue();
+	  } else {
+		console.log("Книг больше нет и не было");
+	  }
+	};
+	
+	console.log(games.getAll());
+	
+	db.onversionchange = function() {
+		db.close();
+		alert("База данных устарела, пожалуста, перезагрузите страницу.")
+	};
+};
+
+qr.onblocked = function() {	
+	console.log('qr.onblocked ');
+  // есть другое соединение к той же базе
+  // и оно не было закрыто после срабатывания на нём db.onversionchange
+};
+</script>
+</body>
+</html>
