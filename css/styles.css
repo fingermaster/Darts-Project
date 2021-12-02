@@ -1007,8 +1007,6 @@ nav.navbar.fixed-bottom.navbar-dark {
     text-decoration-color: initial;
     text-decoration-skip-ink: auto;
 }
-	
-}
 @keyframes blink {
   20%,  24%,  55% {
     color: #ff0000;
