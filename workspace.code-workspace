@@ -1,8 +1,12 @@
 {
 	"folders": [
 		{
-			"path": "."
+			"path": ".",			
 		}
 	],
-	"settings": {}
+	"settings": {		
+		"[javascript]": {
+			"editor.maxTokenizationLineLength": 2500,			
+		}
+	}
 }
