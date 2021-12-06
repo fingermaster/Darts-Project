@@ -5,7 +5,7 @@ var scripts = [
 ];
 
 
-const settings = {toFinish: 39, x3and25: 1, overshootSkip:0}; 
+const settings = {toFinish: 39, x3and25: 1, overshootSkip:0};  
 
 
 
