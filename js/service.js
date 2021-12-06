@@ -4,25 +4,34 @@ var scripts = [
 	"js/interface.js",
 ];
 
+
+const settings = {toFinish: 39, x3and25: 1, overshootSkip:0}; 
+
+
+
 function getRandomInt(min, max) {
 	min = Math.ceil(min);
 	max = Math.floor(max)+1;
 	return Math.floor(Math.random() * (max - min)) + min;
 }
 
-function rand20alt(){	return getRandomInt(1,20); }
-function rand20(){
+function rand20alt(){ return getRandomInt(1,20); }
+function rand20(){	
 	let x = 10000;
 	let rr = Math.trunc((getRandomInt(10*x,31*x-1)-10*x)/x);
 	if(rr == 0){
-		rand20();
+		getRandomInt(1,20);
+	} else {
+		return rr;
 	}
-	return rr;
+	
 }
 function rand20h(){
+	
 	let tens = getRandomInt(0,1);
 	if(tens == 0) return getRandomInt(1,10);
-	else return Math.trunc(getRandomInt(110,209)/10);	
+	else return Math.trunc(getRandomInt(111,209)/10);	
+	
 	// return Math.trunc(getRandomInt(10000,209999)/10000);
 }
 function rand3(){	return getRandomInt(2,3); }
@@ -57,7 +66,7 @@ function testRands(){
 }
 
 
-const settings = {toFinish: 501, x3and25: 0, overshootSkip:1}; 
+
 
 var ConsoleCSS = `
 padding: 4px 25px 1px 0;

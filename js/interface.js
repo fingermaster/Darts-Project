@@ -419,14 +419,18 @@ if(inScope('darts')){
 					function getX(e){						
 						if(e == sc.p1){
 							if(e - Math.trunc(e/2)*2 === 0 && Math.trunc(e/2) <= 20) p1sX.innerHTML = `${e/2}X2`;
-							// if(e - Math.trunc(e/3)*3 === 0) p1sX.innerHTML += ` ${e/3}X3`;
-							// if(e == 50 || e == 25) p1sX.innerHTML += ` ${e}`;
+							if(settings.x3and25){
+								if(e - Math.trunc(e/3)*3 === 0) p1sX.innerHTML += ` ${e/3}X3`;
+								if(e == 50 || e == 25) p1sX.innerHTML += ` ${e}`;
+							}
 							if(e == 50) p1sX.innerHTML += ` ${e}`;
 						}
 						if(e == sc.p2){
 							if(e - Math.trunc(e/2)*2 === 0 && Math.trunc(e/2) <= 20) p2sX.innerHTML = `${e/2}X2`;
-							// if(e - Math.trunc(e/3)*3 === 0) p2sX.innerHTML += ` ${e/3}X3`;
-							// if(e == 50 || e == 25) p2sX.innerHTML += ` ${e}`;
+							if(settings.x3and25){
+								if(e - Math.trunc(e/3)*3 === 0) p2sX.innerHTML += ` ${e/3}X3`;
+								if(e == 50 || e == 25) p2sX.innerHTML += ` ${e}`;
+							}
 							if(e == 50) p2sX.innerHTML += ` ${e}`;
 						}
 					};
