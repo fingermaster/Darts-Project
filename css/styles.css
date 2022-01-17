@@ -1,9 +1,9 @@
 body {	
 	color: #FFF;
 	/* overflow: hidden; */
-    /* font-family: Maiandra GD; //Nexa */
+     font-family: Courier New, monospace; //Nexa
 	outline: 0 none !important;
-    font-family: Nexa;   
+    /*font-family: "Roboto Thin";*/
 }
 body div {
 	outline: 0 none !important;
@@ -881,11 +881,6 @@ nav.navbar.fixed-bottom.navbar-dark {
 	
 }
 #last3 {
-    position: fixed;
-    display: flex;
-    bottom: 8px;
-    left: calc(50% - 7em);
-    width: 14em;
     /* font-weight: 300; */
     background: #f7ff82;
     border: 2px dashed rgb(255 132 0 / 76%);
@@ -896,7 +891,6 @@ nav.navbar.fixed-bottom.navbar-dark {
     /* padding: 0vh 30px; */
     border-radius: 4em;
     justify-content: space-around;
-    z-index: 1034;
     align-items: center;
 }
 #last3>span>span {

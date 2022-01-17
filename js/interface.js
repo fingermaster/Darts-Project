@@ -6,6 +6,8 @@ const board = {
 	1:	[2,3,4,6,8,9,10,12,14,15,16,18,20,21,22,24,25,26,27,28,30,32,33,34,36,38,39,40,42,45,48,50,51,54,57,60]
 };
 
+
+
 const GameData = {
 	p1:'',
 	p2:'',
@@ -13,7 +15,7 @@ const GameData = {
 	set beginned(bool){
 		if(bool==true){
 			turnPan.classList.add('ghost');
-		} else { 
+		} else {
 			turnPan.classList.remove('ghost');
 		}
 		beginStatus = bool;
@@ -85,8 +87,83 @@ if(inScope('darts')){
 				};
 			});
 		};
-		
+		let selectedSectorNumber = 1;
+		let multypler = 1;
 		window.onload = function(){
+			window.document.onkeydown = function(event){
+				//event.preventDefault();
+
+				console.log(KeyboardEvent)
+				switch (event.keyCode){
+					case 13:{}
+					case 32:{
+						console.log(`Sector: ${selectedSectorNumber} X: ${multypler}`);
+						goData(game.next, {
+							player: GameData[game.next],
+							sector: selectedSectorNumber,
+							x:		multypler,
+							sx: 	selectedSectorNumber*multypler,
+							shotn: 	GameData.shots[game.next]%3+1,
+							yn: false,
+							calc: true
+						});
+						multypler = 1;
+						break;}
+					case 219:{ showRandDeck(); break; } 		//[ - Random Deck
+					case 221:{ showRand20(); break; }			//] - Random 20
+					case 8:{if(event.shiftKey) game.cancelLastHit(); break; }		//Backspace - cancel last hit
+
+
+					case 17: { selectedSectorNumber = 0; multypler = 1; break;} 	//Control Key set value as Zero
+					case 189:{ selectedSectorNumber = 25; multypler = 1; break;} 	//minus - 25
+					case 187:{ selectedSectorNumber = 50; multypler = 1; break;} 	//Equal - 50
+
+					case 81:{ if(selectedSectorNumber > 0 && selectedSectorNumber<21) multypler = 1; break; }
+					case 87:{ if(selectedSectorNumber > 0 && selectedSectorNumber<21) multypler = 2; break; }
+					case 69:{ if(selectedSectorNumber > 0 && selectedSectorNumber<21) multypler = 3; break; }
+
+
+
+					case 48:{ selectedSectorNumber = 10; 	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
+					case 49:{ selectedSectorNumber = 1; 	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
+					case 50:{ selectedSectorNumber = 2; 	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
+					case 51:{ selectedSectorNumber = 3; 	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
+					case 52:{ selectedSectorNumber = 4; 	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
+					case 53:{ selectedSectorNumber = 5; 	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
+					case 54:{ selectedSectorNumber = 6; 	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
+					case 55:{ selectedSectorNumber = 7; 	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
+					case 56:{ selectedSectorNumber = 8; 	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
+					case 57:{ selectedSectorNumber = 9; 	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
+
+					case 37:{ game.first = 'p1'; break;}	//Left arrow - First player be first
+					case 39:{ game.first = 'p2'; break;}	//Right arrow - Second player be first
+					/*
+					* 	ToDo: HotKeys
+					*  	Create array with hold keys.
+					* 		Add key wen keydown
+					* 		When keyup check show all -> do code if needed -> delete
+					* */
+
+					case 96:	{ 	selectedSectorNumber = 10; 	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
+					case 97:  	{ 	selectedSectorNumber = 1;  	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
+					case 98:  	{	selectedSectorNumber = 2;  	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
+					case 99:  	{ 	selectedSectorNumber = 3;  	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
+					case 100: 	{ 	selectedSectorNumber = 4;  	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
+					case 101: 	{ 	selectedSectorNumber = 5;  	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
+					case 102: 	{ 	selectedSectorNumber = 6;  	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
+					case 103: 	{ 	selectedSectorNumber = 7;  	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
+					case 104: 	{ 	selectedSectorNumber = 8;  	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
+					case 105: 	{ 	selectedSectorNumber = 9;  	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
+
+
+					default: { }
+
+				}
+			}
+			window.document.onkeyup = function (event){
+				document.getElementById('selectedValueInfo').innerHTML = `${selectedSectorNumber}X${multypler}`;
+			}
+
 			let circleParts = 24;
 			for(let i=0; i<circleParts; i++){
 				createCopyUse('milk', '', (10+i*360/circleParts), [0,1]);
@@ -125,7 +202,7 @@ if(inScope('darts')){
 			createCopyUse('points25', 'alpha', 30, [25,1]);
 			createCopyUse('bulleye', 'alpha', 10, [50,1]);
 			
-			// textcircle
+			//textcircle
 			player.list();
 			
 			/*setTimeout(spinLights,100);
@@ -154,9 +231,6 @@ if(inScope('darts')){
 				}				
 				loop();
 			}*/
-			
-			
-
 			
 			DB.CheckGameID(function(game){				
 				if(game.p1){

@@ -5,7 +5,7 @@ var scripts = [
 ];
 
 
-const settings = {toFinish: 39, x3and25: 1, overshootSkip:0};  
+const settings = {toFinish: 501, x3and25: 1, overshootSkip:0};  
 
 
 
@@ -15,8 +15,8 @@ function getRandomInt(min, max) {
 	return Math.floor(Math.random() * (max - min)) + min;
 }
 
-function rand20alt(){ return getRandomInt(1,20); }
-function rand20(){	
+function rand20(){ return getRandomInt(1,20); }
+function rand20alt(){
 	let x = 10000;
 	let rr = Math.trunc((getRandomInt(10*x,31*x-1)-10*x)/x);
 	if(rr == 0){
