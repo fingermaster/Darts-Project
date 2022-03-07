@@ -1,6 +1,6 @@
 const dbName = "darts";
 const dbVersion = 10;
-var db, qr, tx;
+let db, qr, tx;
 
 
 if(window.indexedDB){

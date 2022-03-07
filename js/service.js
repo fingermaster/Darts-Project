@@ -1,12 +1,14 @@
-var scripts = [
-	"js/db.js", 
+const output = document.getElementById('output');
+
+const scripts = [
+	"js/db.js",
 	"js/stats.js",
 	"js/interface.js",
 ];
-
-
-const settings = {toFinish: 501, x3and25: 1, overshootSkip:0};  
-
+const settings = {
+	toFinish: 501,
+	x3and25: 1,
+	overshootSkip: 0 };
 
 
 function getRandomInt(min, max) {
@@ -19,7 +21,7 @@ function rand20(){ return getRandomInt(1,20); }
 function rand20alt(){
 	let x = 10000;
 	let rr = Math.trunc((getRandomInt(10*x,31*x-1)-10*x)/x);
-	if(rr == 0){
+	if(rr === 0){
 		getRandomInt(1,20);
 	} else {
 		return rr;
@@ -27,14 +29,13 @@ function rand20alt(){
 	
 }
 function rand20h(){
-	
 	let tens = getRandomInt(0,1);
-	if(tens == 0) return getRandomInt(1,10);
-	else return Math.trunc(getRandomInt(111,209)/10);	
-	
-	// return Math.trunc(getRandomInt(10000,209999)/10000);
+	if(tens === 0) return getRandomInt(1,10);
+	else return Math.trunc(getRandomInt(111,209)/10);
 }
+
 function rand3(){	return getRandomInt(2,3); }
+
 function randDeck(){
 	if(getRandomInt(1,60)>50){
 		if(getRandomInt(1,15) < 10) { return 25; } 
@@ -47,7 +48,11 @@ function randDeck(){
 }
 
 function testRands(){
-	let rands = {first: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],second: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], alt: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]};
+	let rands = {
+		first: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		second: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		alt: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	};
 	output.innerHTML = '';
 	for(let i = 0;i<2000;i++){
 		rands.first[rand20()-1]++;
@@ -65,36 +70,33 @@ function testRands(){
 	console.log(rands);
 }
 
-
-
-
-var ConsoleCSS = `
+const ConsoleCSS = `
 padding: 4px 25px 1px 0;
 background: rgba(255, 199, 32, .8); color: #222;
 border-width: 0 2px 3px 0; border-style: groove; 
 border-color: rgba(0,0,0,0.44); 
 border-radius: 0px 50px 0 0;`;
-var init = 1;
+let init = 1;
 
-var isEven = function(someNumber) {
-  return (someNumber % 2 == 0) ? true : false;
+const isEven = function (someNumber) {
+	return (someNumber % 2 === 0);
 };
-var isThird = function(someNumber) {
-  return (someNumber % 3 == 0) ? true : false;
+
+const isThird = function (someNumber) {
+	return (someNumber % 3 === 0);
 };
-var	isCorrect = function(sector, x, left){
-	if(sector*x>left) return false;
-	if(sector*x<left-1) return true;
-	if(sector*x == left){
-		if(x == 2 || sector == 50) return true;	
-		else if((settings.x3and25 && x > 1) || (settings.x3and25 && sector == 50) || (settings.x3and25 && sector == 25)) return true;	//
-		else return false;
+
+const isCorrect = function (sector, x, left) {
+	if (sector * x > left) return false;
+	if (sector * x < left - 1) return true;
+	if (sector * x === left) {
+		if (x === 2 || sector === 50) return true;
+		else return (settings.x3and25 && x > 1) || (settings.x3and25 && sector === 50) || (settings.x3and25 && sector === 25);
 	}
 };
 
 function inScope(name){	
-	if(name == document.body.dataset.scope) return true;
-	else return false;
+	return name === document.body.dataset.scope;
 }
 
 function addScript(url){
@@ -110,7 +112,6 @@ function addScript(url){
 scripts.forEach(function(el){addScript(el)});
 
 function msToTime(ms) {
-	
 	let sec, min, hrs, days;
 	sec = (ms / 1000).toFixed(0);	
 	min = (ms / (1000 * 60)).toFixed(0);
@@ -141,7 +142,6 @@ function toggleFullScreen() {
 	}
 }
 
-
 const timerView = document.getElementById('timer');
 var timer = function(limit = 20){
 	let timePassed = 0;
@@ -165,21 +165,23 @@ var timer = function(limit = 20){
 	}
 	startTimer();
 }
-var Timer = {
+const Timer = {
 	passed: 0,
 	limit: 20,
 	left: this.limit,
-	interval: null,	
-	onTimesUp: function() {clearInterval(this.interval)},
-	startTimer: function(output) {
-	  this.interval = setInterval(() => {
-		this.passed++;
-		this.left = this.limit - this.passed;
-		output(this.left);
-		if (this.left === 0) {
-		  this.onTimesUp();
-		}
-	  }, 1000);
+	interval: null,
+	onTimesUp: function () {
+		clearInterval(this.interval)
+	},
+	startTimer: function (output) {
+		this.interval = setInterval(() => {
+			this.passed++;
+			this.left = this.limit - this.passed;
+			output(this.left);
+			if (this.left === 0) {
+				this.onTimesUp();
+			}
+		}, 1000);
 	},
 };
 /*

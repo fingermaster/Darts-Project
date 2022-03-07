@@ -1,4 +1,4 @@
-var vx, player, players, game, tempID, DB;
+var vx, player, players, game, DB;
 
 const boardNums = [20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
 const board = {
@@ -13,7 +13,7 @@ const GameData = {
 	p2:'',
 	current: 0,
 	set beginned(bool){
-		if(bool==true){
+		if( bool === true ){
 			turnPan.classList.add('ghost');
 		} else {
 			turnPan.classList.remove('ghost');
@@ -113,7 +113,6 @@ if(inScope('darts')){
 					case 221:{ showRand20(); break; }			//] - Random 20
 					case 8:{if(event.shiftKey) game.cancelLastHit(); break; }		//Backspace - cancel last hit
 
-
 					case 17: { selectedSectorNumber = 0; multypler = 1; break;} 	//Control Key set value as Zero
 					case 189:{ selectedSectorNumber = 25; multypler = 1; break;} 	//minus - 25
 					case 187:{ selectedSectorNumber = 50; multypler = 1; break;} 	//Equal - 50
@@ -121,8 +120,6 @@ if(inScope('darts')){
 					case 81:{ if(selectedSectorNumber > 0 && selectedSectorNumber<21) multypler = 1; break; }
 					case 87:{ if(selectedSectorNumber > 0 && selectedSectorNumber<21) multypler = 2; break; }
 					case 69:{ if(selectedSectorNumber > 0 && selectedSectorNumber<21) multypler = 3; break; }
-
-
 
 					case 48:{ selectedSectorNumber = 10; 	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
 					case 49:{ selectedSectorNumber = 1; 	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
@@ -137,12 +134,12 @@ if(inScope('darts')){
 
 					case 37:{ game.first = 'p1'; break;}	//Left arrow - First player be first
 					case 39:{ game.first = 'p2'; break;}	//Right arrow - Second player be first
-					/*
+					/**
 					* 	ToDo: HotKeys
 					*  	Create array with hold keys.
 					* 		Add key wen keydown
 					* 		When keyup check show all -> do code if needed -> delete
-					* */
+					**/
 
 					case 96:	{ 	selectedSectorNumber = 10; 	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
 					case 97:  	{ 	selectedSectorNumber = 1;  	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
@@ -246,7 +243,7 @@ if(inScope('darts')){
 		
 		document.onclick = function(e){
 			/*console.log(e.target);*/
-			if(e.target.id == 'start'){				
+			if(e.target.id === 'start'){
 				DB.NewPlayer([p1input.value,p2input.value],function(){					
 					GameData.p1 = p1input.value;
 					GameData.p2 = p2input.value;
@@ -272,7 +269,7 @@ if(inScope('darts')){
 
 		vx = {
 			playerActive: function(p){
-				if(p == 'p1') {
+				if(p === 'p1') {
 					document.getElementById('p1').classList.add('active');
 					document.getElementById('p2').classList.remove('active');
 				} else {
@@ -311,10 +308,10 @@ if(inScope('darts')){
 				shotDBDeleteLastHeat(function(isDeleted){
 					if(isDeleted){
 						let who = game.next;
-						if(game.turn != 0){
+						if(game.turn !== 0){
 							game.turn = game.turn - 1;
 						} else {
-							if(who == 'p1') who = 'p2';
+							if(who === 'p1') who = 'p2';
 							else who = 'p1';
 							game.next = who;
 							game.turn = 2;			
@@ -423,15 +420,15 @@ if(inScope('darts')){
 					let gamer;
 					let correct = nowScore = false;					
 					
-					if(p1name == value.player)	gamer = 'p1';  
+					if(p1name === value.player)	gamer = 'p1';
 					else gamer = 'p2';
 					
 					GameData.shots.total++;
 					GameData.shots[gamer]++;
 					
-					if(value.shotn == 1) GameData.score[gamer].temp = GameData.score[gamer].score;
-					if((isCorrect(value.sector, value.x, settings.toFinish-GameData.score[gamer].temp) && value.shotn == 3)||
-					(isCorrect(value.sector, value.x, settings.toFinish-GameData.score[gamer].temp) && GameData.score[gamer].temp+value.sx == settings.toFinish)){
+					if(value.shotn === 1) GameData.score[gamer].temp = GameData.score[gamer].score;
+					if((isCorrect(value.sector, value.x, settings.toFinish-GameData.score[gamer].temp) && value.shotn === 3)||
+					(isCorrect(value.sector, value.x, settings.toFinish-GameData.score[gamer].temp) && GameData.score[gamer].temp+value.sx === settings.toFinish)){
 						correct = true;
 						GameData.score[gamer].score = GameData.score[gamer].temp+value.sx;
 						nowScore = true;
@@ -442,18 +439,18 @@ if(inScope('darts')){
 					} else {
 						if(GameData.score[gamer].temp + value.sx > settings.toFinish-GameData.score[gamer].temp) GameData.score[gamer].temp = GameData.score[gamer].score; 
 					}
-					if(value.shotn == 3) GameData.score[gamer].score = GameData.score[gamer].temp;
+					if(value.shotn === 3) GameData.score[gamer].score = GameData.score[gamer].temp;
 					let outputMultiplier = '';
 					if(value.x>1) outputMultiplier = `x${value.x}`;
 					
-					document.getElementById(`${(p1name == value.player)?'p1':'p2'}shots`).innerHTML += 
-					`<div class="shot ${(!correct)?'bad':''}">${(value.sector!=0)? value.sector+outputMultiplier:'0'}</div>`;
-					document.getElementById(`${(p1name == value.player)?'p1':'p2'}shots`).innerHTML += `${(value.shotn == 3)?'<div class="scorecol">' + GameData.score[gamer].score + '</div>' :''}`;					
+					document.getElementById(`${(p1name === value.player)?'p1':'p2'}shots`).innerHTML +=
+					`<div class="shot ${(!correct)?'bad':''}">${(value.sector!==0)? value.sector+outputMultiplier:'0'}</div>`;
+					document.getElementById(`${(p1name === value.player)?'p1':'p2'}shots`).innerHTML += `${(value.shotn === 3)?'<div class="scorecol">' + GameData.score[gamer].score + '</div>' :''}`;
 					
-					if(p1name == value.player) {GameData.lastShot.p = 'p1'}  else {GameData.lastShot.p = 'p2'};
+					if(p1name === value.player) { GameData.lastShot.p = 'p1' }  else { GameData.lastShot.p = 'p2' }
 					GameData.lastShot.sector = value.sector;
 					GameData.lastShot.x = value.x;
-					last3array.push(`<span class="${(p1name == value.player)?'p1':'p2'}">${(value.sector!=0)? value.sector+outputMultiplier:'0'}</span>`);
+					last3array.push(`<span class="${(p1name === value.player)?'p1':'p2'}">${(value.sector !== 0)? value.sector+outputMultiplier:'0'}</span>`);
 					cursor.continue();
 				} else {
 					/*
@@ -468,7 +465,7 @@ if(inScope('darts')){
 					}
 					
 					let second = 'p2'
-					if(GameData.first == 'p2') second = 'p1'
+					if(GameData.first === 'p2') second = 'p1'
 
 					let diffMod = GameData.shots.total%6;
 					switch(true){
@@ -484,33 +481,33 @@ if(inScope('darts')){
 					}
 					
 					
-					if(diffMod == 6) vx.playerActive(GameData.first);
-					if(diffMod == 3) vx.playerActive(second);
+					if(diffMod === 6) vx.playerActive(GameData.first);
+					if(diffMod === 3) vx.playerActive(second);
 		
 					document.getElementById('p1sX').innerHTML = document.getElementById('p2sX').innerHTML = '';
 					let sc = {p1: settings.toFinish-GameData.score.p1.temp,p2: settings.toFinish-GameData.score.p2.temp};
 					
 					function getX(e){						
-						if(e == sc.p1){
+						if(e === sc.p1){
 							if(e - Math.trunc(e/2)*2 === 0 && Math.trunc(e/2) <= 20) p1sX.innerHTML = `${e/2}X2`;
 							if(settings.x3and25){
 								if(e - Math.trunc(e/3)*3 === 0) p1sX.innerHTML += ` ${e/3}X3`;
-								if(e == 50 || e == 25) p1sX.innerHTML += ` ${e}`;
+								if(e === 50 || e === 25) p1sX.innerHTML += ` ${e}`;
 							}
-							if(e == 50) p1sX.innerHTML += ` ${e}`;
+							if(e === 50) p1sX.innerHTML += ` ${e}`;
 						}
-						if(e == sc.p2){
+						if(e === sc.p2){
 							if(e - Math.trunc(e/2)*2 === 0 && Math.trunc(e/2) <= 20) p2sX.innerHTML = `${e/2}X2`;
 							if(settings.x3and25){
 								if(e - Math.trunc(e/3)*3 === 0) p2sX.innerHTML += ` ${e/3}X3`;
-								if(e == 50 || e == 25) p2sX.innerHTML += ` ${e}`;
+								if(e === 50 || e === 25) p2sX.innerHTML += ` ${e}`;
 							}
-							if(e == 50) p2sX.innerHTML += ` ${e}`;
+							if(e === 50) p2sX.innerHTML += ` ${e}`;
 						}
 					};
 					board[settings.x3and25].find(getX);
 					
-					if(GameData.score.p1.score == settings.toFinish || GameData.score.p2.score == settings.toFinish){
+					if(GameData.score.p1.score === settings.toFinish || GameData.score.p2.score === settings.toFinish){
 						game.endGame(GameData.lastShot.p, `${GameData.lastShot.sector}X${GameData.lastShot.sector}`);											
 					}		
 				
@@ -561,7 +558,7 @@ if(inScope('darts')){
 				let tx = db.transaction("shots", "readwrite"); 
 				let shots = tx.objectStore("shots");
 				
-				if(parseInt(lastShot.game) == parseInt(GameData.current)) {
+				if(parseInt(lastShot.game) === parseInt(GameData.current)) {
 					let rq = shots.delete(parseInt(lastShot.id));
 
 					rq.onsuccess = function() { 
@@ -630,14 +627,14 @@ if(inScope('darts')){
 						let cursor = e.target.result;
 						if (cursor) {
 							//console.log(cursor);
-							if(gameShotsCounter == 0) firstShotDate = cursor.value.date;
+							if(gameShotsCounter === 0) firstShotDate = cursor.value.date;
 							gameShotsCounter++;
 							cursor.continue();
 						} else {
 /*							console.info(`
 							First Shot Date: %o
 							Total Shots in Game: %o`, dateFormat(firstShotDate), gameShotsCounter);*/						
-							if(gameShotsCounter == 1) {
+							if(gameShotsCounter === 1) {
 								MaxID("games", function(maxID,game){
 									let tx = db.transaction("games", "readwrite"); 
 									let games = tx.objectStore("games");
