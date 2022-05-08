@@ -6,8 +6,6 @@ const board = {
 	1:	[2,3,4,6,8,9,10,12,14,15,16,18,20,21,22,24,25,26,27,28,30,32,33,34,36,38,39,40,42,45,48,50,51,54,57,60]
 };
 
-
-
 const GameData = {
 	p1:'',
 	p2:'',
@@ -95,8 +93,8 @@ if(inScope('darts')){
 
 				console.log(KeyboardEvent)
 				switch (event.keyCode){
-					case 13:{}
-					case 32:{
+					case 13: {};
+					case 32: {
 						console.log(`Sector: ${selectedSectorNumber} X: ${multypler}`);
 						goData(game.next, {
 							player: GameData[game.next],
@@ -843,7 +841,5 @@ if(inScope('darts')){
 				}
 			},
 		};
-		
-		
 	}	
 }
