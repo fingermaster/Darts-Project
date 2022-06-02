@@ -4,48 +4,16 @@
 	<title>Darts Project</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<script lang="javascript" src="./ink/bootstrap/bootstrap.bundle.js"></script>
-	<script lang="javascript" src="./js/service.js"></script>	
-	
-	<link rel="stylesheet" href="./ink/bootstrap/bootstrap.css"/>
-	<link rel="stylesheet" href="./css/styles.css">	
+	<script lang="javascript" src="./js/service.js"></script>
+	<link rel="stylesheet" href="./css/styles.css">
 </head>
 <body data-scope="darts" class="">	
 <div class="abs"></div>
-	<!-- <div class="fixed-top marquee" id="winner"> -->
-		<!-- <span id="winnername"></span> wins <span id="wins"></span> times. Winning throw: <span id="winnerlasthit"></span> -->
-	<!-- </div> -->
-	<nav class="navbar fixed-bottom navbar-dark">
-
-	  <div class="container-fluid">
-		
-		<div class="btn-group btn-group-lg">
-			<button id="namesbtn" type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#names" onclick="player.list()">
-			  Game settings
-			</button>
-			<button class="btn btn-sm btn-danger" onclick="game.cancelLastHit();">Cancel last hit</button>
-		</div>
-		<div class="btn-group btn-group-lg">
-			<button class="btn btn-lg btn-outline-warning" style="font-weight: bold" id="selectedValueInfo"></button>
-		</div>
-		<div class="btn-group btn-group-lg">
-			<button class="btn btn-lg btn-info" id="last3"></button>
-		</div>
-<!--		<div class="fullscreen">-->
-<!--			<a class="" onclick="toggleFullScreen()">-->
-<!--			<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="120" viewBox="0 0 91 16">-->
-<!--				<path class="fullscreen-ico" d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1h-4zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zM.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5z"/>-->
-<!--				<text font-size="14" font-weight="400" text-anchor="middle" class="txt" transform="translate(6, 13) scale(1)" x="50" y="0" fill="#FFF">FullScr</text>-->
-<!--			</svg></a>-->
-<!--		</div>-->
-
-		<div class="btn-group btn-group-lg" id="turnPan">
-			<button class="btn btn-sm btn-outline-info" onclick="game.first = 'p1';">Turn 1</button>
-			<button class="btn btn-sm btn-outline-info" onclick="game.first = 'p2';">Turn 2</button>
-		</div>
-		
-		
-	  </div>
+	<nav>
+		<button id="namesbtn" onclick="player.list()" class="ml-20">Game settings</button>
+		<button onclick="game.cancelLastHit();">Cancel last hit</button>
+		<button id="last3"></button>
+		<button class="disabled mr-20" id="selectedValueInfo"></button>
 	</nav>
 
 		<!-- Modal -->
@@ -142,7 +110,11 @@
 					<button id="randInput20" class="btn btn-outline-danger" onclick="showRand20()">1-20</button>			
 				</div>
 			</div>
-			<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="70%" viewBox="-175 -175 350 350">			
+			<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="70%" viewBox="-175 -175 350 350">
+				<filter id="displacementFilter">
+					<feTurbulence type="turbulence" baseFrequency="0.1" numOctaves="2" result="turbulence"/>
+					<feDisplacementMap in2="turbulence" in="SourceGraphic" scale="5" xChannelSelector="B" yChannelSelector="R"/>
+				</filter>
 				<defs>
 					<circle id="milkarea" cx="0" cy="0" r="180" stroke="none" fill="rgba(0,0,0,0)"/>
 					<!-- <path id="x1" d="12 2 -1 356" stroke-width="0.2" stroke="#444"/> -->
@@ -158,22 +130,12 @@
 					<path d="M  -99, -99 A -99, -99 0 0 1 99, 99  Z" id="x2circle" stroke-width="0" stroke="#A00" />
 					<text id="x2text" transform="scale(1)" x="10"  fill="#FFF"><textPath xlink:href="#x2circle">X2</textPath></text>
 					<path d="M  -58, -58 A -58, -58 0 0 1 58, 58  Z" id="x3circle" stroke-width="0" stroke="#A00" />
-					<text id="x3text" transform="scale(1)" x="10"  fill="#FFF"><textPath xlink:href="#x3circle">X3</textPath></text>					
+					<text id="x3text" transform="scale(1)" x="10"  fill="#FFF"><textPath xlink:href="#x3circle">X3</textPath></text>
 					<path d="M  -13, -13 A -13, -13 0 0 1 13, 13  Z" id="textcircle" stroke-width="1" stroke="#A00" />					
 					<text id="twentyfive" transform="scale(1)" x="10" y="0" fill="#FFF"><textPath xlink:href="#textcircle">25</textPath></text>
-					
-					
-					
-				</defs>	
-				
-				<g id="vxBoard" font-size="18" font-weight="500" text-anchor="middle">
+				</defs>
 
-					<!-- <text transform="translate(0,-28) scale(0.7,0.7)" x="0" y="0.7ex" fill="#FFF" data-point="25" data-x="1">25</text> -->
-					<!-- <text transform="translate(0,28) scale(0.7,0.7)" x="0" y="0.7ex" fill="#FFF" data-point="25" data-x="1">25</text> -->
-					<!-- <text transform="translate(29,0) scale(0.7,0.7)" x="0" y="0.7ex" fill="#FFF" data-point="25" data-x="1">25</text> -->
-					<!-- <text transform="translate(-29,0) scale(0.7,0.7)" x="0" y="0.7ex" fill="#FFF" data-point="25" data-x="1">25</text> -->
-					
-					<!-- <text transform="translate(0,  0) scale(0.8,0.8)" font-weight="bold" font-size="25" x="0" y="0.7ex" fill="#EEE" data-point="50"  data-x="1">50</text> -->
+				<g id="vxBoard" font-size="18" font-weight="500" text-anchor="middle" style="/*filter: url(#displacementFilter)*/">
 				</g>
 			</svg>
 		</div>		

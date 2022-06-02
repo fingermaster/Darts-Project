@@ -11,11 +11,6 @@ const GameData = {
 	p2:'',
 	current: 0,
 	set beginned(bool){
-		if( bool === true ){
-			turnPan.classList.add('ghost');
-		} else {
-			turnPan.classList.remove('ghost');
-		}
 		beginStatus = bool;
 	},
 	get beginned(){
@@ -93,8 +88,8 @@ if(inScope('darts')){
 
 				console.log(KeyboardEvent)
 				switch (event.keyCode){
-					case 13: {};
-					case 32: {
+					// case 13: {};
+					case 13 || 32: {
 						console.log(`Sector: ${selectedSectorNumber} X: ${multypler}`);
 						goData(game.next, {
 							player: GameData[game.next],
@@ -149,8 +144,6 @@ if(inScope('darts')){
 					case 103: 	{ 	selectedSectorNumber = 7;  	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
 					case 104: 	{ 	selectedSectorNumber = 8;  	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
 					case 105: 	{ 	selectedSectorNumber = 9;  	if(event.shiftKey) selectedSectorNumber = selectedSectorNumber+10; break;}
-
-
 					default: { }
 
 				}
@@ -196,37 +189,8 @@ if(inScope('darts')){
 			}						
 			createCopyUse('points25', 'alpha', 30, [25,1]);
 			createCopyUse('bulleye', 'alpha', 10, [50,1]);
-			
-			//textcircle
 			player.list();
-			
-			/*setTimeout(spinLights,100);
-			var loops = 5;
-			
-			function spinLights(interval = 20){
-				let i = 0;
-				let source = document.getElementsByClassName('alpha');
-				
-				
-				function loop() {       
-					setTimeout(function() {						
-						let sec = source[i];
-						if(source[i].dataset.x == 1){
-							sec.classList.add('christ');
-						}						
-						setTimeout(function(){
-							sec.classList.remove('christ')},4400);
-						i++;                    
-						if (i < source.length-2) loop(); 
-						else if(loops!=0) {
-							loops--;
-							setTimeout(spinLights,source.length*interval-4400);
-						}
-					}, interval)
-				}				
-				loop();
-			}*/
-			
+
 			DB.CheckGameID(function(game){				
 				if(game.p1){
 					GameData.first = game.first;
@@ -408,47 +372,50 @@ if(inScope('darts')){
 			request.openCursor(singleKeyRange).onsuccess = function(e) {
 				let lastThrow = {};
 				let cursor = e.target.result;
-				if (cursor) {					
+				let nowScore;
+				if (cursor) {
 					let key = cursor.key;
 					let value = cursor.value;
-					
-					lastThrow = cursor;
-					//console.log(value);
-					//if(p1name === undefined) p1name = value.player;
 					let gamer;
-					let correct = nowScore = false;					
-					
-					if(p1name === value.player)	gamer = 'p1';
+					let correct = false;
+
+					if (p1name === value.player) gamer = 'p1';
 					else gamer = 'p2';
-					
+
 					GameData.shots.total++;
 					GameData.shots[gamer]++;
-					
-					if(value.shotn === 1) GameData.score[gamer].temp = GameData.score[gamer].score;
-					if((isCorrect(value.sector, value.x, settings.toFinish-GameData.score[gamer].temp) && value.shotn === 3)||
-					(isCorrect(value.sector, value.x, settings.toFinish-GameData.score[gamer].temp) && GameData.score[gamer].temp+value.sx === settings.toFinish)){
-						correct = true;
-						GameData.score[gamer].score = GameData.score[gamer].temp+value.sx;
-						nowScore = true;
-					}	
-					if(isCorrect(value.sector, value.x, settings.toFinish-GameData.score[gamer].temp)){
-						correct = true;
-						GameData.score[gamer].temp = GameData.score[gamer].temp+value.sx;
-					} else {
-						if(GameData.score[gamer].temp + value.sx > settings.toFinish-GameData.score[gamer].temp) GameData.score[gamer].temp = GameData.score[gamer].score; 
+
+					if (value.shotn === 1) {
+						GameData.score[gamer].temp = GameData.score[gamer].score;
 					}
-					if(value.shotn === 3) GameData.score[gamer].score = GameData.score[gamer].temp;
+					if ((isCorrect(value.sector, value.x, settings.toFinish - GameData.score[gamer].temp) && value.shotn === 3) ||
+						(isCorrect(value.sector, value.x, settings.toFinish - GameData.score[gamer].temp) && GameData.score[gamer].temp + value.sx === settings.toFinish)) {
+						correct = true;
+						GameData.score[gamer].score = GameData.score[gamer].temp + value.sx;
+						nowScore = true;
+					}
+					if (isCorrect(value.sector, value.x, settings.toFinish - GameData.score[gamer].temp)) {
+						correct = true;
+						GameData.score[gamer].temp = GameData.score[gamer].temp + value.sx;
+					} else {
+						if (GameData.score[gamer].temp + value.sx > settings.toFinish - GameData.score[gamer].temp) GameData.score[gamer].temp = GameData.score[gamer].score;
+					}
+					if (value.shotn === 3) GameData.score[gamer].score = GameData.score[gamer].temp;
 					let outputMultiplier = '';
-					if(value.x>1) outputMultiplier = `x${value.x}`;
-					
-					document.getElementById(`${(p1name === value.player)?'p1':'p2'}shots`).innerHTML +=
-					`<div class="shot ${(!correct)?'bad':''}">${(value.sector!==0)? value.sector+outputMultiplier:'0'}</div>`;
-					document.getElementById(`${(p1name === value.player)?'p1':'p2'}shots`).innerHTML += `${(value.shotn === 3)?'<div class="scorecol">' + GameData.score[gamer].score + '</div>' :''}`;
-					
-					if(p1name === value.player) { GameData.lastShot.p = 'p1' }  else { GameData.lastShot.p = 'p2' }
+					if (value.x > 1) outputMultiplier = `x${value.x}`;
+
+					document.getElementById(`${(p1name === value.player) ? 'p1' : 'p2'}shots`).innerHTML +=
+						`<div class="shot ${(!correct) ? 'bad' : ''}">${(value.sector !== 0) ? value.sector + outputMultiplier : '0'}</div>`;
+					document.getElementById(`${(p1name === value.player) ? 'p1' : 'p2'}shots`).innerHTML += `${(value.shotn === 3) ? '<div class="scorecol">' + GameData.score[gamer].score + '</div>' : ''}`;
+
+					if (p1name === value.player) {
+						GameData.lastShot.p = 'p1'
+					} else {
+						GameData.lastShot.p = 'p2'
+					}
 					GameData.lastShot.sector = value.sector;
 					GameData.lastShot.x = value.x;
-					last3array.push(`<span class="${(p1name === value.player)?'p1':'p2'}">${(value.sector !== 0)? value.sector+outputMultiplier:'0'}</span>`);
+					last3array.push(`<span class="${(p1name === value.player) ? 'p1' : 'p2'}">${(value.sector !== 0) ? value.sector + outputMultiplier : '0'}</span>`);
 					cursor.continue();
 				} else {
 					/*
@@ -456,64 +423,70 @@ if(inScope('darts')){
 						console.log(`TOTAL: ${GameData.shots.total} ${GameData.lastShot.p} change`);
 					}*/
 					last3.innerHTML = '';
-					if(last3array.length < 4){last3.style.display='none'}
-					else{last3.style.display='flex'}
-					for(let i=last3array.length-1;i>last3array.length-5;i--){
+					if (last3array.length < 4) {
+						last3.style.display = 'none'
+					} else {
+						last3.style.display = 'flex'
+					}
+					for (let i = last3array.length - 1; i > last3array.length - 5; i--) {
 						last3.innerHTML += `<span>${last3array[i]}</span>`;
 					}
-					
-					let second = 'p2'
-					if(GameData.first === 'p2') second = 'p1'
 
-					let diffMod = GameData.shots.total%6;
-					switch(true){
-						case diffMod < 3: 
-							game.next = GameData.first;		
+					let second = 'p2'
+					if (GameData.first === 'p2') second = 'p1'
+
+					let diffMod = GameData.shots.total % 6;
+					switch (true) {
+						case diffMod < 3:
+							game.next = GameData.first;
 							// console.log(GameData.first);
 							break;
-						case diffMod >= 3: 
-							
+						case diffMod >= 3:
+
 							// console.log(second);
 							game.next = second;
 							break;
 					}
-					
-					
-					if(diffMod === 6) vx.playerActive(GameData.first);
-					if(diffMod === 3) vx.playerActive(second);
-		
+
+
+					if (diffMod === 6) vx.playerActive(GameData.first);
+					if (diffMod === 3) vx.playerActive(second);
+
 					document.getElementById('p1sX').innerHTML = document.getElementById('p2sX').innerHTML = '';
-					let sc = {p1: settings.toFinish-GameData.score.p1.temp,p2: settings.toFinish-GameData.score.p2.temp};
-					
-					function getX(e){						
-						if(e === sc.p1){
-							if(e - Math.trunc(e/2)*2 === 0 && Math.trunc(e/2) <= 20) p1sX.innerHTML = `${e/2}X2`;
-							if(settings.x3and25){
-								if(e - Math.trunc(e/3)*3 === 0) p1sX.innerHTML += ` ${e/3}X3`;
-								if(e === 50 || e === 25) p1sX.innerHTML += ` ${e}`;
+					let sc = {
+						p1: settings.toFinish - GameData.score.p1.temp,
+						p2: settings.toFinish - GameData.score.p2.temp
+					};
+
+					function getX(e) {
+						if (e === sc.p1) {
+							if (e - Math.trunc(e / 2) * 2 === 0 && Math.trunc(e / 2) <= 20) p1sX.innerHTML = `${e / 2}X2`;
+							if (settings.x3and25) {
+								if (e - Math.trunc(e / 3) * 3 === 0) p1sX.innerHTML += ` ${e / 3}X3`;
+								if (e === 50 || e === 25) p1sX.innerHTML += ` ${e}`;
 							}
-							if(e === 50) p1sX.innerHTML += ` ${e}`;
+							if (e === 50) p1sX.innerHTML += ` ${e}`;
 						}
-						if(e === sc.p2){
-							if(e - Math.trunc(e/2)*2 === 0 && Math.trunc(e/2) <= 20) p2sX.innerHTML = `${e/2}X2`;
-							if(settings.x3and25){
-								if(e - Math.trunc(e/3)*3 === 0) p2sX.innerHTML += ` ${e/3}X3`;
-								if(e === 50 || e === 25) p2sX.innerHTML += ` ${e}`;
+						if (e === sc.p2) {
+							if (e - Math.trunc(e / 2) * 2 === 0 && Math.trunc(e / 2) <= 20) p2sX.innerHTML = `${e / 2}X2`;
+							if (settings.x3and25) {
+								if (e - Math.trunc(e / 3) * 3 === 0) p2sX.innerHTML += ` ${e / 3}X3`;
+								if (e === 50 || e === 25) p2sX.innerHTML += ` ${e}`;
 							}
-							if(e === 50) p2sX.innerHTML += ` ${e}`;
+							if (e === 50) p2sX.innerHTML += ` ${e}`;
 						}
 					};
 					board[settings.x3and25].find(getX);
-					
-					if(GameData.score.p1.score === settings.toFinish || GameData.score.p2.score === settings.toFinish){
-						game.endGame(GameData.lastShot.p, `${GameData.lastShot.sector}X${GameData.lastShot.sector}`);											
-					}		
-				
-					p1score.innerHTML = `${settings.toFinish-GameData.score.p1.temp} <span>${settings.toFinish-GameData.score.p1.score}</span>`;
-					p2score.innerHTML = `${settings.toFinish-GameData.score.p2.temp} <span>${settings.toFinish-GameData.score.p2.score}</span>`;
-					document.getElementById("p1progress").style.width = `${GameData.score.p1.temp*100/settings.toFinish}%`;
-					document.getElementById("p2progress").style.width = `${GameData.score.p2.temp*100/settings.toFinish}%`;
-					
+
+					if (GameData.score.p1.score === settings.toFinish || GameData.score.p2.score === settings.toFinish) {
+						game.endGame(GameData.lastShot.p, `${GameData.lastShot.sector}X${GameData.lastShot.sector}`);
+					}
+
+					p1score.innerHTML = `${settings.toFinish - GameData.score.p1.temp} <span>${settings.toFinish - GameData.score.p1.score}</span>`;
+					p2score.innerHTML = `${settings.toFinish - GameData.score.p2.temp} <span>${settings.toFinish - GameData.score.p2.score}</span>`;
+					document.getElementById("p1progress").style.width = `${GameData.score.p1.temp * 100 / settings.toFinish}%`;
+					document.getElementById("p2progress").style.width = `${GameData.score.p2.temp * 100 / settings.toFinish}%`;
+
 
 					callback('done');
 				}
