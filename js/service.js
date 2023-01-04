@@ -2,15 +2,14 @@ const output = document.getElementById('output');
 const testrand = document.getElementsByClassName('testrand');
 
 const scripts = [
-	"js/db.js",
-	"js/stats.js",
-	"js/interface.js",
+	"./myJsLib.js",
+	"./js/deck.js",
+	"./js/interface.js",
+	"./js/db.js",
+	// "./js/stats.js",
 ];
 
-const settings = {
-	toFinish: 501,
-	x3and25: 1,
-	overshootSkip: 0 };
+
 
 const ConsoleCSS = `
 padding: 4px 25px 1px 0;
@@ -21,12 +20,15 @@ border-radius: 0px 50px 0 0;`;
 
 let init = 1;
 
-for (const element of scripts) { addScript(element).then(x)
-
+for (const element of scripts) {
+	addScript(element).then(x)
 	function x(r) {
 	}
 }
 
+const gameConsole = function (message) {
+	console.info(`%c ${init++}. ${message} `, ConsoleCSS);
+}
 
 function getRandomInt(min, max) {
 	min = Math.ceil(min);
@@ -55,7 +57,7 @@ function rand3(){	return getRandomInt(2,3); }
 
 function randDeck(){
 	if(getRandomInt(1,60)>50){
-		if(getRandomInt(1,15) < 10) { return 25; } 
+		if(getRandomInt(1,15) < 10) { return 25; }
 		else { return 50; }
 	} else if(getRandomInt(1,40) > 22) {
 		return `${rand20()}x${rand3()}`
@@ -83,7 +85,7 @@ function testRands(){
 		testrand[1].getElementsByClassName('rand-col')[i].style.fontSize = rands.second[i]/5 + 10 + 'pt';
 		testrand[2].getElementsByClassName('rand-col')[i].innerHTML = `${i+1}<span>${rands.alt[i]}</span>`;
 		testrand[2].getElementsByClassName('rand-col')[i].style.fontSize = rands.alt[i]/5 + 10 + 'pt';
-	}	
+	}
 	console.log(rands);
 }
 
@@ -100,11 +102,11 @@ const isCorrect = function (sector, x, left) {
 	if (sector * x < left - 1) return true;
 	if (sector * x === left) {
 		if (x === 2 || sector === 50) return true;
-		else return (settings.x3and25 && x > 1) || (settings.x3and25 && sector === 50) || (settings.x3and25 && sector === 25);
+		else return (Settings.x3and25 && x > 1) || (Settings.x3and25 && sector === 50) || (Settings.x3and25 && sector === 25);
 	}
 };
 
-function inScope(name){	
+function inScope(name){
 	return name === document.body.dataset.scope;
 }
 
@@ -112,7 +114,8 @@ async function addScript(url){
 	let script = document.createElement('script');
 	script.src = url;
 	await document.getElementsByTagName('head')[0].appendChild(script);
-	console.info(`%c ${init++}. ${url} Added `, ConsoleCSS);
+	// console.info(`%c ${init++}. ${url} Added `, ConsoleCSS);
+	gameConsole(`${url} Added `);
 	/*script.onload = function(e){
 		console.log(e);
 	}*/
@@ -120,13 +123,13 @@ async function addScript(url){
 
 function msToTime(ms) {
 	let sec, min, hrs, days;
-	sec = (ms / 1000).toFixed(0);	
+	sec = (ms / 1000).toFixed(0);
 	min = (ms / (1000 * 60)).toFixed(0);
 	hrs = (ms / (1000 * 60 * 60)).toFixed(0);
 	days = (ms / (1000 * 60 * 60 * 24)).toFixed(0);
-	
+
 	if(sec>60) sec = sec-min*60;
-	
+
 	return ` ${min} min ${sec} sec`;
 }
 
@@ -148,6 +151,28 @@ function dateFormat(fulldate){
 		}
 	}
 }*/
+
+function syntaxHighlight(json) {
+	if (typeof json != 'string') {
+		json = JSON.stringify(json, undefined, 2);
+	}
+	json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+	return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+		var cls = 'number';
+		if (/^"/.test(match)) {
+			if (/:$/.test(match)) {
+				cls = 'key';
+			} else {
+				cls = 'string';
+			}
+		} else if (/true|false/.test(match)) {
+			cls = 'boolean';
+		} else if (/null/.test(match)) {
+			cls = 'null';
+		}
+		return '<span class="' + cls + '">' + match + '</span>';
+	});
+}
 
 const timerView = document.getElementById('timer');
 const timer = function (limit = 20) {

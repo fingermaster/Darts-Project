@@ -24,11 +24,11 @@ if(window.indexedDB){
 				return false;
 			}
 		}
-		if(storageAvailable()) gamefx(db);
+		if(storageAvailable()) gameFx(db);
 
 		db.onversionchange = function() {
 			db.close();
-			alert("New version of the IndexedDB aviable. Requires page reload")
+			alert("New version of the IndexedDB available. Requires page reload")
 		};
 	};
 
