@@ -36,15 +36,16 @@
 						<div class="pform">
 							<div class="label"> <label>First Player
 								<input type="radio" hidden name="first" value="p1">
-							</label></div><input id="p1input" type="text" class="form-control form-control-lg dark mb-4" list="playersSelect" placeholder="First Player" aria-label="Recipient's username" aria-describedby="confirmP1" onload="this.value = GameData.p1">
+							</label></div><input id="p1input" type="text" class="form-control form-control-lg dark mb-4" list="playersSelect" placeholder="First Player" aria-label="Recipient's username" aria-describedby="confirmP1" onload="this.value = DATA.p1">
 							<div class="label"> <label>Second Player
 								<input type="radio" hidden name="first" value="p2">
-							</label></div><input id="p2input" type="text" class="form-control form-control-lg dark mb-4" list="playersSelect" placeholder="Second Player" aria-label="Recipient's username" aria-describedby="confirmP2" onload="this.value = GameData.p2">
-							<datalist id="playersSelect"></datalist>
+							</label></div><input id="p2input" type="text" class="form-control form-control-lg dark mb-4" list="playersSelect" placeholder="Second Player" aria-label="Recipient's username" aria-describedby="confirmP2" onload="this.value = DATA.p2">
+<!--							<datalist id="playersSelect"></datalist>-->
+							<div id="playersSelect"></div>
 
 							<div class="line">
-								Game
-								<div class="btn-group ">
+								Score to finish
+								<div class="btn-group"  id="toFinish">
 									<button class="btn btn-outline-warning dark" type="button" onclick="Settings.toFinish = 301">301</button>
 									<button class="btn btn-warning dark" type="button" onclick="Settings.toFinish = 501">501</button>
 									<input type="number" class="btn btn-outline-warning dark" onchange="Settings.toFinish = this.value" placeholder="Custom">
@@ -53,27 +54,16 @@
 
 							<div class="line">
 								Finish mode
-								<div class="btn-group ">
-									<button class="btn btn-outline-warning dark" type="button" onclick="Settings.x3and25 = 1">With X3 and 25</button>
-									<button class="btn btn-warning dark" type="button" onclick="Settings.x3and25 = 0">Without</button>
+								<div class="btn-group" id="x3and25">
+									<button class="btn btn-warning dark" type="button" onclick="Settings.x3and25 = 0">Double And Bulls aye</button>
+									<button class="btn btn-outline-warning dark" type="button" onclick="Settings.x3and25 = 1">All multipliers</button>
 								</div>
 							</div>
 							<div class="line">
-								Overshot rules
-								<div class="btn-group ">
-									<button class="btn btn-outline-warning dark" type="button" onclick="Settings.overshootSkip = 1">Skip after overshot</button>
+								Overshoot rules
+								<div class="btn-group" id="overshootSkip">
 									<button class="btn btn-outline-warning dark" type="button" onclick="Settings.overshootSkip = 0">Don't skip</button>
-								</div>
-							</div>
-							Who starts?
-							<div>
-								<div class="custom-control custom-radio custom-control-inline">
-									<input type="radio" id="fpradio" name="whostarts" class="custom-control-input" value="p1" checked onclick="GameData.next = 'p1'">
-									<label class="custom-control-label" for="fpradio">First Player</label>
-								</div>
-								<div class="custom-control custom-radio custom-control-inline">
-									<input type="radio" id="spradio" name="whostarts" class="custom-control-input" value="p2" onclick="GameData.next = 'p2'">
-									<label class="custom-control-label" for="spradio">Second Player</label>
+									<button class="btn btn-outline-warning dark" type="button" onclick="Settings.overshootSkip = 1">Skip after overshot</button>
 								</div>
 							</div>
 						</div>
@@ -145,7 +135,7 @@
 	<h1 id="fireworksname">Jesus Christ WON!</h1>
 	<br>
 	<div class="btn-group btn-group-lg">
-			<button type="button" class="btn btn-won" onclick="game.cancelLastHit();">Cancel last hit</button><button type="button" class="btn btn-won" onclick="game.newGame();">New Game</button>
+			<button type="button" class="btn btn-won" onclick="game.cancelLastHit();">Cancel last hit</button><button type="button" class="btn btn-won" onclick="game.new();">New Game</button>
 	</div>
 
 	</div>

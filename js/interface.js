@@ -1,12 +1,33 @@
 let vx, player, modal, players, game, DB;
 let shots = [];
 
+
+let HTMLtoFinish = document.getElementById('toFinish');
+let HTMLx3and25 = document.getElementById('x3and25');
+let HTMLovershootSkip = document.getElementById('overshootSkip');
+
+let checkValue = function(value){
+	return value === -1 ? 0 : value;
+}
+
 const Settings = {
 	get toFinish() {
 		return this.toFinishValue;
 	},
 	set toFinish(num) {
 		if(this.toFinishValue !== num) {
+			for(let i = 0; i < HTMLtoFinish.children.length; i++){
+				HTMLtoFinish.children[i].classList.remove('active')
+			}
+			switch (num){
+				case 301: HTMLtoFinish.children[0].classList.add('active'); break;
+				case 501: HTMLtoFinish.children[1].classList.add('active'); break;
+				default: {
+					HTMLtoFinish.children[2].classList.add('active');
+					console.log('default')
+					break;
+				}
+			}
 			this.toFinishValue = num;
 			InfoBar();
 		}
@@ -16,6 +37,8 @@ const Settings = {
 	},
 	set x3and25(num) {
 		if(this.x3and25Value !== num) {
+			HTMLx3and25.children[checkValue(this.x3and25Value)].classList.remove('active');
+			HTMLx3and25.children[num].classList.add('active');
 			this.x3and25Value = num;
 			InfoBar();
 		}
@@ -25,13 +48,15 @@ const Settings = {
 	},
 	set overshootSkip(num) {
 		if(this.overshootSkipValue !== num) {
+			HTMLovershootSkip.children[checkValue(this.overshootSkipValue)].classList.remove('active');
+			HTMLovershootSkip.children[num].classList.add('active');
 			this.overshootSkipValue = num;
 			InfoBar();
 		}
 	},
-	toFinishValue: 501,
-	x3and25Value: 1,
-	overshootSkipValue: 0,
+	toFinishValue: -1,
+	x3and25Value: -1,
+	overshootSkipValue: -1,
 };
 
 const VxBoard = document.getElementById('vxBoard');
@@ -42,7 +67,7 @@ const board = {
 	1:	[2,3,4,6,8,9,10,12,14,15,16,18,20,21,22,24,25,26,27,28,30,32,33,34,36,38,39,40,42,45,48,50,51,54,57,60]
 };
 
-const GameData = {
+const DATA = {
 	p1:'',
 	p2:'',
 	current: 0,
@@ -74,20 +99,20 @@ function showRand20(){
 
 const InfoBar = function (){
 	document.getElementById('gameInfo').innerHTML = `
-			<div class="name">#${GameData.gameObj.id} ${Settings.toFinish}</div>
+			<div class="name">#${DATA.gameObj.id} ${Settings.toFinish}</div>
 			<div>
-				<div class="players">${GameData.p1} vs ${GameData.p2}</div>
+				<div class="players">${DATA.p1} vs ${DATA.p2}</div>
 				(finish mode: ${Settings.x3and25 === 1 ? 'x3 and 25' : 'without x3 and 25' }; overshot: ${Settings.overshootSkip === 1 ? 'skip' : 'don\'t skip'})
 			</div>`;
 }
 
 function setGameDataNames(data = {}){
 	if(data.p1){
-		GameData.p1 = data.p1;
-		GameData.p2 = data.p2;
+		DATA.p1 = data.p1;
+		DATA.p2 = data.p2;
 	}
-	p1.innerHTML = GameData.p1;
-	p2.innerHTML = GameData.p2;
+	p1.innerHTML = DATA.p1;
+	p2.innerHTML = DATA.p2;
 }
 
 const Shots = {
@@ -129,11 +154,11 @@ gameFx = function (db){
 				case 13 || 32: {
 					console.log(`Sector: ${number} X: ${multiplier}`);
 					goData(game.next, {
-						player: GameData[game.next],
+						player: DATA[game.next],
 						sector: number,
 						x:		multiplier,
 						sx: 	number*multiplier,
-						shotn: 	GameData.shots[game.next]%3+1,
+						shotn: 	DATA.shots[game.next]%3+1,
 						yn: false,
 						calc: true
 					});
@@ -192,13 +217,12 @@ gameFx = function (db){
 				.innerHTML = `${number}X${multiplier}`;
 		}
 
-
 		player.list();
 
 		DB.CheckGameID(function(game){
 			console.log(game)
 			if(game.p1){
-				GameData.first = game.first;
+				DATA.first = game.first;
 				setGameDataNames(game);
 				calculate(function(){
 				});
@@ -214,30 +238,61 @@ gameFx = function (db){
 
 
 	document.onclick = function(e){
-		/*console.log(e.target);*/
+		if(e.target.tagName !== 'BUTTON' && modal.state === true && !modal.isOnModal(e.x, e.y)){
+			modal.hide();
+		}
 		if(e.target.id === 'start'){
 			DB.NewPlayer([p1input.value,p2input.value],function(){
-				GameData.p1 = p1input.value ;
-				GameData.p2 = p2input.value;
+				DATA.p1 = p1input.value ;
+				DATA.p2 = p2input.value;
 				let inputSettings = new FormData(document.forms.InputSettings);
-				GameData.first = inputSettings.get('whostarts');
+				DATA.first = inputSettings.get('whostarts');
 				setGameDataNames();
-				game.newGame();
+				game.new();
+				modal.toggle();
 			});
 		}
 		if(e.target.dataset.point){
 			// console.log(`Shot from ${game.next}`);
 			goData(game.next, {
-				player: GameData[game.next],
+				player: DATA[game.next],
 				sector: parseInt(e.target.dataset.point),
 				x:parseInt(e.target.dataset.x),
 				sx: parseInt(e.target.dataset.point)*parseInt(e.target.dataset.x),
-				shotn: GameData.shots[game.next]%3+1,
+				shotn: DATA.shots[game.next]%3+1,
 				yn: false,
 				calc: true
 			});
 		}
 	};
+
+	modal = {
+		show: function () {
+			document.getElementsByClassName('modal').item(0).classList.add('show');
+			modal.state = true;
+		},
+		hide: function () {
+			document.getElementsByClassName('modal').item(0).classList.remove('show');
+			modal.state = false;
+		},
+		toggle: function () {
+			if(document.getElementsByClassName('modal').item(0).classList.contains('show')) {
+				this.hide();
+			} else {
+				this.show();
+			}
+		},
+		isOnModal: function (x,y) {
+			let mSize = document.getElementsByClassName('modal').item(0).getBoundingClientRect();
+			if (x < mSize.left) return false;
+			if (x > (mSize.left + mSize.width)) return false;
+			if (y < mSize.top) return false;
+			if (y > (mSize.top + mSize.height)) return false;
+			return true;
+		},
+		state: false
+	}
+
 
 	vx = {
 		playerActive: function(p){
@@ -255,7 +310,7 @@ gameFx = function (db){
 	game = {
 		get next(){
 			DB.GetNext();
-			return GameData.next;
+			return DATA.next;
 		},
 		set next(p){
 			DB.SetNext(p);
@@ -269,10 +324,10 @@ gameFx = function (db){
 			this.turn = 0;
 		},
 		get turn(){
-			return GameData.shots.turn;
+			return DATA.shots.turn;
 		},
 		set turn(shot){
-			GameData.shots.turn = shot;
+			DATA.shots.turn = shot;
 		},
 		cancelLastHit: function(){
 			document.getElementById("fireworks").style.display = 'none';
@@ -300,31 +355,30 @@ gameFx = function (db){
 		clearX: function(){
 			document.getElementById('p1sX').innerHTML = document.getElementById('p2sX').innerHTML = '';
 		},
-		newGame: function(){
+		new: function(){
 			game.clearX();
 			DB.NewGame();
 			game.turn = 0;
-			GameData.shots = {p1:0,p2:0,total:0,turn:0};
+			DATA.shots = {p1:0,p2:0,total:0,turn:0};
 			p1shots.innerHTML = p2shots.innerHTML = '';
 			p1score.innerHTML = Settings.toFinish;
 			p2score.innerHTML = Settings.toFinish;
 			document.getElementById("fireworks").style.display = 'none';
 		},
 		// endGame: function(p, winnerlasthit){
-		endGame: function(p){
+		end: function(p){
 			DB.EndGame();
 			document.getElementById("fireworks").style.display = 'flex';
-			document.getElementById("fireworksname").innerHTML = `${GameData[p]} WON!`;
+			document.getElementById("fireworksname").innerHTML = `${DATA[p]} WON!`;
 		},
 
 	};
 
-
 	player = {
 		list: function(args = false){
 			playersSelect.innerHTML = '';
-			p1input.value = GameData.p1;
-			p2input.value = GameData.p2;
+			p1input.value = DATA.p1;
+			p2input.value = DATA.p2;
 			DB.PlayersList(function(p){
 				playersSelect.innerHTML = '';
 				p.forEach(function(el){
@@ -334,30 +388,13 @@ gameFx = function (db){
 		}
 	};
 
-	modal = {
-		show: function () {
-			document.getElementsByClassName('modal').item(0).classList.add('show');
-		},
-		hide: function () {
-			document.getElementsByClassName('modal').item(0).classList.remove('show');
-		},
-		toggle: function () {
-			if(document.getElementsByClassName('modal').item(0).classList.contains('show')) {
-				this.hide();
-			} else {
-				this.show();
-			}
-		},
-
-	}
-
 	function goData(player = 'p1', shot){
 		if(shot) {
-			shot.game = parseInt(GameData.current);
+			shot.game = parseInt(DATA.current);
 			shot.date = new Date();
 			shotDBWrite(shot);
 
-			if(Settings.overshootSkip && GameData.score[player].temp+shot.sx > Settings.toFinish-2){
+			if(Settings.overshootSkip && DATA.score[player].temp+shot.sx > Settings.toFinish-2){
 				goZero();
 				function goZero(){
 					if(shot.shotn < 3){
@@ -385,16 +422,16 @@ gameFx = function (db){
 
 	function calculate(callback){
 		clearData();
-		let gameID = GameData.current;
+		let gameID = DATA.current;
 		let request = db.transaction("shots", "readwrite").objectStore("shots").index("game");
 		let singleKeyRange = IDBKeyRange.only(gameID);
-		let p1name = GameData.p1;
+		let p1name = DATA.p1;
 
-		GameData.score = {p1: {score: 0, temp: 0}, p2: {score: 0, temp: 0}};
+		DATA.score = {p1: {score: 0, temp: 0}, p2: {score: 0, temp: 0}};
 
-		GameData.shots.p1 = 0;
-		GameData.shots.p2 = 0;
-		GameData.shots.total = 0;
+		DATA.shots.p1 = 0;
+		DATA.shots.p2 = 0;
+		DATA.shots.total = 0;
 
 		Shots.clear();
 
@@ -412,65 +449,62 @@ gameFx = function (db){
 				if (p1name === value.player) gamer = 'p1';
 				else gamer = 'p2';
 
-				GameData.shots.total++;
-				GameData.shots[gamer]++;
+				DATA.shots.total++;
+				DATA.shots[gamer]++;
 
 				if (value.shotn === 1) {
-					GameData.score[gamer].temp = GameData.score[gamer].score;
+					DATA.score[gamer].temp = DATA.score[gamer].score;
 				}
-				if ((isCorrect(value.sector, value.x, Settings.toFinish - GameData.score[gamer].temp) && value.shotn === 3) ||
-					(isCorrect(value.sector, value.x, Settings.toFinish - GameData.score[gamer].temp) && GameData.score[gamer].temp + value.sx === Settings.toFinish)) {
+				if ((isCorrect(value.sector, value.x, Settings.toFinish - DATA.score[gamer].temp) && value.shotn === 3) ||
+					(isCorrect(value.sector, value.x, Settings.toFinish - DATA.score[gamer].temp) && DATA.score[gamer].temp + value.sx === Settings.toFinish)) {
 					correct = true;
-					GameData.score[gamer].score = GameData.score[gamer].temp + value.sx;
+					DATA.score[gamer].score = DATA.score[gamer].temp + value.sx;
 					// nowScore = true;
 				}
-				if (isCorrect(value.sector, value.x, Settings.toFinish - GameData.score[gamer].temp)) {
+				if (isCorrect(value.sector, value.x, Settings.toFinish - DATA.score[gamer].temp)) {
 					correct = true;
-					GameData.score[gamer].temp = GameData.score[gamer].temp + value.sx;
+					DATA.score[gamer].temp = DATA.score[gamer].temp + value.sx;
 				} else {
-					if (GameData.score[gamer].temp + value.sx > Settings.toFinish - GameData.score[gamer].temp) GameData.score[gamer].temp = GameData.score[gamer].score;
+					if (DATA.score[gamer].temp + value.sx > Settings.toFinish - DATA.score[gamer].temp) DATA.score[gamer].temp = DATA.score[gamer].score;
 				}
-				if (value.shotn === 3) GameData.score[gamer].score = GameData.score[gamer].temp;
+				if (value.shotn === 3) DATA.score[gamer].score = DATA.score[gamer].temp;
 				let outputMultiplier = '';
 				if (value.x > 1) outputMultiplier = `x${value.x}`;
 
 				document.getElementById(`${(p1name === value.player) ? 'p1' : 'p2'}shots`).innerHTML +=
 					`<div class="shot ${(!correct) ? 'bad' : ''}">${(value.sector !== 0) ? value.sector + outputMultiplier : '0'}</div>`;
-				document.getElementById(`${(p1name === value.player) ? 'p1' : 'p2'}shots`).innerHTML += `${(value.shotn === 3) ? '<div class="scorecol">' + GameData.score[gamer].score + '</div>' : ''}`;
+				document.getElementById(`${(p1name === value.player) ? 'p1' : 'p2'}shots`).innerHTML += `${(value.shotn === 3) ? '<div class="scorecol">' + DATA.score[gamer].score + '</div>' : ''}`;
 
 				if (p1name === value.player) {
-					GameData.lastShot.p = 'p1'
+					DATA.lastShot.p = 'p1'
 				} else {
-					GameData.lastShot.p = 'p2'
+					DATA.lastShot.p = 'p2'
 				}
-				GameData.lastShot.sector = value.sector;
-				GameData.lastShot.x = value.x;
+				DATA.lastShot.sector = value.sector;
+				DATA.lastShot.x = value.x;
 				cursor.continue();
 			} else {
 				let second = 'p2'
-				if (GameData.first === 'p2') second = 'p1'
+				if (DATA.first === 'p2') second = 'p1'
 
-				let diffMod = GameData.shots.total % 6;
+				let diffMod = DATA.shots.total % 6;
 				switch (true) {
 					case diffMod < 3:
-						game.next = GameData.first;
-						// console.log(GameData.first);
+						game.next = DATA.first;
 						break;
 					case diffMod >= 3:
-
-						// console.log(second);
 						game.next = second;
 						break;
 				}
 
 
-				if (diffMod === 6) vx.playerActive(GameData.first);
+				if (diffMod === 6) vx.playerActive(DATA.first);
 				if (diffMod === 3) vx.playerActive(second);
 
 				document.getElementById('p1sX').innerHTML = document.getElementById('p2sX').innerHTML = '';
 				let sc = {
-					p1: Settings.toFinish - GameData.score.p1.temp,
-					p2: Settings.toFinish - GameData.score.p2.temp
+					p1: Settings.toFinish - DATA.score.p1.temp,
+					p2: Settings.toFinish - DATA.score.p2.temp
 				};
 
 				function getX(e) {
@@ -493,15 +527,14 @@ gameFx = function (db){
 				}
 				board[Settings.x3and25].find(getX);
 
-				if (GameData.score.p1.score === Settings.toFinish || GameData.score.p2.score === Settings.toFinish) {
-					// game.endGame(GameData.lastShot.p, `${GameData.lastShot.sector}X${GameData.lastShot.sector}`);
-					game.endGame(GameData.lastShot.p);
+				if (DATA.score.p1.score === Settings.toFinish || DATA.score.p2.score === Settings.toFinish) {
+					game.end(DATA.lastShot.p);
 				}
 
-				p1score.innerHTML = `${Settings.toFinish - GameData.score.p1.temp} <span>${Settings.toFinish - GameData.score.p1.score}</span>`;
-				p2score.innerHTML = `${Settings.toFinish - GameData.score.p2.temp} <span>${Settings.toFinish - GameData.score.p2.score}</span>`;
-				document.getElementById("p1progress").style.width = `${GameData.score.p1.temp * 100 / Settings.toFinish}%`;
-				document.getElementById("p2progress").style.width = `${GameData.score.p2.temp * 100 / Settings.toFinish}%`;
+				p1score.innerHTML = `${Settings.toFinish - DATA.score.p1.temp} <span>${Settings.toFinish - DATA.score.p1.score}</span>`;
+				p2score.innerHTML = `${Settings.toFinish - DATA.score.p2.temp} <span>${Settings.toFinish - DATA.score.p2.score}</span>`;
+				document.getElementById("p1progress").style.width = `${DATA.score.p1.temp * 100 / Settings.toFinish}%`;
+				document.getElementById("p2progress").style.width = `${DATA.score.p2.temp * 100 / Settings.toFinish}%`;
 
 				document.getElementById('service').innerHTML = syntaxHighlight(Shots.last());
 				document.getElementById('last3').innerHTML = '';
@@ -561,11 +594,11 @@ gameFx = function (db){
 			let tx = db.transaction("shots", "readwrite");
 			let shots = tx.objectStore("shots");
 
-			if(parseInt(lastShot.game) === parseInt(GameData.current)) {
+			if(parseInt(lastShot.game) === parseInt(DATA.current)) {
 				let rq = shots.delete(parseInt(lastShot.id));
 
 				rq.onsuccess = function() {
-					console.log(`Shot ID%o successfully canceling. Game %o DB Game`, parseInt(lastShot.id), parseInt(GameData.current),parseInt(lastShot.game));
+					console.log(`Shot ID%o successfully canceling. Game %o DB Game`, parseInt(lastShot.id), parseInt(DATA.current),parseInt(lastShot.game));
 					callback(true);
 				};
 				rq.onerror = function() {
@@ -602,8 +635,8 @@ gameFx = function (db){
 		CheckGameID: function(callback){
 			MaxID("games", function(maxID,game){
 				if(maxID>0){
-					GameData.current = maxID;
-					GameData.gameObj = game;
+					DATA.current = maxID;
+					DATA.gameObj = game;
 					console.log(game);
 					if(Object.keys(game).includes('toFinish')){
 						Settings.toFinish = game.toFinish;
@@ -615,11 +648,11 @@ gameFx = function (db){
 						Settings.x3and25 = 1;
 					}
 					if(game.begin){
-						GameData.beginned = true;
-						GameData.beginTime = game.begin;
+						DATA.beginned = true;
+						DATA.beginTime = game.begin;
 					}
 					if(game.end){
-						GameData.endTime = game.end;
+						DATA.endTime = game.end;
 					}
 					// console.info(`%c ${init++}. Game ID ${maxID} OK`, ConsoleCSS);
 					gameConsole(`Game ID ${maxID} OK`);
@@ -631,9 +664,9 @@ gameFx = function (db){
 			});
 		},
 		SetGameBegin: function(){
-			if(!GameData.beginned){
+			if(!DATA.beginned){
 				let request = db.transaction("shots", "readwrite").objectStore("shots").index("game");
-				let singleKeyRange = IDBKeyRange.only(GameData.current);
+				let singleKeyRange = IDBKeyRange.only(DATA.current);
 				let gameShotsCounter = 0;
 				let firstShotDate;
 
@@ -655,7 +688,7 @@ gameFx = function (db){
 								game.begin = firstShotDate;
 								let rq = games.put(game);
 								rq.onsuccess = function() {
-									GameData.beginned = true;
+									DATA.beginned = true;
 									// console.info(`%c ${init++}.\t Game ${maxID} begin time ${dateFormat(firstShotDate)} `, ConsoleCSS);
 									gameConsole(`Game ${maxID} begin time ${dateFormat(firstShotDate)}`);
 								};
@@ -668,7 +701,7 @@ gameFx = function (db){
 				};
 			}
 		},
-		SetGameEnd: function(gameID = GameData.current){
+		SetGameEnd: function(gameID = DATA.current){
 			let request = db.transaction("shots", "readwrite").objectStore("shots").index("game");
 			let singleKeyRange = IDBKeyRange.only(gameID);
 			let gameShotsCounter = 0;
@@ -704,7 +737,7 @@ gameFx = function (db){
 		},
 		GetNext: function(){
 			MaxID("games", function(maxID,g){
-				GameData.next = g.next;
+				DATA.next = g.next;
 			});
 		},
 		SetNext: function(next){
@@ -712,7 +745,7 @@ gameFx = function (db){
 			MaxID("games", function(maxID,game){
 				let tx = db.transaction("games", "readwrite");
 				let games = tx.objectStore("games");
-				GameData.next = next;
+				DATA.next = next;
 				game.next = next;
 				let rq = games.put(game);
 				rq.onsuccess = function(){
@@ -729,8 +762,8 @@ gameFx = function (db){
 			MaxID("games", function(maxID,game){
 				let tx = db.transaction("games", "readwrite");
 				let games = tx.objectStore("games");
-				GameData.first = next;
-				GameData.next = next;
+				DATA.first = next;
+				DATA.next = next;
 				game.next = next;
 				game.first = next;
 				let rq = games.put(game);
@@ -807,13 +840,13 @@ gameFx = function (db){
 			let gData = {
 				begin:	'',
 				end:	'',
-				first:	GameData.first,
-				p1:		GameData.p1,
-				p2:		GameData.p2,
+				first:	DATA.first,
+				p1:		DATA.p1,
+				p2:		DATA.p2,
 				winner:	'',
 				hits:	0,
 				lasthit:'',
-				next:	GameData.first,
+				next:	DATA.first,
 				toFinish: Settings.toFinish,
 				overshootSkip: Settings.overshootSkip,
 				x3and25: Settings.x3and25,
@@ -822,8 +855,8 @@ gameFx = function (db){
 			rq.onsuccess = function() {
 				// console.info(`%c ${init++}.\t New game successfully started ${rq.result} `, ConsoleCSS);
 				gameConsole(`New game successfully started ${rq.result}`);
-				GameData.current = rq.result;
-				GameData.beginned = false;
+				DATA.current = rq.result;
+				DATA.beginned = false;
 				callback();
 			};
 			rq.onerror = function() {

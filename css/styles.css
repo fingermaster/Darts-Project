@@ -1,3 +1,14 @@
+:root {
+	--code-token-tag: #0069c2;
+	--code-token-punctuation: #858585;
+	--accent-primary: #2376bb;
+	--code-token-attribute-name: #d30038;
+	--code-token-attribute-value: #007936;
+	--code-token-comment: #858585;
+	--code-token-default: #1b1b1b;
+	--code-token-selector: #872bff;
+}
+
 body {
 	color: #FFF;
      font-family: Courier New, monospace; //Nexa
@@ -38,16 +49,6 @@ pre {
 	margin: 5px;
 
 }
-:root {
-	--code-token-tag: #0069c2;
-	--code-token-punctuation: #858585;
-	--accent-primary: #2376bb;
-	--code-token-attribute-name: #d30038;
-	--code-token-attribute-value: #007936;
-	--code-token-comment: #858585;
-	--code-token-default: #1b1b1b;
-	--code-token-selector: #872bff;
-}
 .string { color: var(--code-token-attribute-value);}
 .number { color: var(--accent-primary); font-weight: bold;}
 .boolean { color: var(--code-token-tag); font-weight: bold; text-transform: uppercase;	font-style: italic; font-size: 13px}
@@ -64,18 +65,22 @@ button {
 	color: #FFF;
 }
 button,
-button.btn.btn-outline-success.dark,
-.btn.btn-success.dark:active,
-.btn.btn-success.dark.active {
+button.btn.btn-outline-success.dark{
 	border: none;
 	font-weight: 700;
 	box-shadow: 0 1px 1px rgb(0 0 0) inset, 0 0 8px rgb(179 179 179 / 18%);
 	text-shadow: 0 1px 1px rgb(0 0 0);
 	outline: 0 none !important;
-	transition: 400ms ease-in;
+	transition: 200ms ease;
+}
+.btn.active,
+button.active {
+	background: #138d4f;
+	box-shadow: 0 1px 1px rgb(0 0 0);
 }
 button:hover,
 .btn:hover {
+	transition: 300ms ease-in;
 	background: #701e1e;
 }
 .btn.btn-lg {
@@ -153,7 +158,7 @@ nav {
 	display: flex;
 	width: 100%;
 	height: 70px;
-	background: rgb(0 0 0 / 16%);
+	background: rgb(59 60 59 / 25%);
 	z-index: 100;
 	justify-content: space-between;
 	align-items: center;
@@ -966,13 +971,13 @@ nav.navbar.fixed-bottom.navbar-dark {
 	display: flex;
 	/* font-weight: 300; */
 	background: #f7ff82;
-	border: 2px dashed rgb(255 132 0 / 76%);
+	border: 2px dashed rgb(255 0 0);
 	box-sizing: border-box;
-	box-shadow: 2px 2px 1px #fff6, inset 0 0 29px #f900008c;
-	/*color: #f7d5aa;*/
-	/*font-size: 26px;*/
+	box-shadow: inset -2px -4px 11px #0000002e, inset 0 0 29px #f900008c;
+	/* color: #f7d5aa; */
+	/* font-size: 26px; */
 	/* padding: 0vh 30px; */
-	border-radius: 4em;
+	/* border-radius: 4em; */
 	justify-content: space-around;
 	align-items: center;
 	min-width: 500px;
@@ -1032,35 +1037,26 @@ nav.navbar.fixed-bottom.navbar-dark {
     color: #fff4a9;
     text-align: center;
 }
-#fireworks .btn-group.btn-group-lg {
-	box-shadow: 3px 1px 5px rgba(0, 0, 0, 0.45) inset, 0 0 5px #ffa500, 0 0 15px #ffa500, 0 0 20px #ffa500, 0 0 40px #ffa500, 0 0 60px #ff0000, 0 0 10px #ff8d00, 0 0 98px #ff0000;
-	border-radius: 100px;
+#fireworks button {
+	font-family: Hobo Std, serif;
+	border: none;
+	cursor: pointer;
+	font-size: calc(2px + 3vh);
+	font-weight: 400;
+	/* line-height: calc(2px + 5vh); */
+	box-sizing: border-box;
+	text-shadow: 0 0 5px #000000, 0 0 15px #ff0000, 0 0 20px #0027ff, 0 0 40px #ff00eb;
+	color: #fff6a9;
+	text-align: center;
+	padding: 0.1em 1em;
+	background: none;
+	box-shadow: none;
+	opacity: 0.5;
 }
-#fireworks .btn.btn-won{
-    cursor: pointer;
-    font-size: calc(2px + 4vh);
-    font-weight: 400;
-    line-height: calc(2px + 6vh);
-    text-shadow: 0 0 5px #000000, 0 0 15px #ff0000, 0 0 20px #0027ff, 0 0 40px #ff00eb;
-    color: #fff6a9;
-    text-align: center;
-    padding: 0.6em 1em;
-    background: linear-gradient(217deg, rgba(255,0,0,.8), rgba(255,0,0,0) 70.71%),
-		linear-gradient(336deg, rgba(0,0,255,.8), rgba(0,0,255,0) 70.71%);
-    border: 0.1em solid #fff6a9;
-}
-#fireworks .btn.btn-won:nth-child(2){
-	    background:
-		linear-gradient(217deg, rgba(0,255,0,.8), rgba(0,255,0,0) 70.71%),
-		linear-gradient(127deg, rgba(255,0,0,.8), rgba(255,0,0,0) 70.71%);
-	border-left: 0;
-}
-#fireworks .btn.btn-won:hover{
-    text-decoration-line: underline;
-    text-decoration-thickness: from-font;
-    text-decoration-style: dashed;
-    text-decoration-color: initial;
-    text-decoration-skip-ink: auto;
+#fireworks button:hover{
+	opacity: 1;
+	color: #fff6a9;
+	text-shadow: 2px 4px 6px #4a0a39, 1px 0 5px #ffa500, 0 0 108px #ffa500, 0 0 40px #ffa500, 0 0 60px #ff0000, 0 0 10px #ff8d00, 0 0 98px #ff0000, -1px 1px 0 #fffa;
 }
 @keyframes blink {
   20%,  24%,  55% {
