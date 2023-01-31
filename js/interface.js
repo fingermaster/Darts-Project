@@ -1,4 +1,4 @@
-let vx, player, modal, players, game, DB;
+let vx, player, modal, players, Game, DB;
 let shots = [];
 
 
@@ -30,6 +30,7 @@ const Settings = {
 			}
 			this.toFinishValue = num;
 			InfoBar();
+			this.updateInDB();
 		}
 	},
 	get x3and25() {
@@ -41,6 +42,7 @@ const Settings = {
 			HTMLx3and25.children[num].classList.add('active');
 			this.x3and25Value = num;
 			InfoBar();
+			this.updateInDB();
 		}
 	},
 	get overshootSkip(){
@@ -52,8 +54,10 @@ const Settings = {
 			HTMLovershootSkip.children[num].classList.add('active');
 			this.overshootSkipValue = num;
 			InfoBar();
+			this.updateInDB();
 		}
 	},
+	updateInDB: () => DB.SetSettings(),
 	toFinishValue: -1,
 	x3and25Value: -1,
 	overshootSkipValue: -1,
@@ -82,7 +86,7 @@ const DATA = {
 	endTime: '',
 	lastShot: {p:'',sector:0,x:1},
 	gameObj: {},
-	first: '',
+	first: 'p1',
 	shots: {p1:0,p2:0,total:0,turn:0},
 	score: {p1: {score: 0, temp: 0}, p2: {score: 0, temp: 0}},
 	beginStatus: false,
@@ -129,112 +133,89 @@ const Shots = {
 }
 
 gameFx = function (db){
-	deck();
+	// deck();
+	let selector = new Selector();
 
-	// let lastGame =  function(){
-	// 	MaxID("games", function(maxID){
-	// 		let tx = db.transaction("games", "readwrite");
-	// 		let games = tx.objectStore("games");
-	//
-	// 		let r = games.get(maxID);
-	// 		r.onsuccess = function(){
-	// 			console.log(r.result);
-	// 		};
-	// 	});
-	// };
-	let number = 1;
-	let multiplier = 1;
-	window.onload = function(){
-		window.document.onkeydown = function(event){
-			//event.preventDefault();
 
-			console.log(KeyboardEvent)
-			switch (event.keyCode){
-				// case 13: {};
-				case 13 || 32: {
-					console.log(`Sector: ${number} X: ${multiplier}`);
-					goData(game.next, {
-						player: DATA[game.next],
-						sector: number,
-						x:		multiplier,
-						sx: 	number*multiplier,
-						shotn: 	DATA.shots[game.next]%3+1,
-						yn: false,
-						calc: true
-					});
-					multiplier = 1;
-					break;}
-				case 219:{ showRandDeck(); break; } 		//[ - Random Deck
-				case 221:{ showRand20(); break; }			//] - Random 20
-				case 8:{if(event.shiftKey) game.cancelLastHit(); break; }		//Backspace - cancel last hit
+	let initGame = () => {
+		selector.toIndex(0);
 
-				case 17: { number = 0; multiplier = 1; break;} 	//Control Key set value as Zero
-				case 189:{ number = 25; multiplier = 1; break;} 	//minus - 25
-				case 187:{ number = 50; multiplier = 1; break;} 	//Equal - 50
+		function sendData(sector, x) {
+			let shotData = {
+				player: DATA[Game.next],
+				sector: sector,
+				x: x,
+				sx: sector * x,
+				shotn: DATA.shots[Game.next] % 3 + 1,
+				yn: false,
+				calc: true
+			};
+			goData(Game.next, shotData);
+			selector.toIndex(0);
+		}
 
-				case 81:{ if(number > 0 && number<21) multiplier = 1; break; }
-				case 87:{ if(number > 0 && number<21) multiplier = 2; break; }
-				case 69:{ if(number > 0 && number<21) multiplier = 3; break; }
-
-				case 48:{ number = 10; 	if(event.shiftKey) number = number+10; break;}
-				case 49:{ number = 1; 	if(event.shiftKey) number = number+10; break;}
-				case 50:{ number = 2; 	if(event.shiftKey) number = number+10; break;}
-				case 51:{ number = 3; 	if(event.shiftKey) number = number+10; break;}
-				case 52:{ number = 4; 	if(event.shiftKey) number = number+10; break;}
-				case 53:{ number = 5; 	if(event.shiftKey) number = number+10; break;}
-				case 54:{ number = 6; 	if(event.shiftKey) number = number+10; break;}
-				case 55:{ number = 7; 	if(event.shiftKey) number = number+10; break;}
-				case 56:{ number = 8; 	if(event.shiftKey) number = number+10; break;}
-				case 57:{ number = 9; 	if(event.shiftKey) number = number+10; break;}
-
-				case 37:{ game.first = 'p1'; break;}	//Left arrow - First player be first
-				case 39:{ game.first = 'p2'; break;}	//Right arrow - Second player be first
-				/**
-				* 	ToDo: HotKeys
-				*  	Create array with hold keys.
-				* 		Add key wen keydown
-				* 		When keyup check show all -> do code if needed -> delete
-				**/
-
-				case 96:	{ 	number = 10; 	if(event.shiftKey) number = number+10; break;}
-				case 97:  	{ 	number = 1;  	if(event.shiftKey) number = number+10; break;}
-				case 98:  	{	number = 2;  	if(event.shiftKey) number = number+10; break;}
-				case 99:  	{ 	number = 3;  	if(event.shiftKey) number = number+10; break;}
-				case 100: 	{ 	number = 4;  	if(event.shiftKey) number = number+10; break;}
-				case 101: 	{ 	number = 5;  	if(event.shiftKey) number = number+10; break;}
-				case 102: 	{ 	number = 6;  	if(event.shiftKey) number = number+10; break;}
-				case 103: 	{ 	number = 7;  	if(event.shiftKey) number = number+10; break;}
-				case 104: 	{ 	number = 8;  	if(event.shiftKey) number = number+10; break;}
-				case 105: 	{ 	number = 9;  	if(event.shiftKey) number = number+10; break;}
-				default: { }
-
+		window.document.onkeydown = function (event) {
+			console.log(event.code);
+			switch (event.code) {
+				case 'Digit1':
+					Game.first = 'p1';
+					break;
+				case 'Digit2':
+					Game.first = 'p2';
+					break;
+				case 'Space':
+					sendData(0, 1)
+					break;
+				case 'Enter':
+					let selected = selector.enter();
+					sendData(selected.sector, selected.x);
+					break;
+				default:
+					if (event.code.includes('Arrow')) {
+						selector.keyDown(event);
+					}
+					if (event.code.includes('Numpad')) {
+						event.preventDefault();
+						let num = (event.code).match(/\d+/g);
+						if(num !== null) {
+							num = parseInt(num[0]);
+							if(num === 0) {
+								num = 10;
+							}
+							if(event.shiftKey) {
+								num = num + 10;
+							}
+							selector.toSector(num);
+						}
+						// selector.keyDown(event);
+					}
+					break;
 			}
 		}
-		window.document.onkeyup = function (event){
-			document.getElementById('selectedValueInfo')
-				.classList.add('show');
-			document.getElementById('selectedValueInfo')
-				.innerHTML = `${number}X${multiplier}`;
+		window.document.onkeyup = function (event) {
+			if (event.code.includes('Arrow')) {
+				selector.keyUp(event);
+			}
 		}
 
 		player.list();
 
-		DB.CheckGameID(function(game){
+		DB.CheckGameID(function (game) {
 			console.log(game)
-			if(game.p1){
+			if (game.p1) {
 				DATA.first = game.first;
 				setGameDataNames(game);
-				calculate(function(){
+				calculate(function () {
 				});
 			} else {
 				modal.toggle();
-				// document.getElementById('namesbtn').click();
 			}
 			InfoBar();
 		});
-
 	}
-
+	setTimeout(()=>{
+		initGame()
+	}, 100);
 
 
 	document.onclick = function(e){
@@ -246,20 +227,24 @@ gameFx = function (db){
 				DATA.p1 = p1input.value ;
 				DATA.p2 = p2input.value;
 				let inputSettings = new FormData(document.forms.InputSettings);
-				DATA.first = inputSettings.get('whostarts');
+				Game.first = 'p1';
 				setGameDataNames();
-				game.new();
+				Game.new();
 				modal.toggle();
 			});
 		}
+		if(e.target.parentNode.dataset.num){
+			selector.toIndex(e.target.parentNode.dataset.num);
+			// console.info(e.target.parentNode.dataset.num)
+		}
 		if(e.target.dataset.point){
 			// console.log(`Shot from ${game.next}`);
-			goData(game.next, {
-				player: DATA[game.next],
+			goData(Game.next, {
+				player: DATA[Game.next],
 				sector: parseInt(e.target.dataset.point),
 				x:parseInt(e.target.dataset.x),
 				sx: parseInt(e.target.dataset.point)*parseInt(e.target.dataset.x),
-				shotn: DATA.shots[game.next]%3+1,
+				shotn: DATA.shots[Game.next]%3+1,
 				yn: false,
 				calc: true
 			});
@@ -268,6 +253,8 @@ gameFx = function (db){
 
 	modal = {
 		show: function () {
+			document.getElementById('p1input').value = DATA.p1;
+			document.getElementById('p2input').value = DATA.p2;
 			document.getElementsByClassName('modal').item(0).classList.add('show');
 			modal.state = true;
 		},
@@ -307,9 +294,10 @@ gameFx = function (db){
 	};
 
 
-	game = {
+	Game = {
 		get next(){
 			DB.GetNext();
+			// console.log(DATA.next);
 			return DATA.next;
 		},
 		set next(p){
@@ -318,6 +306,7 @@ gameFx = function (db){
 			this.turn = 0;
 		},
 		set first(p){
+			console.log('SET FIRST!!!!')
 			DB.SetNext(p);
 			DB.SetFirst(p);
 			vx.playerActive(p);
@@ -331,17 +320,19 @@ gameFx = function (db){
 		},
 		cancelLastHit: function(){
 			document.getElementById("fireworks").style.display = 'none';
-			console.info(`game.turn = %o, game.next = %o`, game.turn, game.next);
+			console.info(`game.turn = %o, game.next = %o`, Game.turn, Game.next);
 			shotDBDeleteLastHeat(function(isDeleted){
 				if(isDeleted){
-					let who = game.next;
-					if(game.turn !== 0){
-						game.turn = game.turn - 1;
+					let who = Game.next;
+					// let who = Game.next ?? 'p1';
+					console.log(who);
+					if(Game.turn !== 0){
+						Game.turn = Game.turn - 1;
 					} else {
 						if(who === 'p1') who = 'p2';
 						else who = 'p1';
-						game.next = who;
-						game.turn = 2;
+						Game.next = who;
+						Game.turn = 2;
 					}
 					calculate(function(){
 						// console.log('we are calculate');
@@ -356,22 +347,20 @@ gameFx = function (db){
 			document.getElementById('p1sX').innerHTML = document.getElementById('p2sX').innerHTML = '';
 		},
 		new: function(){
-			game.clearX();
+			Game.clearX();
 			DB.NewGame();
-			game.turn = 0;
+			Game.turn = 0;
 			DATA.shots = {p1:0,p2:0,total:0,turn:0};
 			p1shots.innerHTML = p2shots.innerHTML = '';
 			p1score.innerHTML = Settings.toFinish;
 			p2score.innerHTML = Settings.toFinish;
 			document.getElementById("fireworks").style.display = 'none';
 		},
-		// endGame: function(p, winnerlasthit){
 		end: function(p){
 			DB.EndGame();
 			document.getElementById("fireworks").style.display = 'flex';
 			document.getElementById("fireworksname").innerHTML = `${DATA[p]} WON!`;
 		},
-
 	};
 
 	player = {
@@ -438,9 +427,6 @@ gameFx = function (db){
 		request.openCursor(singleKeyRange).onsuccess = function(e) {
 			let cursor = e.target.result;
 			Shots.add(cursor?.value);
-			// console.log(Shots.show());
-			// console.log(Shots.last());
-			// let nowScore;
 			if (cursor) {
 				let value = cursor.value;
 				let gamer;
@@ -490,10 +476,10 @@ gameFx = function (db){
 				let diffMod = DATA.shots.total % 6;
 				switch (true) {
 					case diffMod < 3:
-						game.next = DATA.first;
+						Game.next = DATA.first;
 						break;
 					case diffMod >= 3:
-						game.next = second;
+						Game.next = second;
 						break;
 				}
 
@@ -528,7 +514,8 @@ gameFx = function (db){
 				board[Settings.x3and25].find(getX);
 
 				if (DATA.score.p1.score === Settings.toFinish || DATA.score.p2.score === Settings.toFinish) {
-					game.end(DATA.lastShot.p);
+					console.log('END NAHOOY')
+					Game.end(DATA.lastShot.p);
 				}
 
 				p1score.innerHTML = `${Settings.toFinish - DATA.score.p1.temp} <span>${Settings.toFinish - DATA.score.p1.score}</span>`;
@@ -536,7 +523,7 @@ gameFx = function (db){
 				document.getElementById("p1progress").style.width = `${DATA.score.p1.temp * 100 / Settings.toFinish}%`;
 				document.getElementById("p2progress").style.width = `${DATA.score.p2.temp * 100 / Settings.toFinish}%`;
 
-				document.getElementById('service').innerHTML = syntaxHighlight(Shots.last());
+				// document.getElementById('service').innerHTML = syntaxHighlight(Shots.last());
 				document.getElementById('last3').innerHTML = '';
 				Shots.last().forEach(val => {
 					let div = document.createElement('div');
@@ -633,30 +620,30 @@ gameFx = function (db){
 
 	DB = {
 		CheckGameID: function(callback){
-			MaxID("games", function(maxID,game){
+			MaxID("games", function(maxID,gameDB){
 				if(maxID>0){
 					DATA.current = maxID;
-					DATA.gameObj = game;
-					console.log(game);
-					if(Object.keys(game).includes('toFinish')){
-						Settings.toFinish = game.toFinish;
-						Settings.overshootSkip = game.overshootSkip;
-						Settings.x3and25 = game.x3and25;
+					DATA.gameObj = gameDB;
+					console.log(gameDB);
+					if(Object.keys(gameDB).includes('toFinish')){
+						Settings.toFinish = gameDB.toFinish;
+						Settings.overshootSkip = gameDB.overshootSkip;
+						Settings.x3and25 = gameDB.x3and25;
 					} else {
 						Settings.toFinish = 501;
 						Settings.overshootSkip = 0;
 						Settings.x3and25 = 1;
 					}
-					if(game.begin){
+					if(gameDB.begin){
 						DATA.beginned = true;
-						DATA.beginTime = game.begin;
+						DATA.beginTime = gameDB.begin;
 					}
-					if(game.end){
-						DATA.endTime = game.end;
+					if(gameDB.end){
+						DATA.endTime = gameDB.end;
 					}
 					// console.info(`%c ${init++}. Game ID ${maxID} OK`, ConsoleCSS);
 					gameConsole(`Game ID ${maxID} OK`);
-					callback(game);
+					callback(gameDB);
 				} else {
 					console.trace(`Game ID is not defined`);
 					callback(undefined);
@@ -682,11 +669,11 @@ gameFx = function (db){
 						First Shot Date: %o
 						Total Shots in Game: %o`, dateFormat(firstShotDate), gameShotsCounter);*/
 						if(gameShotsCounter === 1) {
-							MaxID("games", function(maxID,game){
+							MaxID("games", function(maxID,gameDB){
 								let tx = db.transaction("games", "readwrite");
 								let games = tx.objectStore("games");
-								game.begin = firstShotDate;
-								let rq = games.put(game);
+								gameDB.begin = firstShotDate;
+								let rq = games.put(gameDB);
 								rq.onsuccess = function() {
 									DATA.beginned = true;
 									// console.info(`%c ${init++}.\t Game ${maxID} begin time ${dateFormat(firstShotDate)} `, ConsoleCSS);
@@ -718,11 +705,11 @@ gameFx = function (db){
 					// Last Shot Date: %o
 					// Total Shots in Game: %o`, dateFormat(endShotDate), gameShotsCounter);
 					if(gameShotsCounter > 0) {
-						MaxID("games", function(maxID,game){
+						MaxID("games", function(maxID,gameDB){
 							let tx = db.transaction("games", "readwrite");
 							let games = tx.objectStore("games");
-							game.end = endShotDate;
-							let rq = games.put(game);
+							gameDB.end = endShotDate;
+							let rq = games.put(gameDB);
 							rq.onsuccess = function() {
 								// console.info(`%c ${init++}.\t Game ${maxID} ending time ${dateFormat(endShotDate)} `, ConsoleCSS);
 								gameConsole(`Game ${maxID} ending time ${dateFormat(endShotDate)}`);
@@ -742,12 +729,12 @@ gameFx = function (db){
 		},
 		SetNext: function(next){
 			// console.log(next);
-			MaxID("games", function(maxID,game){
+			MaxID("games", function(maxID,gameDB){
 				let tx = db.transaction("games", "readwrite");
 				let games = tx.objectStore("games");
 				DATA.next = next;
-				game.next = next;
-				let rq = games.put(game);
+				gameDB.next = next;
+				let rq = games.put(gameDB);
 				rq.onsuccess = function(){
 					// console.info(`%c ${init++}.\t Game ${maxID} next player ${next} `, ConsoleCSS);
 					gameConsole(`Game ${maxID} next player ${next}`);
@@ -759,14 +746,14 @@ gameFx = function (db){
 		},
 		SetFirst: function(next){
 			console.log(next);
-			MaxID("games", function(maxID,game){
+			MaxID("games", function(maxID,gameDB){
 				let tx = db.transaction("games", "readwrite");
 				let games = tx.objectStore("games");
 				DATA.first = next;
 				DATA.next = next;
-				game.next = next;
-				game.first = next;
-				let rq = games.put(game);
+				gameDB.next = next;
+				gameDB.first = next;
+				let rq = games.put(gameDB);
 				rq.onsuccess = function(){
 					// console.info(`%c ${init++}.\t Game ${maxID} next player ${next} `, ConsoleCSS);
 					gameConsole(`Game ${maxID} next player ${next}`);
@@ -777,13 +764,13 @@ gameFx = function (db){
 			});
 		},
 		SetSettings: function(){
-			MaxID("games", function(maxID,game){
+			MaxID("games", function(maxID,gameDB){
 				let tx = db.transaction("games", "readwrite");
 				let games = tx.objectStore("games");
-				game.x3and25 = Settings.x3and25;
-				game.overshootSkip = Settings.overshootSkip;
-				game.toFinish = Settings.toFinish;
-				let rq = games.put(game);
+				gameDB.x3and25 = Settings.x3and25;
+				gameDB.overshootSkip = Settings.overshootSkip;
+				gameDB.toFinish = Settings.toFinish;
+				let rq = games.put(gameDB);
 				rq.onsuccess = function(){
 					// console.info(`%c ${init++}.\t Game ${maxID} next player ${next} `, ConsoleCSS);
 					gameConsole(`Game ${maxID} to finish: ${Settings.toFinish} finish mode: ${Settings.x3and25} overshot: ${Settings.overshootSkip}`);
@@ -793,47 +780,6 @@ gameFx = function (db){
 				};
 			});
 		},
-		// SetHits: function(data, callback){
-		// 	let tx = db.transaction("service", "readwrite");
-		// 	let service = tx.objectStore("service");
-		// 	let newData = {
-		// 		game: GameData.current,
-		// 		first: GameData.first,
-		// 		p1shots: data.p1,
-		// 		p2shots: data.p2,
-		// 	};
-		//
-		// 	let rq = service.put(newData);
-		// 	rq.onsuccess = function(){
-		// 		// console.info(`%c ${init++}.\t ${data.total} Hits: ${GameData.p1} - ${data.p1} ${GameData.p2} - ${data.p2} `, ConsoleCSS);
-		// 		gameConsole(`${data.total} Hits: ${GameData.p1} - ${data.p1} ${GameData.p2} - ${data.p2}`);
-		// 		// console.log(newData);
-		// 		callback(newData);
-		// 	};
-		// 	rq.onerror = function() {
-		// 		console.error("Error setting ending time", rq.error);
-		// 	};
-		// },
-		// Hit: function(data, callback){
-			// let request = db.transaction("service", "readwrite").objectStore("service").index("game");
-			// let singleKeyRange = IDBKeyRange.only(GameData.current);
-
-			// request.openCursor(singleKeyRange).onsuccess = function(e) {
-				// let cursor = e.target.result;
-				// if (cursor) {
-					// console.log(cursor);
-				// }
-				// else{
-					// console.log(`End Serv`);
-				// }
-			// }
-		// },
-		// Hit: function(id){
-		// 	let r = db.transaction("service", "readwrite").objectStore("service").get(GameData.current);
-		// 	r.onsuccess = function(){
-		// 		console.log(r.result);
-		// 	};
-		// },
 		NewGame: function(callback = function(e){console.log(e)}){
 			let tx = db.transaction("games", "readwrite");
 			let games = tx.objectStore("games");
@@ -864,10 +810,10 @@ gameFx = function (db){
 			};
 		},
 		EndGame: function(){
-			MaxID("games", function(maxID,game){
+			MaxID("games", function(maxID,gameDB){
 				let tx = db.transaction("games", "readwrite");
 				let games = tx.objectStore("games");
-				let rq = games.put(game);
+				let rq = games.put(gameDB);
 				rq.onsuccess = function() {
 					// console.info(`%c ${init++}.\t Game Over ${rq.result} `, ConsoleCSS);
 					gameConsole(`Game Over ${rq.result}`);
@@ -892,19 +838,7 @@ gameFx = function (db){
 			res.onerror = function() {
 				console.log(`pardon moi mesie Developer - %o`, rq.error);
 			};
-
 		},
-		/*NewPlayer: function(data){
-			let tx = db.transaction("players", "readwrite");
-			let plrs = tx.objectStore("players");
-			let rq = plrs.put({name: data});
-			rq.onsuccess = function() {
-				console.info(`%c ${init++}.\t Player ${np} added `, ConsoleCSS);
-			};
-			rq.onerror = function() {
-				console.log("New player creating error", rq.error);
-			};
-		},*/
 		NewPlayer: function(datas, callback = function(e){console.log(e)}) {
 			const tx = db.transaction(["players"], "readwrite");
 

@@ -4,6 +4,7 @@ const testrand = document.getElementsByClassName('testrand');
 const scripts = [
 	"./myJsLib.js",
 	"./js/deck.js",
+	"./js/selector.js",
 	"./js/interface.js",
 	"./js/db.js",
 	// "./js/stats.js",

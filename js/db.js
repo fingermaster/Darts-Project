@@ -2,6 +2,18 @@ const dbName = "darts";
 const dbVersion = 10;
 let db, qr, tx;
 
+function storageAvailable() {
+	try {
+		let x = 'localStorage_test__';
+		localStorage.setItem(x, x);
+		localStorage.removeItem(x);
+		console.info(`%c ${init++}. LocalStorage  OK `, ConsoleCSS);
+		return true;
+	} catch(e) {
+		console.error(`localStorage Error: %o`, e);
+		return false;
+	}
+}
 
 if(window.indexedDB){
 	qr = indexedDB.open(dbName, dbVersion);
@@ -12,19 +24,8 @@ if(window.indexedDB){
 		console.log(`%c ${init++}. IndexedDB  OK `, ConsoleCSS);
 		db = qr.result;
 
-		function storageAvailable() {
-			try {
-				let x = 'localStorage_test__';
-				localStorage.setItem(x, x);
-				localStorage.removeItem(x);
-				console.info(`%c ${init++}. LocalStorage  OK `, ConsoleCSS);
-				return true;
-			} catch(e) {
-				console.error(`localStorage Error: %o`, e);
-				return false;
-			}
-		}
-		if(storageAvailable()) gameFx(db);
+
+		gameFx(db);
 
 		db.onversionchange = function() {
 			db.close();

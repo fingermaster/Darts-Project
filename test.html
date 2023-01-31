@@ -5,271 +5,105 @@
     <title>Darts Test</title>
     <link rel="stylesheet" type="text/css" href="css/styles.css">
     <style>
-        html {
-            --angle: 0;
-            --circle: 800px;
-            --sector: calc(var(--circle) / 20);
-            --sector-item: calc(var(--circle) / 20);
-            --border-radius: 35px;
-            --transition: 200ms;
-            --selector-width: 100px;
-            --selector-height: 220px;
-        }
-        body {
-            font-size: 30px;
-            font-family: "Hobo Std",serif;
-        }
-        .wrapper {
-            transform: scale(0.6) translate(20px, 20px);
-            position: relative;
-            overflow: hidden;
-            width: var(--selector-width);
-            height: var(--selector-height);
-            border: 3px solid #ffa300;
-            border-radius: var(--border-radius);
-            background:
-                    repeating-linear-gradient(0deg, rgb(96 20 20 / 52%) 3px, transparent 8px),
-                    linear-gradient(45deg, #ffd400, #ff005e);
-            box-shadow: 0 0 41px 2px #4a0000;
-        }
-        .wrapper::before {
-            content: " ";
-            position: absolute;
-            display: block;
-            width: var(--selector-width);
-            height: var(--selector-height);
-            border-radius: calc(var(--border-radius) - 5px);
-            box-shadow: 0 0 20px 10px inset rgb(58 0 0), 4px 4px 2px 0 inset rgb(0 0 0 / 93%);
-            z-index: 2;
-        }
-        #selectorCircle {
-            margin-top: -10px;
-            margin-left: calc(((var(--circle) - (var(--sector) / 2) ) / 2) * -1);
-            position: absolute;
-            left: var(--sector);
-            top: var(--sector);
-            display: flex;
-            user-select: none;
-            box-sizing: border-box;
-            rotate: var(--angle);
-            width: var(--circle);
-            height: var(--circle);
-            transition: var(--transition);
-            transition-timing-function: ease-out;
-        }
-        #selectorCircle div div{
-            box-sizing: border-box;
-            rotate: calc(var(--angle)*(-1));
-            transition: var(--transition);
-            transition-timing-function: ease-out;
-            display: flex;
-            width: var(--sector-item);
-            height: var(--sector-item);
-            line-height: var(--sector-item);
-            align-items: center;
-            justify-content: center;
-            color: #FFF6;
-        }
-        #selectorCircle .active {
-            color: #FFF;
-            text-shadow: 2px 1px 2px black;
-        }
-        #selectorCircle .num {
-            font-size: var(--sector);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            line-height: var(--sector);
-            height: var(--sector);
-            width: calc(var(--sector));
-        }
+
     </style>
 </head>
 <body>
-    <div class="wrapper" id="selector"></div>
 
 <script>
-
-    function pointOnCircle(radius, angle, base = 0, centerByZero = true, offset = {x: 0, y: 0}) {
-        angle = base + angle;
-        return {
-            x: offset.x + (centerByZero ? 0 : radius) + Math.round(radius * Math.cos(angle * Math.PI / 180)),
-            y: offset.y + (centerByZero ? 0 : radius) + Math.round(radius * Math.sin(angle * Math.PI / 180))
-        }
+    const DB_CONFIG = {
+        name: 'test',
+        version: 1
     }
-
-    const CONFIG = {
-        output: 'selector',
-        radius: 400,
-        cssVariables: `--angle: 90deg; --circle: 800px; --sector: calc(var(--circle) / 20); --sector-item: calc(var(--circle) / 20); --border-radius: 35px; --transition: 200ms; --selector-width: 100px; --selector-height: 220px;`,
-        boardNums: [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5],
-    }
-
-    class Selector {
-        OUTPUT;
-        sector;
-        level = 1;
-        step = 360/CONFIG.boardNums.length;
-        offset = {
-            x: CONFIG.radius - 20,
-            y: CONFIG.radius - 20,
-        };
-        total = CONFIG.boardNums.length;
-
+    class IndexedDB {
+        dbOpen;
+        DB;
+        store = 'data';
+        mode = 'readwrite';
+        result;
+        id;
 
         constructor() {
-            this._initial().finally(()=>{
-            });
-        }
-
-        async _initial() {
-            this.OUTPUT = document.createElementNS("http://www.w3.org/1999/xhtml", 'div');
-            this.OUTPUT.id = 'selectorCircle';
-            await document.getElementById(CONFIG.output).appendChild(this.OUTPUT);
-            await this.setCssProperty();
-            this.drawDeck();
-        }
-
-        async setCssProperty(){
-            let props = CONFIG.cssVariables.split(/;\s*/);
-            props.forEach(prop => {
-                if(prop.length > 0){
-                    let newProp = prop.split(':');
-                    document.documentElement.style.setProperty(newProp[0],newProp[1]);
-                }
-            })
-            console.log(props);
-        }
-
-        sectorElement(text, step, multiplier, className){
-            let div = document.createElement('div');
-            switch (typeof className) {
-                case "object":
-                    className.forEach(name => {div.classList.add(name);})
-                    break;
-                case "string":
-                    div.classList.add(className);
-                    break
-            }
-            div.setAttribute('style', `position: absolute; left: ${pointOnCircle(CONFIG.radius/multiplier, (360/this.total)*step, 180, true, this.offset).x}px; top: ${pointOnCircle(CONFIG.radius/multiplier, (360/this.total)*step, 180, true, this.offset).y}px;`);
-            div.innerText = text;
-            return div;
-        }
-
-        drawDeck(){
-            for (let i = 0; i < this.total; i++) {
-                let wrapper = document.createElement('div');
-                wrapper.append(this.sectorElement('x2', i, 1, 'x2'));
-                wrapper.append(this.sectorElement(CONFIG.boardNums[i], i, 1.11, ['num', 'active']));
-                wrapper.append(this.sectorElement('x3', i, 1.24, 'x3'));
-                wrapper.append(this.sectorElement('25', i, 1.4, 'twentyFive'));
-                wrapper.append(this.sectorElement('50', i, 1.65, ['num', 'fifty']));
-
-                document.getElementById('selectorCircle').append(wrapper);
+            if(this.checkPossibility()){
+                console.log(`Browser support IndexedDB`);
+                this.open();
+                this.dbOpen.onerror = (error) => { this.error(error)};
+                this.dbOpen.onsuccess = () => { this.success() };
+                this.dbOpen.onupgradeneeded = (event) => { this.upgrade(event) };
+                this.dbOpen.onblocked = () => { this.blocked() }
+            } else {
+                console.log(`Browser does not support IndexedDB`);
             }
         }
-        position = {
-            up: function (){
-                this.now === 0 ? this.now = 4 : this.now--
-            },
-            down: function (){
-                this.now === 4 ? this.now = 0 : this.now++
-            },
-            now: 1,
-            index: 0,
-            sector: CONFIG.boardNums[0]
-        };
-
-        keyDown(event){
-            let angleValue = parseInt(document.documentElement.style.getPropertyValue('--angle'));
-            let angleStep = 360/this.total;
-            switch (event.code) {
-                case 'ArrowLeft': {
-                    document.documentElement.style.setProperty("--angle", (angleValue-angleStep)+'deg');
-                    this.position.now = 1;
-                    break;
-                }
-                case 'ArrowRight': {
-                    document.documentElement.style.setProperty("--angle", (angleValue+angleStep)+'deg');
-                    this.position.now = 1;
-                    break;
-                }
+        checkPossibility() {
+            return Object.keys(window).includes('indexedDB');
+        }
+        open(){
+            this.dbOpen = window.indexedDB.open(DB_CONFIG.name, DB_CONFIG.version);
+        }
+        error(error){
+            console.log(error);
+        }
+        success(){
+            this.DB = this.dbOpen.result;
+            this.DB.onversionchange = () => {
+                this.DB.close();
+            };
+            console.log('success');
+        }
+        setStore(name, mode = 'readwrite'){
+            this.store = name;
+            this.mode = mode;
+        }
+        addData(data){
+            let store = this.DB.transaction(this.store, this.mode).objectStore(this.store);
+            let request;
+            if(Object.keys(data).includes('id')) {
+                request = store.put(data)
+            } else {
+                request = store.add(data);
+            }
+            request.onsuccess = () => {
+                this.result = request;
+                this.id = request.result;
             }
         }
-
-        keyUp(event){
-            let angleValue = parseInt(document.documentElement.style.getPropertyValue('--angle'))-90;
-            let indexBoard = this.total - Math.abs(angleValue/this.step%this.total < 0 ? this.total + angleValue/this.step%this.total : angleValue/this.step%this.total);
-            this.position.index = indexBoard === this.total ? 0 : indexBoard;
-            this.position.sector = CONFIG.boardNums[this.position.index];
-            switch (event.code) {
-                case 'ArrowUp': {
-                    this.position.up();
-                    break;
-                }
-                case 'ArrowDown': {
-                    this.position.down();
-                    break;
-                }
-            }
-            document.getElementById('selectorCircle').childNodes.forEach(el => {el.childNodes.forEach(subEl => {subEl.classList.remove('active')})})
-            document.getElementById('selectorCircle').childNodes[this.position.index].childNodes[this.position.now].classList.add('active');
+        read(){
+            let store = this.DB.transaction(this.store, this.mode).objectStore(this.store);
+            store.getAll();
+            let request = store.getAll();
+            request.onsuccess = async () => this.saveResult(request.result);
+            request.onerror = (error) => this.error(error);
         }
-        enter(){
-            let output = {x: 1, sector: 20}
-            switch (this.position.now){
+        saveResult(data){
+            this.result = data;
+        }
+
+        upgrade(event){
+            console.log('upgrade');
+            let tx = this.DB.transaction;
+
+            switch(this.DB.version) {
                 case 0: {
-                    output.x = 2;
-                    output.sector = this.position.sector;
-                    break
+                    let games = tx.createObjectStore('data', {keyPath: 'id', autoIncrement: true });
+                    games.createIndex("p1", "p1", { unique: false });
+                    games.createIndex("p2", "p2", { unique: false });
+                    break;
                 }
-                case 1: {
-                    output.x = 1;
-                    output.sector = this.position.sector;
-                    break
-                }
-                case 2: {
-                    output.x = 3;
-                    output.sector = this.position.sector;
-                    break
-                }
-                case 3: {
-                    output.x = 1;
-                    output.sector = 25;
-                    break
-                }
-                case 4: {
-                    output.x = 1;
-                    output.sector = 50;
-                    break
+                case DB_CONFIG.version: {
+                    break;
                 }
             }
-            return output;
         }
-        space(){
-            return {x: 1, sector: 0};
+        blocked(){
+            console.log('blocked');
         }
     }
-    let selector = new Selector();
-    window.onload = function () {
-        window.document.onkeydown = function(event) {
-            console.log(event.code);
-            if (event.code.includes('Arrow')) {
-                selector.keyDown(event);
-            }
-            if (event.code === 'Space') {
-                console.log(selector.space());
-            }
-            if (event.code === 'Enter') {
-                console.log(selector.enter());
-            }
-        }
-        window.document.onkeyup = function (event) {
-            if (event.code.includes('Arrow')) {
-                selector.keyUp(event);
-            }
-        }
-    }
+    let idb = new IndexedDB();
+
+
+
+
 </script>
 
 </body>

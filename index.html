@@ -11,16 +11,17 @@
 	<div class="abs"></div>
 	<nav>
 		<button onclick="modal.toggle()" class="ml-20">Game</button>
-		<button onclick="game.cancelLastHit();">Cancel last hit</button>
+		<button onclick="Game.cancelLastHit();">Cancel last hit</button>
 		<button id="last3"></button>
-		<button class="disabled mr-20" id="selectedValueInfo"></button>
+<!--		<button class="disabled mr-20" id="selectedValueInfo"></button>-->
+
 
 	</nav>
 	<div id="gameInfo"></div>
-	<!--DEVELOP REPORTER-->
-	<div  id="serviceWrapper">
-		<pre><code id="service"></code></pre>
-	</div><!-- /END DEVELOP REPORTER -->
+<!--	&lt;!&ndash;DEVELOP REPORTER&ndash;&gt;-->
+<!--	<div  id="serviceWrapper">-->
+<!--		<pre><code id="service"></code></pre>-->
+<!--	</div>&lt;!&ndash; /END DEVELOP REPORTER &ndash;&gt;-->
 	<div class="modal">
 		<div class="modal-content bg-custom" id="modal-bg">
 			<div class="modal-header">
@@ -34,21 +35,21 @@
 
 						</div>
 						<div class="pform">
-							<div class="label"> <label>First Player
-								<input type="radio" hidden name="first" value="p1">
-							</label></div><input id="p1input" type="text" class="form-control form-control-lg dark mb-4" list="playersSelect" placeholder="First Player" aria-label="Recipient's username" aria-describedby="confirmP1" onload="this.value = DATA.p1">
-							<div class="label"> <label>Second Player
-								<input type="radio" hidden name="first" value="p2">
-							</label></div><input id="p2input" type="text" class="form-control form-control-lg dark mb-4" list="playersSelect" placeholder="Second Player" aria-label="Recipient's username" aria-describedby="confirmP2" onload="this.value = DATA.p2">
-<!--							<datalist id="playersSelect"></datalist>-->
-							<div id="playersSelect"></div>
+							<div class="versus">
+								<input id="p1input" type="text" class="form-control form-control-lg dark mb-4"
+									   list="playersSelect" placeholder="First Player" aria-label="Recipient's username" aria-describedby="confirmP1" onload="this.value = DATA.p1"> vs
+								<input id="p2input" type="text" class="form-control form-control-lg dark mb-4"
+									   list="playersSelect" placeholder="Second Player" aria-label="Recipient's username" aria-describedby="confirmP2" onload="this.value = DATA.p2">
+								<datalist id="playersSelect"></datalist>
+							</div>
+<!--							<select id="playersSelect" ></select>-->
 
 							<div class="line">
 								Score to finish
 								<div class="btn-group"  id="toFinish">
 									<button class="btn btn-outline-warning dark" type="button" onclick="Settings.toFinish = 301">301</button>
 									<button class="btn btn-warning dark" type="button" onclick="Settings.toFinish = 501">501</button>
-									<input type="number" class="btn btn-outline-warning dark" onchange="Settings.toFinish = this.value" placeholder="Custom">
+									<input type="number" class="btn btn-outline-warning dark" onchange="Settings.toFinish = parseInt(this.value)" placeholder="Custom">
 								</div>
 							</div>
 
@@ -95,6 +96,7 @@
 			<div id="p2shots"></div>
 		</div>
 		<div class="deck">
+			<div class="wrapper" id="selector"></div>
 			<div class="rand">
 				<div class="danger random-title text-center" >Get Random</div>
 				<div class="btn-group">
@@ -135,7 +137,7 @@
 	<h1 id="fireworksname">Jesus Christ WON!</h1>
 	<br>
 	<div class="btn-group btn-group-lg">
-			<button type="button" class="btn btn-won" onclick="game.cancelLastHit();">Cancel last hit</button><button type="button" class="btn btn-won" onclick="game.new();">New Game</button>
+			<button type="button" class="btn btn-won" onclick="Game.cancelLastHit();">Cancel last hit</button><button type="button" class="btn btn-won" onclick="Game.new();">New Game</button>
 	</div>
 
 	</div>
