@@ -176,7 +176,12 @@ let initGame = () => {
                 Game.first = 'p2';
                 break;
             case 'Space':
+                event.preventDefault();
                 sendData(0, 1)
+                break;
+            case 'Backspace':
+                event.preventDefault();
+                Game.cancelLastHit();
                 break;
             case 'Enter':
                 let selected = selector.enter();

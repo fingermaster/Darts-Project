@@ -1,8 +1,6 @@
 ﻿<html lang="En">
 <head>
 	<title>IDB</title>
-	<script lang="javascript" src="ink/bootstrap/bootstrap.bundle.js"></script>
-	<link rel="stylesheet" href="ink/bootstrap/bootstrap.css"/>
 	<link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="">
@@ -16,7 +14,7 @@ var qr = indexedDB.open(dbName, 2);
 qr.onupgradeneeded = function() {
 	console.log('qr.onupgradeneeded ');
 	let db = qr.result;
-	
+
 	if (!db.objectStoreNames.contains('games')) { // если хранилище "games" не существует
 		db.createObjectStore('games', {keyPath: 'id', autoIncrement: true }); // создаем хранилище
 	}
@@ -48,7 +46,7 @@ p2 			Smerti
 winner 		Jsus
 hits 		24
 lasthit 	1x2
-gamesource 	JSON 
+gamesource 	JSON
 ---------------------------
 *********Players***********
 ---------------------------
@@ -74,14 +72,14 @@ status		passed/failed
 qr.onsuccess = function() {
 	console.log('qr.onsuccess ');
 	let db = qr.result;
-	let tx = db.transaction("games", "readwrite"); 
+	let tx = db.transaction("games", "readwrite");
 	let games = tx.objectStore("games");
 	let game = {
 		data: JSON.parse("{\"next\":\"p1\",\"p1JSON\":\"[{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":1,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":2,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":3,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":1,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":2,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":3,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":1,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":2,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":3,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":1,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":2,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":3,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":1,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":2,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":3,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":13,\\\"x\\\":3,\\\"sx\\\":39,\\\"shotn\\\":1,\\\"yn\\\":true,\\\"calc\\\":false},{\\\"sector\\\":13,\\\"x\\\":2,\\\"sx\\\":26,\\\"shotn\\\":2,\\\"yn\\\":true,\\\"calc\\\":true}]\",\"winnershots\":\"17\",\"turn\":\"1\",\"p2\":\"Hidan Smerty\",\"p1score\":\"0\",\"p2JSON\":\"[{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":1,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":2,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":3,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":1,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":2,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":3,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":1,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":2,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":3,\\\"yn\\\":true,\\\"calc\\\":true},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":1,\\\"yn\\\":true,\\\"calc\\\":false},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":2,\\\"yn\\\":true,\\\"calc\\\":false},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":3,\\\"yn\\\":true,\\\"calc\\\":false},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":1,\\\"yn\\\":true,\\\"calc\\\":false},{\\\"sector\\\":25,\\\"x\\\":1,\\\"sx\\\":25,\\\"shotn\\\":2,\\\"yn\\\":true,\\\"calc\\\":false},{\\\"sector\\\":50,\\\"x\\\":1,\\\"sx\\\":50,\\\"shotn\\\":3,\\\"yn\\\":true,\\\"calc\\\":false}]\",\"winnerlasthit\":\"13x2\",\"Hidan Smerty\":\"7\",\"Jesus Christ\":\"12\",\"players\":\"[\\\"Hidan Smerty\\\",\\\"Jesus Christ\\\"]\",\"p2score\":\"126\",\"stopgame\":\"true\",\"winnername\":\"Jesus Christ\",\"p1\":\"Jesus Christ\"}"),
 		end: new Date()
 	};
 	/*let rq = games.add(game);
-	rq.onsuccess = function() { 
+	rq.onsuccess = function() {
 		console.log("Игра записана", rq.result);
 	};
 	rq.onerror = function() {
@@ -107,16 +105,16 @@ countRequest.onsuccess = function() {
 		console.log("Книг больше нет и не было");
 	  }
 	};
-	
+
 	console.log(games.getAll());
-	
+
 	db.onversionchange = function() {
 		db.close();
 		alert("База данных устарела, пожалуста, перезагрузите страницу.")
 	};
 };
 
-qr.onblocked = function() {	
+qr.onblocked = function() {
 	console.log('qr.onblocked ');
   // есть другое соединение к той же базе
   // и оно не было закрыто после срабатывания на нём db.onversionchange
