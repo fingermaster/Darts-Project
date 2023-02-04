@@ -1,35 +1,47 @@
 const output = document.getElementById('output');
 const testrand = document.getElementsByClassName('testrand');
 
-const scripts = [
+const Scripts = [
 	"./myJsLib.js",
+	"./js/db.js",
 	"./js/deck.js",
 	"./js/selector.js",
-	"./js/interface.js",
-	"./js/db.js",
+	"./js/game.js",
+	// "./js/interface.js",
 	// "./js/stats.js",
 ];
 
-
-
-const ConsoleCSS = `
-padding: 4px 25px 1px 0;
-background: rgba(255, 199, 32, .8); color: #222;
-border-width: 0 2px 3px 0; border-style: groove; 
-border-color: rgba(0,0,0,0.44); 
-border-radius: 0px 50px 0 0;`;
-
+const ConsoleCSS = `padding: 4px 25px 1px 0; background: rgba(255, 199, 32, .5); color: #222; border-width: 0 2px 3px 0; border-style: groove; border-color: rgba(0,0,0,0.44); border-radius: 0px 50px 0 0;`;
+const BadConsoleCSS = `padding: 4px 25px 1px 0; background: rgba(255, 50, 32, .1); color: #F00; border-width: 0 2px 3px 0; border-style: groove; border-color: rgba(0,0,0,0.44); border-radius: 0px 50px 0 0;`;
+const InfoConsoleCSS = `padding: 10px 20px; background: rgba(100, 190, 32, .1); color: #000; border-width: 1px; border-style: dashed; border-color: #000; border-radius:  10px; font-size: 16px`;
 let init = 1;
 
-for (const element of scripts) {
-	addScript(element).then(x)
-	function x(r) {
-	}
+const gameConsole = function (message, error = false) {
+	console.info(`%c ${init++}. ${message} `, !error ? ConsoleCSS : BadConsoleCSS);
 }
 
-const gameConsole = function (message) {
-	console.info(`%c ${init++}. ${message} `, ConsoleCSS);
+function addScript(url){
+	let httpRequest = new XMLHttpRequest();
+	httpRequest.open('GET', url, false);
+	try {
+		httpRequest.send();
+		if (httpRequest.status === 200) {
+			let script = document.createElement('script');
+			script.src = url;
+			document.getElementsByTagName('head')[0].appendChild(script);
+		} else {
+			throw (`"${httpRequest.responseURL}" - ${httpRequest.statusText} ${httpRequest.status}`);
+		}
+		gameConsole(`"${httpRequest.responseURL}" - ${httpRequest.statusText} ${httpRequest.status}`);
+	} catch(error) {
+		gameConsole(error, true);
+	}
 }
+Scripts.forEach(script => {
+	addScript(script);
+});
+
+
 
 function getRandomInt(min, max) {
 	min = Math.ceil(min);
@@ -111,16 +123,7 @@ function inScope(name){
 	return name === document.body.dataset.scope;
 }
 
-async function addScript(url){
-	let script = document.createElement('script');
-	script.src = url;
-	await document.getElementsByTagName('head')[0].appendChild(script);
-	// console.info(`%c ${init++}. ${url} Added `, ConsoleCSS);
-	gameConsole(`${url} Added `);
-	/*script.onload = function(e){
-		console.log(e);
-	}*/
-}
+
 
 function msToTime(ms) {
 	let sec, min, hrs, days;

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -22,6 +22,7 @@
         mode = 'readwrite';
         result;
         id;
+        maxId;
 
         constructor() {
             if(this.checkPossibility()){
@@ -67,13 +68,48 @@
                 this.result = request;
                 this.id = request.result;
             }
+            request.onerror = (error) => { this.error(error) }
         }
-        read(){
+        delete(id){
             let store = this.DB.transaction(this.store, this.mode).objectStore(this.store);
-            store.getAll();
+            let request = store.delete(id);
+            request.onsuccess = () => {
+                this.result = request;
+            }
+            request.onerror = (error) => { this.error(error) }
+        }
+        read(index = false){
+            if(typeof index === "object"){
+                let store, result;
+                result = [];
+                store = this.DB.transaction(this.store, this.mode).objectStore(this.store).index(index[0]);
+                let singleKeyRange = IDBKeyRange.only(index[1]);
+                store.openCursor(singleKeyRange).onsuccess = function(e) {
+                    const cursor = e.target.result;
+                    if (cursor) {
+                        result.push(cursor.value);
+                        cursor.continue();
+                    } else {
+                        console.log('Entries all displayed');
+                    }
+                }
+                this.saveResult(result);
+            } else {
+                let store, request;
+                store = this.DB.transaction(this.store, this.mode).objectStore(this.store);
+                request = store.getAll();
+                request.onsuccess = async () => this.saveResult(request.result);
+                request.onerror = (error) => this.error(error);
+            }
+        }
+        findMaxId(){
+            let store = this.DB.transaction(this.store, this.mode).objectStore(this.store);
             let request = store.getAll();
-            request.onsuccess = async () => this.saveResult(request.result);
+            request.onsuccess = async () => this.maxId = request.result[request.result.length - 1].id;
             request.onerror = (error) => this.error(error);
+        }
+        info(){
+            console.log(this.DB.transaction(this.store, this.mode).objectStore(this.store))
         }
         saveResult(data){
             this.result = data;
