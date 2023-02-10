@@ -12,38 +12,18 @@ class IndexedDB {
 	maxId = 0;
 
 	constructor(Open, DB) {
-		// if(Object.keys(window).includes('indexedDB')) {
-			Open = this.Open = window.indexedDB.open(DB_CONFIG.name, DB_CONFIG.version);
-			Open.onerror = (error) => { this.error(error)};
-			Open.onsuccess = async () => {
-				DB = this.DB = await Open.result;
-				DB.onversionchange = () => {
-					DB.close();
-				};
-				console.log('open')
+		Open = this.Open = window.indexedDB.open(DB_CONFIG.name, DB_CONFIG.version);
+		Open.onerror = (error) => { this.error(error)};
+		Open.onsuccess = async () => {
+			DB = this.DB = await Open.result;
+			DB.onversionchange = () => {
+				DB.close();
 			};
-			Open.onupgradeneeded = (event) => { this.upgrade(event) };
-			Open.onblocked = () => { this.blocked() }
-		// } else {
-		//
-		// }
+			console.log('open')
+		};
+		Open.onupgradeneeded = (event) => { this.upgrade(event) };
+		Open.onblocked = () => { this.blocked() }
 	}
-	// async checkPossibility() {
-	// 	if(Object.keys(window).includes('indexedDB')) {
-	// 		const Open = window.indexedDB.open(DB_CONFIG.name, DB_CONFIG.version);
-	// 		Open.onerror = (error) => { this.error(error)};
-	// 		Open.onsuccess = async () => {
-	// 			this.DB = await Open.result;
-	// 			this.DB.onversionchange = () => {
-	// 				this.DB.close();
-	// 			};
-	// 		};
-	// 		Open.onupgradeneeded = (event) => { this.upgrade(event) };
-	// 		Open.onblocked = () => { this.blocked() }
-	// 	} else {
-	//
-	// 	}
-	// }
 	error(error){
 		console.log(error);
 		return error;
@@ -78,15 +58,15 @@ class IndexedDB {
 	}
 	async delete(id){
 		const transaction = this.DB.transaction(this.store, this.mode);
-		let store = transaction.objectStore(this.store);
-		let request = await store.delete(id);
-		request.onsuccess = () => {
-			this.result = request;
-		}
-		request.onerror = (error) => { this.error(error) }
-		transaction.oncomplete(()=>{
-			console.log('deleted')
-		})
+		new Promise((resolve, reject) => {
+			let store = transaction.objectStore(this.store);
+			let request = store.delete(id);
+			request.onsuccess = () => {
+				this.result = request;
+				resolve();
+			}
+			request.onerror = (error) => { reject(this.error(error)) }
+		});
 	}
 	async read(index = false){
 		const transaction = this.DB.transaction(this.store, this.mode);
@@ -164,79 +144,3 @@ class IndexedDB {
 	}
 }
 const DB = new IndexedDB;
-
-
-// const dbName = "darts";
-// const dbVersion = 10;
-// let db, qr, tx;
-//
-// if(window.indexedDB){
-// 	qr = indexedDB.open(dbName, dbVersion);
-// 	qr.onerror = function() {
-// 		console.error("Error", qr.error);
-// 	};
-// 	qr.onsuccess = function() {
-// 		console.log(`%c ${init++}. IndexedDB  OK `, ConsoleCSS);
-// 		db = qr.result;
-// 		gameFx(db);
-// 		db.onversionchange = function() {
-// 			db.close();
-// 			alert("New version of the IndexedDB available. Requires page reload")
-// 		};
-// 	};
-//
-// 	qr.onupgradeneeded = function(e) {
-// 		db = qr.result || e.currentTarget.result;
-// 		tx = e.currentTarget.transaction;
-//
-// 		switch(db.version) {
-// 			case 0: break;
-// 			case dbVersion: {
-// 				if (!db.objectStoreNames.contains('games')) {
-// 					let games = db.createObjectStore('games', {keyPath: 'id', autoIncrement: true });
-// 					games.createIndex("p1", "p1", { unique: false });
-// 					games.createIndex("p2", "p2", { unique: false });
-// 				} else {
-// 					/*	let games = tx.objectStore('games');
-//                         games.createIndex("p1", "p1", { unique: false });
-//                         games.createIndex("p2", "p2", { unique: false });	*/
-// 				}
-//
-// 				if (!db.objectStoreNames.contains('service')) {
-// 					let service = db.createObjectStore('service', {keyPath: 'game', unique: true });
-// 				} else {
-// 					/*	let service = tx.objectStore('service');
-//                         service.createIndex("p1", "p1", { unique: false });
-//                         service.createIndex("p2", "p2", { unique: false });	*/
-// 				}
-//
-// 				if (!db.objectStoreNames.contains('players')) {
-// 					db.createObjectStore('players', {keyPath: 'name', unique: true});
-// 				} else {
-// 					/*let players = tx.objectStore('players');
-//                     players.createIndex("name", "name", { unique: true });*/
-// 				}
-// 				// objectStore.createIndex("year", "year", { unique: false });
-//
-// 				if (!db.objectStoreNames.contains('shots')) {
-// 					let shots = db.createObjectStore('shots', {keyPath: 'id', autoIncrement: true });
-// 					shots.createIndex("player", "player", { unique: false });
-// 					shots.createIndex("game", "game", { unique: false });
-// 					shots.createIndex("date", "date", { unique: true });
-// 				} else {
-// 					//let shots = tx.objectStore('shots');
-// 					//shots.createIndex("player", "player", { unique: false });
-// 					//shots.createIndex("game", "game", { unique: false });
-// 					//shots.createIndex("date", "date", { unique: true });
-// 				}
-// 				break;
-// 			}
-// 		}
-// 	};
-//
-// 	qr.onblocked = function() {
-// 		console.log('qr.onblocked');
-// 	};
-// }
-//
-//

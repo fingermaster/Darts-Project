@@ -6,7 +6,10 @@ const Scripts = [
 	"./js/db.js",
 	"./js/deck.js",
 	"./js/selector.js",
+	"./js/timer.js",
+	"./js/storage.js",
 	"./js/game.js",
+
 	// "./js/interface.js",
 	// "./js/stats.js",
 ];
@@ -69,14 +72,17 @@ function rand20h(){
 function rand3(){	return getRandomInt(2,3); }
 
 function randDeck(){
+	const res = {sector: 20, multipler: 1};
 	if(getRandomInt(1,60)>50){
-		if(getRandomInt(1,15) < 10) { return 25; }
-		else { return 50; }
+		if(getRandomInt(1,15) < 10) { res.multipler = 3; }
+		else { res.multipler = 4; }
 	} else if(getRandomInt(1,40) > 22) {
-		return `${rand20()}x${rand3()}`
+		res.multipler = rand3();
+		res.sector = rand20();
 	} else {
-		return `${rand20()}x1`
+		res.sector = rand20();
 	}
+	return res;
 }
 
 function testRands(){
@@ -178,51 +184,5 @@ function syntaxHighlight(json) {
 	});
 }
 
-const timerView = document.getElementById('timer');
-const timer = function (limit = 20) {
-	let timePassed = 0;
-	let timeLeft = limit;
-	let timerInterval = null;
-	timerView.innerHTML = `${timeLeft}`;
 
-	function onTimesUp() {
-		clearInterval(timerInterval);
-	}
 
-	function startTimer() {
-		timerInterval = setInterval(() => {
-			timePassed = timePassed += 1;
-			timeLeft = limit - timePassed;
-			timerView.innerHTML = timeLeft;
-			if (timeLeft === 0) {
-				onTimesUp();
-			}
-		}, 1000);
-	}
-
-	startTimer();
-};
-
-/*const Timer = {
-	passed: 0,
-	limit: 20,
-	left: this.limit,
-	interval: null,
-	onTimesUp: function () {
-		clearInterval(this.interval)
-	},
-	startTimer: function (output) {
-		this.interval = setInterval(() => {
-			this.passed++;
-			this.left = this.limit - this.passed;
-			output(this.left);
-			if (this.left === 0) {
-				this.onTimesUp();
-			}
-		}, 1000);
-	},
-};*/
-/*
-var t1 = Object.create(Timer);
-t1.startTimer(function(t){document.getElementById('timer').innerHTML = t;})
-*/

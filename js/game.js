@@ -1,22 +1,37 @@
-let vx, player, modal, players, Game;
-// let shots = [];
+let player, modal, players, Game;
 
-let HTMLtoFinish = document.getElementById('toFinish');
-let HTMLx3and25 = document.getElementById('x3and25');
-let HTMLovershootSkip = document.getElementById('overshootSkip');
-let randInput = document.getElementById('randInput');
-let randInput20 = document.getElementById('randInput20');
-let p1 = document.getElementById('p1');
-let p1shots = document.getElementById('p1shots');
-let p1score = document.getElementById('p1score');
-let p1sX = document.getElementById('p1sX');
-let p2 = document.getElementById('p2');
-let p2shots = document.getElementById('p2shots');
-let p2score = document.getElementById('p2score');
-let p2sX = document.getElementById('p2sX');
-let p1input = document.getElementById('p1input');
-let p2input = document.getElementById('p2input');
-let playersSelect = document.getElementById('playersSelect');
+const ElementID = [
+    'gameInfo',
+    'HTMLtoFinish',
+    'HTMLx3and25',
+    'HTMLovershootSkip',
+    'randInput',
+    'randInput20',
+    'p1',
+    'p1progress',
+    'p1shots',
+    'p1score',
+    'p1temp',
+    'p1sX',
+    'p2',
+    'p2progress',
+    'p2shots',
+    'p2score',
+    'p2temp',
+    'p2sX',
+    'p1input',
+    'p2input',
+    'playersSelect',
+    'fireworks',
+    'fireworksname',
+    'last3'];
+const View = (id) => {
+    if(ElementID.includes(id)) {
+        return document.getElementById(id)
+    } else {
+        return null;
+    }
+}
 
 let checkValue = function(value){
     return value === -1 ? 0 : value;
@@ -28,14 +43,14 @@ const Settings = {
     },
     set toFinish(num) {
         if(this.toFinishValue !== num) {
-            for(let i = 0; i < HTMLtoFinish.children.length; i++){
-                HTMLtoFinish.children[i].classList.remove('active')
+            for(let i = 0; i < View('HTMLtoFinish').children.length; i++){
+                View('HTMLtoFinish').children[i].classList.remove('active')
             }
             switch (num){
-                case 301: HTMLtoFinish.children[0].classList.add('active'); break;
-                case 501: HTMLtoFinish.children[1].classList.add('active'); break;
+                case 301: View('HTMLtoFinish').children[0].classList.add('active'); break;
+                case 501: View('HTMLtoFinish').children[1].classList.add('active'); break;
                 default: {
-                    HTMLtoFinish.children[2].classList.add('active');
+                    View('HTMLtoFinish').children[2].classList.add('active');
                     console.log('default')
                     break;
                 }
@@ -50,8 +65,8 @@ const Settings = {
     },
     set x3and25(num) {
         if(this.x3and25Value !== num) {
-            HTMLx3and25.children[checkValue(this.x3and25Value)].classList.remove('active');
-            HTMLx3and25.children[num].classList.add('active');
+            View('HTMLx3and25').children[checkValue(this.x3and25Value)].classList.remove('active');
+            View('HTMLx3and25').children[num].classList.add('active');
             this.x3and25Value = num;
             InfoBar();
             this.updateInDB();
@@ -62,20 +77,18 @@ const Settings = {
     },
     set overshootSkip(num) {
         if(this.overshootSkipValue !== num) {
-            HTMLovershootSkip.children[checkValue(this.overshootSkipValue)].classList.remove('active');
-            HTMLovershootSkip.children[num].classList.add('active');
+            View('HTMLovershootSkip').children[checkValue(this.overshootSkipValue)].classList.remove('active');
+            View('HTMLovershootSkip').children[num].classList.add('active');
             this.overshootSkipValue = num;
             InfoBar();
             this.updateInDB();
         }
     },
-    updateInDB: () => DbObject.SetSettings(),
+    updateInDB: () => Storage.SetSettings(),
     toFinishValue: 501,
     x3and25Value: 1,
     overshootSkipValue: 0,
 };
-
-const VxBoard = document.getElementById('vxBoard');
 
 const boardNums = [20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
 const board = {
@@ -84,38 +97,35 @@ const board = {
 };
 
 const DATA = {
-    maxId: 0,
     p1:'',
     p2:'',
     current: 0,
-    set beginned(bool){
-        this.beginStatus = bool;
-    },
-    get beginned(){
-        return this.beginStatus;
-    },
     next: 'p1',
-    beginTime: '',
-    endTime: '',
     lastShot: {p:'',sector:0,x:1},
     gameObj: {},
     first: 'p1',
     shots: {p1:0,p2:0,total:0,turn:0},
     score: {p1: {score: 0, temp: 0}, p2: {score: 0, temp: 0}},
-    beginStatus: false,
 };
 
 players = Array();
 
-function showRandDeck(){
-    randInput.innerHTML = randDeck();
-}
-function showRand20(){
-    randInput20.innerHTML = rand20();
+
+let selector = new Selector();
+
+const randomGenerator = {
+    all: () => {
+        let rand = randDeck();
+        selector.toSector(rand.sector);
+        selector.toPosition(rand.multipler);
+    },
+    sector: () => {
+        selector.toSector(rand20());
+    }
 }
 
 const InfoBar = function (){
-    document.getElementById('gameInfo').innerHTML = `
+    View('gameInfo').innerHTML = `
 			<div class="name">#${DATA.gameObj.id} ${Settings.toFinish}</div>
 			<div>
 				<div class="players">${DATA.p1} vs ${DATA.p2}</div>
@@ -128,28 +138,16 @@ function setGameDataNames(data = {}){
         DATA.p1 = data.p1;
         DATA.p2 = data.p2;
     }
-    p1.innerHTML = DATA.p1;
-    p2.innerHTML = DATA.p2;
+    View('p1').innerHTML = DATA.p1;
+    View('p2').innerHTML = DATA.p2;
 }
-
-const Shots = {
-    add: function (shot){
-        // console.log(shot);
-        if(shot !== undefined) {
-            shots.splice(0, 0, shot);
-        }
-    },
-    last: () => { return Array.from({length: 6}).map((_, index) => {
-        return shots[index]??{};
-    })},
-    clear: () => { shots = []; }
-}
-
-let selector = new Selector();
 
 
 let initGame = () => {
     selector.toIndex(0);
+    const timer = new Timer(() => {
+        sendData(0,1);
+    }, 10, 100);
 
     function sendData(sector, x) {
         const next = Game.next;
@@ -158,16 +156,19 @@ let initGame = () => {
             sector: sector,
             x: x,
             sx: sector * x,
-            shotn: DATA.shots[next] % 3 + 1,
-            yn: false,
-            calc: true
         };
         goData(next, shotData);
         selector.toIndex(0);
     }
 
-    window.document.onkeydown = function (event) {
+    let holdKeys = [];
+
+    window.document.onkeydown = (event) => {
         console.log(event.code);
+        if(!holdKeys.includes(event.code) && !event.repeat){
+            holdKeys.push(event.code);
+        }
+        let selected;
         switch (event.code) {
             case 'Digit1':
                 Game.first = 'p1';
@@ -177,16 +178,29 @@ let initGame = () => {
                 break;
             case 'Space':
                 event.preventDefault();
-                sendData(0, 1)
+                sendData(0, 1);
+                timer.clearTimer();
                 break;
             case 'Backspace':
                 event.preventDefault();
                 Game.cancelLastHit();
+                timer.clearTimer();
                 break;
             case 'Enter':
-                let selected = selector.enter();
+                selected = selector.enter();
                 sendData(selected.sector, selected.x);
+                timer.clearTimer();
                 break;
+            case 'NumpadEnter':
+                selected = selector.enter();
+                sendData(selected.sector, selected.x);
+                timer.clearTimer();
+                break;
+            case 'Pause':
+                timer.switchTimer();
+                break;
+            case 'NumpadDivide': randomGenerator.all(); break;
+            case 'NumpadMultiply': randomGenerator.sector(); break;
             default:
                 if (event.code.includes('Arrow')) {
                     selector.keyDown(event);
@@ -209,15 +223,19 @@ let initGame = () => {
                 break;
         }
     }
-    window.document.onkeyup = function (event) {
+    document.addEventListener('keyup', (event) => {
         if (event.code.includes('Arrow')) {
-            selector.keyUp(event);
+            // selector.keyUp(event);
         }
-    }
+        holdKeys.pop();
+    });
+    onwheel = (event) => {
+        event.deltaY > 0 ? selector.keyDown({code: 'ArrowLeft'}) : selector.keyDown({code: 'ArrowRight'}) ;
+    };
 
     player.list();
 
-    DbObject.CheckGameID(function (game) {
+    Storage.CheckGameID((game) => {
         console.log(game)
         if (game.p1) {
             DATA.first = game.first;
@@ -235,43 +253,31 @@ setTimeout(()=>{
 }, 100);
 
 
-document.onclick = function(e){
-    if(e.target.tagName !== 'BUTTON' && modal.state === true && !modal.isOnModal(e.x, e.y)){
+document.onclick = (clickEvent) => {
+    if(clickEvent.target.tagName !== 'BUTTON' &&
+        modal.state === true &&
+        !modal.isOnModal(clickEvent.x, clickEvent.y)){
         modal.hide();
     }
-    if(e.target.id === 'start'){
-        DbObject.NewPlayer([p1input.value, p2input.value],function(){
-            DATA.p1 = p1input.value ;
-            DATA.p2 = p2input.value;
-            // let inputSettings = new FormData(document.forms.InputSettings);
+    if(clickEvent.target.id === 'start'){
+        Storage.NewPlayer([View('p1input').value, View('p2input').value], () => {
+            DATA.p1 = View('p1input').value ;
+            DATA.p2 = View('p2input').value;
             Game.first = 'p1';
             setGameDataNames();
             Game.new();
             modal.toggle();
         });
     }
-    if(e.target.parentNode.dataset.num){
-        selector.toIndex(e.target.parentNode.dataset.num);
-        // console.info(e.target.parentNode.dataset.num)
-    }
-    if(e.target.dataset.point){
-        // console.log(`Shot from ${game.next}`);
-        goData(Game.next, {
-            player: DATA[Game.next],
-            sector: parseInt(e.target.dataset.point),
-            x:parseInt(e.target.dataset.x),
-            sx: parseInt(e.target.dataset.point)*parseInt(e.target.dataset.x),
-            shotn: DATA.shots[Game.next]%3+1,
-            yn: false,
-            calc: true
-        });
+    if(clickEvent.target.parentNode.dataset.num){
+        selector.toIndex(clickEvent.target.parentNode.dataset.num);
     }
 };
 
 modal = {
     show: function () {
-        document.getElementById('p1input').value = DATA.p1;
-        document.getElementById('p2input').value = DATA.p2;
+        View('p1input').value = DATA.p1;
+        View('p2input').value = DATA.p2;
         document.getElementsByClassName('modal').item(0).classList.add('show');
         modal.state = true;
     },
@@ -297,35 +303,20 @@ modal = {
     state: false
 }
 
-
-vx = {
-    playerActive: function(p){
-        if(p === 'p1') {
-            document.getElementById('p1').classList.add('active');
-            document.getElementById('p2').classList.remove('active');
-        } else {
-            document.getElementById('p2').classList.add('active');
-            document.getElementById('p1').classList.remove('active');
-        }
-    },
-};
-
-
 Game = {
     get next(){
-        DbObject.GetNext();
+        Storage.GetNext();
         return DATA.next;
     },
-    set next(p){
-        DbObject.SetNext(p);
-        vx.playerActive(p);
+    set next(player){
+        Storage.SetNext(player);
+        Game.setActivePlayer(player);
         this.turn = 0;
     },
-    set first(p){
-        console.log('SET FIRST!!!!')
-        DbObject.SetNext(p);
-        DbObject.SetFirst(p);
-        vx.playerActive(p);
+    set first(player){
+        Storage.SetNext(player);
+        Storage.SetFirst(player);
+        Game.setActivePlayer(player);
         this.turn = 0;
     },
     get turn(){
@@ -334,10 +325,19 @@ Game = {
     set turn(shot){
         DATA.shots.turn = shot;
     },
+    setActivePlayer: (player) => {
+        if(player === 'p1') {
+            View('p1').classList.add('active');
+            View('p2').classList.remove('active');
+        } else {
+            View('p2').classList.add('active');
+            View('p1').classList.remove('active');
+        }
+    },
     cancelLastHit: function(){
-        document.getElementById("fireworks").style.display = 'none';
+        View('fireworks').style.display = 'none';
         console.info(`game.turn = %o, game.next = %o`, Game.turn, Game.next);
-        DbObject.CancelShot(() => {
+        Storage.CancelShot(() => {
             let who = Game.next;
             console.log(who);
             if(Game.turn !== 0){
@@ -355,34 +355,34 @@ Game = {
 
     },
     clearX: function(){
-        document.getElementById('p1sX').innerHTML = document.getElementById('p2sX').innerHTML = '';
+        View('p1sX').innerHTML = View('p2sX').innerHTML = '';
     },
     new: function(){
         Game.clearX();
-        DbObject.NewGame();
+        Storage.NewGame();
         Game.turn = 0;
         DATA.shots = {p1:0,p2:0,total:0,turn:0};
-        p1shots.innerHTML = p2shots.innerHTML = '';
-        p1score.innerHTML = Settings.toFinish;
-        p2score.innerHTML = Settings.toFinish;
-        document.getElementById("fireworks").style.display = 'none';
+        View('p1shots').innerHTML = View('p2shots').innerHTML = '';
+        View('p1score').innerHTML = Settings.toFinish;
+        View('p2score').innerHTML = Settings.toFinish;
+        View('fireworks').style.display = 'none';
     },
-    end: function(p){
-        DbObject.EndGame();
-        document.getElementById("fireworks").style.display = 'flex';
-        document.getElementById("fireworksname").innerHTML = `${DATA[p]} WON!`;
+    end: (winner) => {
+        Storage.EndGame();
+        View('fireworks').style.display = 'flex';
+        View('fireworksname').innerHTML = `${winner} WON!`;
     },
 };
 
 player = {
     list: () => {
-        playersSelect.innerHTML = '';
-        p1input.value = DATA.p1;
-        p2input.value = DATA.p2;
-        DbObject.PlayersList(() => {
-            playersSelect.innerHTML = '';
+        View('playersSelect').innerHTML = '';
+        View('p1input').value = DATA.p1;
+        View('p2input').value = DATA.p2;
+        Storage.PlayersList(() => {
+            View('playersSelect').innerHTML = '';
             players.forEach(function(el){
-                playersSelect.innerHTML += `<option value='${el.name}' class="selectplayer" data-player-name="${el.name}">${el.name}</option>\n`;
+                View('playersSelect').innerHTML += `<option value='${el.name}' class="selectplayer" data-player-name="${el.name}">${el.name}</option>\n`;
             });
         });
     }
@@ -392,7 +392,7 @@ function goData(player = 'p1', shot){
     if(shot) {
         shot.game = parseInt(DATA.current);
         shot.date = new Date();
-        DbObject.NewShot(shot);
+        Storage.NewShot(shot);
 
         if(Settings.overshootSkip && DATA.score[player].temp+shot.sx > Settings.toFinish-2){
             goZero();
@@ -403,7 +403,7 @@ function goData(player = 'p1', shot){
                     shot.sector = 0;
                     shot.x = 1;
                     shot.sx = 0;
-                    DbObject.NewShot(shot);
+                    Storage.NewShot(shot);
                     goZero();
                 }
             }
@@ -413,129 +413,157 @@ function goData(player = 'p1', shot){
         // console.log(`looks like calculated`);
     });
 }
-
+const shotsByPlayer = {
+    playerOne: {
+        all: [],
+        score: 0,
+        session: 0
+    },
+    playerTwo: {
+        all: [],
+        score: 0,
+        session: 0
+    },
+}
 function clearData(){
-    p1shots.innerHTML = p2shots.innerHTML = p1score.innerHTML = p2score.innerHTML = '';
+    View('p1shots').innerHTML = View('p2shots').innerHTML = View('p1score').innerHTML = View('p2score').innerHTML = '';
+    shotsByPlayer.playerOne.all = [];
+    shotsByPlayer.playerTwo.all = [];
+    shotsByPlayer.playerOne.score = 0;
+    shotsByPlayer.playerTwo.score = 0;
+    shotsByPlayer.playerOne.session = 0;
+    shotsByPlayer.playerTwo.session = 0;
 }
 
 function calculate(callback){
     clearData();
-    let shots = DbObject.shots;
-    let p1name = DATA.p1;
+    let shots = Storage.shots;
 
-    DATA.score = {p1: {score: 0, temp: 0}, p2: {score: 0, temp: 0}};
+    if(shots.length>0){
+        let playerOne = Storage.games[Storage.games.length-1].p1;
+        function shotCheck(player, shot){
+            shot.status = true;
+            switch (shot.shotn){
+                case 1: {
+                    shotsByPlayer[player].session = shot.sx;
+                    break;
+                }
+                case 2: {
+                    shotsByPlayer[player].session = shotsByPlayer[player].session + shot.sx;
+                    break;
+                }
+                case 3: {
+                    shotsByPlayer[player].session = shotsByPlayer[player].session + shot.sx;
+                    break;
+                }
+            }
+            View(player === 'playerOne' ? 'p1temp' : 'p2temp').innerHTML = Settings.toFinish - shotsByPlayer[player].session - shotsByPlayer[player].score;
+            if(Settings.toFinish - shotsByPlayer[player].score - shotsByPlayer[player].session === 0){
+                function isItWon(shot){
+                    if(Settings.x3and25 === 1) {
+                        return shot.x > 1 || shot.sector === 25 || shot.sector === 50;
+                    } else {
+                        return shot.x === 2 || shot.sector === 50;
+                    }
+                }
+                if(isItWon(shot)){
+                    shotsByPlayer[player].score = shotsByPlayer[player].score + shotsByPlayer[player].session;
+                    shotsByPlayer[player].session = 0;
+                    console.log(shotsByPlayer[player].all[1]['player']);
+                    Game.end(shotsByPlayer[player].all[1]['player']);
+                    shot.status = true;
+                } else {
+                    shotsByPlayer[player].session = 0;
+                    shot.status = false;
+                }
 
-    DATA.shots.p1 = 0;
-    DATA.shots.p2 = 0;
-    DATA.shots.total = 0;
-
-    Shots.clear();
-
-    shots.forEach((shot) => {
-        Shots.add(shot);
-
-        let value = shot;
-        let gamer;
-        let correct = false;
-
-        if (p1name === value.player) gamer = 'p1';
-        else gamer = 'p2';
-
-        DATA.shots.total++;
-        DATA.shots[gamer]++;
-
-        if (value.shotn === 1) {
-            DATA.score[gamer].temp = DATA.score[gamer].score;
+            } else if (Settings.toFinish - shotsByPlayer[player].score - shotsByPlayer[player].session < 2) {
+                shotsByPlayer[player].session = 0;
+                shot.status = false;
+            }
+            if(shot.shotn === 3) {
+                shotsByPlayer[player].score = shotsByPlayer[player].score + shotsByPlayer[player].session;
+            }
+            shotsByPlayer[player].all.push(shot);
         }
-        if ((isCorrect(value.sector, value.x, Settings.toFinish - DATA.score[gamer].temp) && value.shotn === 3) ||
-            (isCorrect(value.sector, value.x, Settings.toFinish - DATA.score[gamer].temp) && DATA.score[gamer].temp + value.sx === Settings.toFinish)) {
-            correct = true;
-            DATA.score[gamer].score = DATA.score[gamer].temp + value.sx;
-            // nowScore = true;
-        }
-        if (isCorrect(value.sector, value.x, Settings.toFinish - DATA.score[gamer].temp)) {
-            correct = true;
-            DATA.score[gamer].temp = DATA.score[gamer].temp + value.sx;
-        } else {
-            if (DATA.score[gamer].temp + value.sx > Settings.toFinish - DATA.score[gamer].temp) DATA.score[gamer].temp = DATA.score[gamer].score;
-        }
-        if (value.shotn === 3) DATA.score[gamer].score = DATA.score[gamer].temp;
-        let outputMultiplier = '';
-        if (value.x > 1) outputMultiplier = `x${value.x}`;
 
-        document.getElementById(`${(p1name === value.player) ? 'p1' : 'p2'}shots`).innerHTML +=
-            `<div class="shot ${(!correct) ? 'bad' : ''}">${(value.sector !== 0) ? value.sector + outputMultiplier : '0'}</div>`;
-        document.getElementById(`${(p1name === value.player) ? 'p1' : 'p2'}shots`).innerHTML += `${(value.shotn === 3) ? '<div class="scorecol">' + DATA.score[gamer].score + '</div>' : ''}`;
-
-        if (p1name === value.player) {
-            DATA.lastShot.p = 'p1'
-        } else {
-            DATA.lastShot.p = 'p2'
-        }
-        DATA.lastShot.sector = value.sector;
-        DATA.lastShot.x = value.x;
-    });
+        shots.forEach((shot, index) => {
+            shot.shotn = (index+1)%3 === 0 ? 3 : (index+1)%3;
+            let currentPlayer = shot.player === playerOne ? 'playerOne' : 'playerTwo';
+            shotCheck(currentPlayer, shot);
+        });
+        console.log(shotsByPlayer);
+    }
 
     let second = 'p2'
     if (DATA.first === 'p2') second = 'p1'
 
-    let diffMod = DATA.shots.total % 6;
-    console.log(`%c${diffMod}`, `font-size: 60px`);
+    // let diffMod = DATA.shots.total % 6;
+    let diffMod = shots.length % 6;
+    // console.log(`%c${diffMod}`, `font-size: 60px`);
     switch (true) {
         case diffMod < 3:
             if(diffMod === 0) {
                 Game.next = DATA.first;
             }
-            vx.playerActive(DATA.first);
+            Game.setActivePlayer(DATA.first);
             break;
         case diffMod >= 3:
             if(diffMod === 3) {
                 Game.next = second;
             }
-            vx.playerActive(second);
+            Game.setActivePlayer(second);
             break;
     }
 
-    document.getElementById('p1sX').innerHTML = document.getElementById('p2sX').innerHTML = '';
+    View('p1sX').innerHTML = View('p2sX').innerHTML = ''
     let sc = {
-        p1: Settings.toFinish - DATA.score.p1.temp,
-        p2: Settings.toFinish - DATA.score.p2.temp
+        p1: Settings.toFinish - shotsByPlayer.playerOne.score,
+        p2: Settings.toFinish - shotsByPlayer.playerTwo.score,
     };
+
+    function getPoints(player = 'playerOne') {
+        View(player === 'playerOne' ? 'p1shots' : 'p2shots').innerHTML = '';
+        shotsByPlayer[player  === 'playerOne' ? 'playerOne' : 'playerTwo'].all.forEach(item => {
+            let div = document.createElement('div');
+            div.className = !item.status ? 'bad' : '';
+            div.innerHTML = `${item.sector}${item.x > 1 ? 'x' + item.x : ''}`;
+
+            View(player === 'playerOne' ? 'p1shots' : 'p2shots').append(div);
+        })
+    }
+    getPoints();
+    getPoints('playerTwo');
 
     function getX(e) {
         if (e === sc.p1) {
-            if (e - Math.trunc(e / 2) * 2 === 0 && Math.trunc(e / 2) <= 20) p1sX.innerHTML = `${e / 2}X2`;
+            if (e - Math.trunc(e / 2) * 2 === 0 && Math.trunc(e / 2) <= 20) View('p1sX').innerHTML = `${e / 2}X2`;
             if (Settings.x3and25) {
-                if (e - Math.trunc(e / 3) * 3 === 0) p1sX.innerHTML += ` ${e / 3}X3`;
-                if (e === 50 || e === 25) p1sX.innerHTML += ` ${e}`;
+                if (e - Math.trunc(e / 3) * 3 === 0) View('p1sX').innerHTML += ` ${e / 3}X3`;
+                if (e === 50 || e === 25) View('p1sX').innerHTML += ` ${e}`;
             }
-            if (e === 50) p1sX.innerHTML += ` ${e}`;
+            if (e === 50) View('p1sX').innerHTML += ` ${e}`;
         }
         if (e === sc.p2) {
-            if (e - Math.trunc(e / 2) * 2 === 0 && Math.trunc(e / 2) <= 20) p2sX.innerHTML = `${e / 2}X2`;
+            if (e - Math.trunc(e / 2) * 2 === 0 && Math.trunc(e / 2) <= 20) View('p2sX').innerHTML = `${e / 2}X2`;
             if (Settings.x3and25) {
-                if (e - Math.trunc(e / 3) * 3 === 0) p2sX.innerHTML += ` ${e / 3}X3`;
-                if (e === 50 || e === 25) p2sX.innerHTML += ` ${e}`;
+                if (e - Math.trunc(e / 3) * 3 === 0) View('p2sX').innerHTML += ` ${e / 3}X3`;
+                if (e === 50 || e === 25) View('p2sX').innerHTML += ` ${e}`;
             }
-            if (e === 50) p2sX.innerHTML += ` ${e}`;
+            if (e === 50) View('p2sX').innerHTML += ` ${e}`;
         }
     }
     console.log(Settings.x3and25)
     board[Settings.x3and25].find(getX);
 
-    if (DATA.score.p1.score === Settings.toFinish || DATA.score.p2.score === Settings.toFinish) {
-        console.log('END NAHOOY')
-        Game.end(DATA.lastShot.p);
-    }
+    View('p1score').innerHTML = `${sc.p1} <span>+${shotsByPlayer.playerOne.score}</span>`;
+    View('p2score').innerHTML = `${sc.p2} <span>+${shotsByPlayer.playerTwo.score}</span>`;
+    View('p1progress').style.width = `${shotsByPlayer.playerOne.score * 100 / Settings.toFinish}%`;
+    View('p2progress').style.width = `${shotsByPlayer.playerTwo.score * 100 / Settings.toFinish}%`;
 
-    p1score.innerHTML = `${Settings.toFinish - DATA.score.p1.temp} <span>${Settings.toFinish - DATA.score.p1.score}</span>`;
-    p2score.innerHTML = `${Settings.toFinish - DATA.score.p2.temp} <span>${Settings.toFinish - DATA.score.p2.score}</span>`;
-    document.getElementById("p1progress").style.width = `${DATA.score.p1.temp * 100 / Settings.toFinish}%`;
-    document.getElementById("p2progress").style.width = `${DATA.score.p2.temp * 100 / Settings.toFinish}%`;
-
-    // document.getElementById('service').innerHTML = syntaxHighlight(Shots.last());
-    document.getElementById('last3').innerHTML = '';
-    Shots.last().forEach(val => {
+    View('last3').innerHTML = '';
+    for(let i=shots.length - 1; i>=shots.length-6; i--){
+        let val = shots[i];
         let div = document.createElement('div');
         div.className = 'shot';
         let player =  document.createElement('div');
@@ -545,174 +573,9 @@ function calculate(callback){
         shot.className = 'value';
         shot.innerHTML = val.x !== undefined ? `${val.sector}${val.x !== 1 ? 'x'+val.x : ''}` : '';
         div.append(player, shot);
-        // div.append(shot);
-        document.getElementById('last3').append(div);
-    })
+        View('last3').append(div);
+    }
+
     callback('done');
 }
 
-const DbObject = {
-    maxGameId: 0,
-    games: [],
-    shots: [],
-    MaxID: () => {
-        console.log(`%cMaxID`, InfoConsoleCSS);
-        DB.setStore('games');
-        setTimeout(async () => {
-            DB.findMaxId((maxGameId, games)=>{
-                DbObject.maxGameId = maxGameId;
-                DbObject.games = games;
-                DbObject.GetShots();
-            });}, 0);
-    },
-    GetShots: () => {
-        console.log(`%cGetShots`, InfoConsoleCSS);
-        DB.setStore('shots');
-        DB.read(['game', DbObject.maxGameId]).then();
-        setTimeout(async () => {
-
-                DbObject.shots = DB.result;
-                console.log(DbObject.shots);
-
-        }, 10);
-    },
-    NewShot: (shot) => {
-        DB.setStore('shots');
-        DB.addData(shot).then();
-        DbObject.shots.push(shot);
-    },
-    CancelShot: (callback) => {
-        DB.setStore('shots');
-        if(DbObject.shots.length > 0) {
-            DB.delete(DbObject.shots[DbObject.shots.length - 1].id).then();
-            DbObject.shots.splice(DbObject.shots.length - 1, 1);
-        }
-        setTimeout(callback, 0)
-    },
-    CheckGameID: function(callback){
-        console.log(`%cCheckGameID`, InfoConsoleCSS);
-        const gameDB = DbObject.games[DbObject.games.length-1];
-        if(gameDB.id>0) {
-            DATA.current = gameDB.id;
-            DATA.gameObj = gameDB;
-            console.log(gameDB);
-            if(Object.keys(gameDB).includes('toFinish')){
-                Settings.toFinish = gameDB.toFinish;
-                Settings.overshootSkip = gameDB.overshootSkip;
-                Settings.x3and25 = gameDB.x3and25;
-            } else {
-                Settings.toFinish = 501;
-                Settings.overshootSkip = 0;
-                Settings.x3and25 = 1;
-            }
-            if(gameDB.begin){
-                DATA.beginned = true;
-                DATA.beginTime = gameDB.begin;
-            }
-            if(gameDB.end){
-                DATA.endTime = gameDB.end;
-            }
-            gameConsole(`Game ID ${gameDB.id} OK`);
-            callback(gameDB);
-        } else {
-            // console.trace(`Game ID is not defined`);
-            callback(undefined);
-        }
-
-    },
-    SetGameEnd: () => {
-        console.log(`%cSetGameEnd`, InfoConsoleCSS);
-        DB.setStore("games");
-        let gameDB = DbObject.games[DbObject.games.length-1];
-        gameDB.end = new Date();
-        gameDB.hits = shots.length;
-        DB.addData(gameDB).then();
-    },
-    GetNext: () => {
-        // console.trace();
-        console.log(`%cGetNext`, InfoConsoleCSS);
-        DATA.next = DbObject.games[DbObject.games.length-1].next;
-    },
-    SetNext: (next) => {
-        // console.trace();
-        console.log(`%cSetNext`, InfoConsoleCSS);
-        DB.setStore("games");
-        let gameDB = DbObject.games[DbObject.games.length-1];
-        DATA.next = next;
-        gameDB.next = next;
-        DB.addData(gameDB).then();
-    },
-    SetFirst: (next) => {
-        console.log(`%cSetFirst`, InfoConsoleCSS);
-        DB.setStore("games");
-        let gameDB = DbObject.games[DbObject.games.length-1];
-        DATA.first = next;
-        DATA.next = next;
-        gameDB.next = next;
-        gameDB.first = next;
-        DB.addData(gameDB).then();
-    },
-    SetSettings: () => {
-        // console.trace();
-        console.log(`%cSetSettings`, InfoConsoleCSS);
-        DB.setStore("games");
-        let gameDB = DbObject.games[DbObject.games.length-1];
-        gameDB.x3and25 = Settings.x3and25;
-        gameDB.overshootSkip = Settings.overshootSkip;
-        gameDB.toFinish = Settings.toFinish;
-        DB.addData(gameDB).then();
-    },
-    NewGame: () => {
-        console.log(`%cNewGame`, InfoConsoleCSS);
-        let gData = {
-            begin:	new Date(),
-            end:	'',
-            first:	DATA.first,
-            p1:		DATA.p1,
-            p2:		DATA.p2,
-            winner:	'',
-            hits:	0,
-            lasthit:'',
-            next:	DATA.first,
-            toFinish: Settings.toFinish,
-            overshootSkip: Settings.overshootSkip,
-            x3and25: Settings.x3and25,
-        };
-        DB.setStore("games");
-        DB.addData(gData).then();
-        DbObject.MaxID();
-        setTimeout(async () => {
-            return DbObject.games;
-        }, 0);
-    },
-    EndGame: function(){
-        console.log(`%cEndGame`, InfoConsoleCSS);
-        DbObject.SetGameEnd();
-    },
-    PlayersList: (callback) => {
-        console.log(`%cPlayersList`, InfoConsoleCSS);
-        DB.setStore("players");
-        DB.read().then();
-        setTimeout(() => {
-            players = DB.result;
-            console.log(players);
-            callback(players);
-        }, 0);
-    },
-    NewPlayer: function(data, callback = function(e){console.log(e)}) {
-        console.log(`%cNewPlayer`, InfoConsoleCSS);
-        DB.setStore("players");
-        data.forEach(row =>  {
-            if(row.length > 0) DB.addData({name: row}).then();
-        });
-        DB.read().then();
-        setTimeout(() => {
-            players = DB.result;
-            callback(players);
-        }, 0);
-    },
-};
-
-
-// DbObject.initDB();
-DbObject.MaxID();

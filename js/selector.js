@@ -1,7 +1,15 @@
 const CONFIG = {
     output: 'selector',
     radius: 400,
-    cssVariables: `--angle: 90deg; --circle: 800px; --sector: calc(var(--circle) / 20); --sector-item: calc(var(--circle) / 20); --border-radius: 35px; --transition: 350ms; --selector-width: 80px; --selector-height: 220px;`,
+    cssVariables: `
+    --angle: 90deg; 
+    --circle: 800px; 
+    --sector: calc(var(--circle) / 20); 
+    --sector-item: calc(var(--circle) / 20); 
+    --border-radius: 35px; 
+    --transition: 350ms; 
+    --selector-width: 80px; 
+    --selector-height: 320px;`,
     boardNums: [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5],
 }
 
@@ -61,15 +69,17 @@ class Selector {
             let wrapper = document.createElement('div');
             wrapper.classList.add('sector');
             wrapper.dataset.num = i;
-            wrapper.append(this.sectorElement('x2', i, 1, 'x2'));
-            wrapper.append(this.sectorElement(CONFIG.boardNums[i], i, 1.11, 'num'));
-            wrapper.append(this.sectorElement('x3', i, 1.24, 'x3'));
-            wrapper.append(this.sectorElement('25', i, 1.5, 'twentyFive'));
-            wrapper.append(this.sectorElement('50', i, 1.7, 'fifty'));
+            wrapper.append(this.sectorElement('x2', i, 0.8, 'x2'));
+            wrapper.append(this.sectorElement(CONFIG.boardNums[i], i, 0.9, 'num'));
+            wrapper.append(this.sectorElement('x3', i, 1.05, 'x3'));
+            wrapper.append(this.sectorElement('25', i, 1.35, 'twentyFive'));
+            wrapper.append(this.sectorElement('50', i, 1.6, 'fifty'));
 
             document.getElementById('selectorCircle').append(wrapper);
         }
     }
+
+
     position = {
         up: function (){
             this.now === 0 ? this.now = 4 : this.now--
@@ -82,27 +92,47 @@ class Selector {
         sector: CONFIG.boardNums[0]
     };
 
+    toPosition(position){
+        this.position.now = position;
+        this.updateActive();
+    }
+
     keyDown(event){
-        // console.log(event);
-        let angleValue = parseInt(document.documentElement.style.getPropertyValue('--angle'));
-        let angleStep = 360/this.total;
         switch (event.code) {
-            case 'ArrowRight': {
-                document.documentElement.style.setProperty("--angle", (angleValue-angleStep)+'deg');
-                this.position.now = 1;
+            case 'ArrowLeft': {
+                this.position.index--;
+                if(this.position.index < 0) {
+                    this.position.index = 19;
+                }
+                this.toIndex(this.position.index, true, 1);
                 break;
             }
-            case 'ArrowLeft': {
-                document.documentElement.style.setProperty("--angle", (angleValue+angleStep)+'deg');
-                this.position.now = 1;
+            case 'ArrowRight': {
+                this.position.index++;
+                if(this.position.index > 19) {
+                    this.position.index = 0;
+                }
+                this.toIndex(this.position.index, true, -1);
+                break;
+            }
+            case 'ArrowUp': {
+                this.position.up();
+                this.updateActive();
+                break;
+            }
+            case 'ArrowDown': {
+                this.position.down();
+                this.updateActive();
                 break;
             }
         }
     }
 
-    toIndex(index){
-        let angleStep = 90-(360/this.total)*parseInt(index);
-        document.documentElement.style.setProperty("--angle", (angleStep)+'deg');
+    toIndex(index, byStep = false, direction = 1){
+        let angle = byStep ?
+            parseInt(document.documentElement.style.getPropertyValue('--angle')) + (360/this.total)*direction :
+            90 - (360 / this.total) * parseInt(index);
+        document.documentElement.style.setProperty("--angle", angle + 'deg');
         this.position.now = 1;
         this.position.index = parseInt(index);
         this.position.sector = CONFIG.boardNums[parseInt(index)];
@@ -115,26 +145,14 @@ class Selector {
 
     updateActive(){
         console.log(this.position.index);
-        document.getElementById('selectorCircle').childNodes.forEach(el => {el.childNodes.forEach(subEl => {subEl.classList.remove('active')})})
+        document.getElementById('selectorCircle').childNodes.forEach(el => {
+            el.childNodes.forEach(subEl => {subEl.classList.remove('active')})
+        })
         document.getElementById('selectorCircle').childNodes[this.position.index].childNodes[this.position.now].classList.add('active');
     }
 
     keyUp(event){
-        let angleValue = parseInt(document.documentElement.style.getPropertyValue('--angle'))-90;
-        let indexBoard = this.total - Math.abs(angleValue/this.step%this.total < 0 ? this.total + angleValue/this.step%this.total : angleValue/this.step%this.total);
-        this.position.index = indexBoard === this.total ? 0 : indexBoard;
-        this.position.sector = CONFIG.boardNums[this.position.index];
-        switch (event.code) {
-            case 'ArrowUp': {
-                this.position.up();
-                break;
-            }
-            case 'ArrowDown': {
-                this.position.down();
-                break;
-            }
-        }
-        this.updateActive();
+        this.keyDown(event)
     }
 
     enter(){
