@@ -2,9 +2,9 @@ let player, modal, players, Game;
 
 const ElementID = [
     'gameInfo',
-    'HTMLtoFinish',
-    'HTMLx3and25',
-    'HTMLovershootSkip',
+    'toFinish',
+    'x3and25',
+    'overshootSkip',
     'randInput',
     'randInput20',
     'p1',
@@ -23,7 +23,7 @@ const ElementID = [
     'p2input',
     'playersSelect',
     'fireworks',
-    'fireworksname',
+    'winnerName',
     'last3'];
 const View = (id) => {
     if(ElementID.includes(id)) {
@@ -43,14 +43,14 @@ const Settings = {
     },
     set toFinish(num) {
         if(this.toFinishValue !== num) {
-            for(let i = 0; i < View('HTMLtoFinish').children.length; i++){
-                View('HTMLtoFinish').children[i].classList.remove('active')
+            for(let i = 0; i < View('toFinish').children.length; i++){
+                View('toFinish').children[i].classList.remove('active')
             }
             switch (num){
-                case 301: View('HTMLtoFinish').children[0].classList.add('active'); break;
-                case 501: View('HTMLtoFinish').children[1].classList.add('active'); break;
+                case 301: View('toFinish').children[0].classList.add('active'); break;
+                case 501: View('toFinish').children[1].classList.add('active'); break;
                 default: {
-                    View('HTMLtoFinish').children[2].classList.add('active');
+                    View('toFinish').children[2].classList.add('active');
                     console.log('default')
                     break;
                 }
@@ -65,8 +65,8 @@ const Settings = {
     },
     set x3and25(num) {
         if(this.x3and25Value !== num) {
-            View('HTMLx3and25').children[checkValue(this.x3and25Value)].classList.remove('active');
-            View('HTMLx3and25').children[num].classList.add('active');
+            View('x3and25').children[checkValue(this.x3and25Value)].classList.remove('active');
+            View('x3and25').children[num].classList.add('active');
             this.x3and25Value = num;
             InfoBar();
             this.updateInDB();
@@ -77,8 +77,8 @@ const Settings = {
     },
     set overshootSkip(num) {
         if(this.overshootSkipValue !== num) {
-            View('HTMLovershootSkip').children[checkValue(this.overshootSkipValue)].classList.remove('active');
-            View('HTMLovershootSkip').children[num].classList.add('active');
+            View('overshootSkip').children[checkValue(this.overshootSkipValue)].classList.remove('active');
+            View('overshootSkip').children[num].classList.add('active');
             this.overshootSkipValue = num;
             InfoBar();
             this.updateInDB();
@@ -88,6 +88,11 @@ const Settings = {
     toFinishValue: 501,
     x3and25Value: 1,
     overshootSkipValue: 0,
+    p1: 'Player One',
+    p2: 'Player Two',
+    current: 1,
+    first: 'p1',
+    next: 'p1',
 };
 
 const boardNums = [20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
@@ -96,22 +101,10 @@ const board = {
     1:	[2,3,4,6,8,9,10,12,14,15,16,18,20,21,22,24,25,26,27,28,30,32,33,34,36,38,39,40,42,45,48,50,51,54,57,60]
 };
 
-const DATA = {
-    p1:'',
-    p2:'',
-    current: 0,
-    next: 'p1',
-    lastShot: {p:'',sector:0,x:1},
-    gameObj: {},
-    first: 'p1',
-    shots: {p1:0,p2:0,total:0,turn:0},
-    score: {p1: {score: 0, temp: 0}, p2: {score: 0, temp: 0}},
-};
-
-players = Array();
+players = [];
 
 
-let selector = new Selector();
+const selector = new Selector();
 
 const randomGenerator = {
     all: () => {
@@ -124,50 +117,59 @@ const randomGenerator = {
     }
 }
 
-const InfoBar = function (){
+const InfoBar = () => {
     View('gameInfo').innerHTML = `
-			<div class="name">#${DATA.gameObj.id} ${Settings.toFinish}</div>
-			<div>
-				<div class="players">${DATA.p1} vs ${DATA.p2}</div>
-				(finish mode: ${Settings.x3and25 === 1 ? 'x3 and 25' : 'without x3 and 25' }; overshot: ${Settings.overshootSkip === 1 ? 'skip' : 'don\'t skip'})
-			</div>`;
-}
-
-function setGameDataNames(data = {}){
-    if(data.p1){
-        DATA.p1 = data.p1;
-        DATA.p2 = data.p2;
-    }
-    View('p1').innerHTML = DATA.p1;
-    View('p2').innerHTML = DATA.p2;
+        <div class="name">#${Settings.current} ${Settings.toFinish}</div>
+        <div>
+            <div class="players">${Settings.p1} vs ${Settings.p2}</div>
+            (   finish mode: ${Settings.x3and25 === 1 ? 'x3 and 25' : 'without x3 and 25' }; 
+                overshot: ${Settings.overshootSkip === 1 ? 'skip' : 'don\'t skip'}   )
+        </div>`;
 }
 
 
-let initGame = () => {
+
+
+const initGame = () => {
     selector.toIndex(0);
     const timer = new Timer(() => {
-        sendData(0,1);
+        sendShot(0,1);
     }, 10, 100);
 
-    function sendData(sector, x) {
-        const next = Game.next;
+    function sendShot(sector, x) {
+        console.warn(Game.next);
         let shotData = {
-            player: DATA[next],
+            player: Settings[Game.next],
             sector: sector,
             x: x,
             sx: sector * x,
         };
-        goData(next, shotData);
+        shotData.game = parseInt(Settings.current);
+        shotData.date = new Date();
+        Storage.NewShot(shotData, () => {
+            let shooter = Game.next === 'p1' ? 'playerOne' : 'playerTwo';
+            if(Settings.overshootSkip && shotsByPlayer[shooter].score + shotsByPlayer[shooter].session + shotData.sx > Settings.toFinish-2){
+                goZero();
+                function goZero(){
+                    if(shotData.shotn < 3){
+                        shotData.date++;
+                        shotData.shotn++;
+                        shotData.sector = 0;
+                        shotData.x = 1;
+                        shotData.sx = 0;
+                        Storage.NewShot(shotData);
+                        goZero();
+                    }
+                }
+            }
+            calculate(function(){
+                // console.log(`looks like calculated`);
+            });
+        });
+
         selector.toIndex(0);
     }
-
-    let holdKeys = [];
-
     window.document.onkeydown = (event) => {
-        console.log(event.code);
-        if(!holdKeys.includes(event.code) && !event.repeat){
-            holdKeys.push(event.code);
-        }
         let selected;
         switch (event.code) {
             case 'Digit1':
@@ -178,7 +180,7 @@ let initGame = () => {
                 break;
             case 'Space':
                 event.preventDefault();
-                sendData(0, 1);
+                sendShot(0, 1);
                 timer.clearTimer();
                 break;
             case 'Backspace':
@@ -188,12 +190,12 @@ let initGame = () => {
                 break;
             case 'Enter':
                 selected = selector.enter();
-                sendData(selected.sector, selected.x);
+                sendShot(selected.sector, selected.x);
                 timer.clearTimer();
                 break;
             case 'NumpadEnter':
                 selected = selector.enter();
-                sendData(selected.sector, selected.x);
+                sendShot(selected.sector, selected.x);
                 timer.clearTimer();
                 break;
             case 'Pause':
@@ -223,22 +225,24 @@ let initGame = () => {
                 break;
         }
     }
-    document.addEventListener('keyup', (event) => {
-        if (event.code.includes('Arrow')) {
-            // selector.keyUp(event);
-        }
-        holdKeys.pop();
-    });
     onwheel = (event) => {
         event.deltaY > 0 ? selector.keyDown({code: 'ArrowLeft'}) : selector.keyDown({code: 'ArrowRight'}) ;
     };
 
-    player.list();
+    View('playersSelect').innerHTML = '';
+    View('p1input').value = Settings.p1;
+    View('p2input').value = Settings.p2;
+    Storage.PlayersList((names) => {
+        View('playersSelect').innerHTML = '';
+        names.forEach(function(el){
+            View('playersSelect').innerHTML += `<option value='${el.name}' class="selectplayer" data-player-name="${el.name}">${el.name}</option>\n`;
+        });
+    });
 
     Storage.CheckGameID((game) => {
         console.log(game)
         if (game.p1) {
-            DATA.first = game.first;
+            Settings.first = game.first;
             setGameDataNames(game);
             calculate(function () {
             });
@@ -248,9 +252,7 @@ let initGame = () => {
         InfoBar();
     });
 }
-setTimeout(()=>{
-    initGame()
-}, 100);
+
 
 
 document.onclick = (clickEvent) => {
@@ -261,8 +263,8 @@ document.onclick = (clickEvent) => {
     }
     if(clickEvent.target.id === 'start'){
         Storage.NewPlayer([View('p1input').value, View('p2input').value], () => {
-            DATA.p1 = View('p1input').value ;
-            DATA.p2 = View('p2input').value;
+            Settings.p1 = View('p1input').value ;
+            Settings.p2 = View('p2input').value;
             Game.first = 'p1';
             setGameDataNames();
             Game.new();
@@ -274,10 +276,19 @@ document.onclick = (clickEvent) => {
     }
 };
 
+function setGameDataNames(data = {}){
+    if(data.p1){
+        Settings.p1 = data.p1;
+        Settings.p2 = data.p2;
+    }
+    View('p1').innerHTML = Settings.p1;
+    View('p2').innerHTML = Settings.p2;
+}
+
 modal = {
     show: function () {
-        View('p1input').value = DATA.p1;
-        View('p2input').value = DATA.p2;
+        View('p1input').value = Settings.p1;
+        View('p2input').value = Settings.p2;
         document.getElementsByClassName('modal').item(0).classList.add('show');
         modal.state = true;
     },
@@ -294,11 +305,10 @@ modal = {
     },
     isOnModal: function (x,y) {
         let mSize = document.getElementsByClassName('modal').item(0).getBoundingClientRect();
-        if (x < mSize.left) return false;
-        if (x > (mSize.left + mSize.width)) return false;
-        if (y < mSize.top) return false;
-        if (y > (mSize.top + mSize.height)) return false;
-        return true;
+        return  x > mSize.left &&
+                x < (mSize.left + mSize.width) &&
+                y > mSize.top &&
+                y < (mSize.top + mSize.height);
     },
     state: false
 }
@@ -306,24 +316,16 @@ modal = {
 Game = {
     get next(){
         Storage.GetNext();
-        return DATA.next;
+        return Settings.next;
     },
     set next(player){
         Storage.SetNext(player);
         Game.setActivePlayer(player);
-        this.turn = 0;
     },
     set first(player){
         Storage.SetNext(player);
         Storage.SetFirst(player);
         Game.setActivePlayer(player);
-        this.turn = 0;
-    },
-    get turn(){
-        return DATA.shots.turn;
-    },
-    set turn(shot){
-        DATA.shots.turn = shot;
     },
     setActivePlayer: (player) => {
         if(player === 'p1') {
@@ -336,18 +338,7 @@ Game = {
     },
     cancelLastHit: function(){
         View('fireworks').style.display = 'none';
-        console.info(`game.turn = %o, game.next = %o`, Game.turn, Game.next);
         Storage.CancelShot(() => {
-            let who = Game.next;
-            console.log(who);
-            if(Game.turn !== 0){
-                Game.turn = Game.turn - 1;
-            } else {
-                if(who === 'p1') who = 'p2';
-                else who = 'p1';
-                Game.next = who;
-                Game.turn = 2;
-            }
             calculate(function(){
                 // console.log('we are calculate');
             });
@@ -360,8 +351,6 @@ Game = {
     new: function(){
         Game.clearX();
         Storage.NewGame();
-        Game.turn = 0;
-        DATA.shots = {p1:0,p2:0,total:0,turn:0};
         View('p1shots').innerHTML = View('p2shots').innerHTML = '';
         View('p1score').innerHTML = Settings.toFinish;
         View('p2score').innerHTML = Settings.toFinish;
@@ -370,49 +359,12 @@ Game = {
     end: (winner) => {
         Storage.EndGame();
         View('fireworks').style.display = 'flex';
-        View('fireworksname').innerHTML = `${winner} WON!`;
+        View('winnerName').innerHTML = `${winner} WON!`;
     },
 };
 
-player = {
-    list: () => {
-        View('playersSelect').innerHTML = '';
-        View('p1input').value = DATA.p1;
-        View('p2input').value = DATA.p2;
-        Storage.PlayersList(() => {
-            View('playersSelect').innerHTML = '';
-            players.forEach(function(el){
-                View('playersSelect').innerHTML += `<option value='${el.name}' class="selectplayer" data-player-name="${el.name}">${el.name}</option>\n`;
-            });
-        });
-    }
-};
 
-function goData(player = 'p1', shot){
-    if(shot) {
-        shot.game = parseInt(DATA.current);
-        shot.date = new Date();
-        Storage.NewShot(shot);
 
-        if(Settings.overshootSkip && DATA.score[player].temp+shot.sx > Settings.toFinish-2){
-            goZero();
-            function goZero(){
-                if(shot.shotn < 3){
-                    shot.date++;
-                    shot.shotn++;
-                    shot.sector = 0;
-                    shot.x = 1;
-                    shot.sx = 0;
-                    Storage.NewShot(shot);
-                    goZero();
-                }
-            }
-        }
-    }
-    calculate(function(){
-        // console.log(`looks like calculated`);
-    });
-}
 const shotsByPlayer = {
     playerOne: {
         all: [],
@@ -487,39 +439,39 @@ function calculate(callback){
             shotsByPlayer[player].all.push(shot);
         }
 
-        shots.forEach((shot, index) => {
-            shot.shotn = (index+1)%3 === 0 ? 3 : (index+1)%3;
-            let currentPlayer = shot.player === playerOne ? 'playerOne' : 'playerTwo';
-            shotCheck(currentPlayer, shot);
+        shots.forEach((shotItem, index) => {
+            shotItem.shotn = (index+1)%3 === 0 ? 3 : (index+1)%3;
+            let currentPlayer = shotItem.player === playerOne ? 'playerOne' : 'playerTwo';
+            shotCheck(currentPlayer, shotItem);
         });
         console.log(shotsByPlayer);
     }
 
     let second = 'p2'
-    if (DATA.first === 'p2') second = 'p1'
+    if (Settings.first === 'p2') second = 'p1'
 
-    // let diffMod = DATA.shots.total % 6;
     let diffMod = shots.length % 6;
     // console.log(`%c${diffMod}`, `font-size: 60px`);
     switch (true) {
         case diffMod < 3:
-            if(diffMod === 0) {
-                Game.next = DATA.first;
+            if(Game.next !== Settings.first) {
+                Game.next = Settings.first;
             }
-            Game.setActivePlayer(DATA.first);
+            Game.setActivePlayer(Settings.first);
             break;
         case diffMod >= 3:
-            if(diffMod === 3) {
+            if(Game.next !== second) {
                 Game.next = second;
             }
             Game.setActivePlayer(second);
             break;
     }
+    // console.log(`Diff: ${diffMod} Next: ${Game.next}`);
 
     View('p1sX').innerHTML = View('p2sX').innerHTML = ''
     let sc = {
-        p1: Settings.toFinish - shotsByPlayer.playerOne.score,
-        p2: Settings.toFinish - shotsByPlayer.playerTwo.score,
+        playerOne: Settings.toFinish - shotsByPlayer.playerOne.score - shotsByPlayer.playerOne.session,
+        playerTwo: Settings.toFinish - shotsByPlayer.playerTwo.score - shotsByPlayer.playerTwo.session,
     };
 
     function getPoints(player = 'playerOne') {
@@ -536,7 +488,7 @@ function calculate(callback){
     getPoints('playerTwo');
 
     function getX(e) {
-        if (e === sc.p1) {
+        if (e === sc.playerOne) {
             if (e - Math.trunc(e / 2) * 2 === 0 && Math.trunc(e / 2) <= 20) View('p1sX').innerHTML = `${e / 2}X2`;
             if (Settings.x3and25) {
                 if (e - Math.trunc(e / 3) * 3 === 0) View('p1sX').innerHTML += ` ${e / 3}X3`;
@@ -544,7 +496,7 @@ function calculate(callback){
             }
             if (e === 50) View('p1sX').innerHTML += ` ${e}`;
         }
-        if (e === sc.p2) {
+        if (e === sc.playerTwo) {
             if (e - Math.trunc(e / 2) * 2 === 0 && Math.trunc(e / 2) <= 20) View('p2sX').innerHTML = `${e / 2}X2`;
             if (Settings.x3and25) {
                 if (e - Math.trunc(e / 3) * 3 === 0) View('p2sX').innerHTML += ` ${e / 3}X3`;
@@ -553,29 +505,33 @@ function calculate(callback){
             if (e === 50) View('p2sX').innerHTML += ` ${e}`;
         }
     }
-    console.log(Settings.x3and25)
     board[Settings.x3and25].find(getX);
 
-    View('p1score').innerHTML = `${sc.p1} <span>+${shotsByPlayer.playerOne.score}</span>`;
-    View('p2score').innerHTML = `${sc.p2} <span>+${shotsByPlayer.playerTwo.score}</span>`;
+    View('p1score').innerHTML = `${sc.playerOne} <span>+${shotsByPlayer.playerOne.score}</span>`;
+    View('p2score').innerHTML = `${sc.playerTwo} <span>+${shotsByPlayer.playerTwo.score}</span>`;
     View('p1progress').style.width = `${shotsByPlayer.playerOne.score * 100 / Settings.toFinish}%`;
     View('p2progress').style.width = `${shotsByPlayer.playerTwo.score * 100 / Settings.toFinish}%`;
 
     View('last3').innerHTML = '';
     for(let i=shots.length - 1; i>=shots.length-6; i--){
-        let val = shots[i];
-        let div = document.createElement('div');
-        div.className = 'shot';
-        let player =  document.createElement('div');
-        let shot =  document.createElement('div');
-        player.className = 'player';
-        player.innerHTML = val.player ?? '';
-        shot.className = 'value';
-        shot.innerHTML = val.x !== undefined ? `${val.sector}${val.x !== 1 ? 'x'+val.x : ''}` : '';
-        div.append(player, shot);
-        View('last3').append(div);
+        if(shots.at(i) !== undefined && shots[i] !== undefined) {
+            let val = shots[i];
+            let div = document.createElement('div');
+            div.className = 'shot';
+            let player = document.createElement('div');
+            let shot = document.createElement('div');
+            player.className = 'player';
+            player.innerHTML = val['player'] ?? '';
+            shot.className = 'value';
+            shot.innerHTML = val.x !== undefined ? `${val.sector}${val.x !== 1 ? 'x' + val.x : ''}` : '';
+            div.append(player, shot);
+            View('last3').append(div);
+        }
     }
 
     callback('done');
 }
 
+setTimeout(() => {
+    initGame();
+}, 300);

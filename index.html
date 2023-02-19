@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="Ru">
+<html lang="en">
 <head>
 	<title>Darts Project</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<script lang="javascript" src="./js/service.js"></script>
-	<link rel="stylesheet" href="./css/styles.css">
+	<link rel="stylesheet"  href="./index.css">
 </head>
 <body data-scope="darts" class="">
 	<div class="abs"></div>
@@ -13,9 +13,6 @@
 		<button onclick="modal.toggle()" class="ml-20">Game</button>
 		<button onclick="Game.cancelLastHit();">Cancel last hit</button>
 		<button id="last3"></button>
-<!--		<button class="disabled mr-20" id="selectedValueInfo"></button>-->
-
-
 	</nav>
 	<div id="gameInfo"></div>
 
@@ -35,19 +32,19 @@
 						<div id="plist" class="plist">
 
 						</div>
-						<div class="pform">
+						<div class="settings">
 							<div class="versus">
 								<input id="p1input" type="text" class="dark"
-									   list="playersSelect" placeholder="First Player" aria-label="Recipient's username" aria-describedby="confirmP1" onload="this.value = DATA.p1"> vs
+									   list="playersSelect" placeholder="First Player" aria-label="Recipient's username" aria-describedby="confirmP1" onload="this.value = Settings.p1"> vs
 								<input id="p2input" type="text" class="dark"
-									   list="playersSelect" placeholder="Second Player" aria-label="Recipient's username" aria-describedby="confirmP2" onload="this.value = DATA.p2">
+									   list="playersSelect" placeholder="Second Player" aria-label="Recipient's username" aria-describedby="confirmP2" onload="this.value = Settings.p2">
 								<datalist id="playersSelect"></datalist>
 							</div>
 							<div class="line">
 								Score to finish
 								<div class="btn-group"  id="toFinish">
 									<button class="btn dark" type="button" onclick="Settings.toFinish = 301">301</button>
-									<button class="btn dark" type="button" onclick="Settings.toFinish = 501">501</button>
+									<button class="btn dark active" type="button" onclick="Settings.toFinish = 501">501</button>
 									<input type="number" class="btn dark" onchange="Settings.toFinish = parseInt(this.value)" placeholder="Custom">
 								</div>
 							</div>
@@ -56,13 +53,13 @@
 								Finish mode
 								<div class="btn-group" id="x3and25">
 									<button class="btn dark" type="button" onclick="Settings.x3and25 = 0">Double And Bulls aye</button>
-									<button class="btn dark" type="button" onclick="Settings.x3and25 = 1">All multipliers</button>
+									<button class="btn dark active" type="button" onclick="Settings.x3and25 = 1">All multipliers</button>
 								</div>
 							</div>
 							<div class="line">
 								Overshoot rules
 								<div class="btn-group" id="overshootSkip">
-									<button class="btn dark" type="button" onclick="Settings.overshootSkip = 0">Don't skip</button>
+									<button class="btn dark active" type="button" onclick="Settings.overshootSkip = 0">Don't skip</button>
 									<button class="btn dark" type="button" onclick="Settings.overshootSkip = 1">Skip after overshot</button>
 								</div>
 							</div>
@@ -135,7 +132,7 @@
 		</div>
 	</div>
 	<div id="fireworks">
-		<h1 id="fireworksname">Jesus Christ WON!</h1>
+		<h1 id="winnerName">Jesus Christ WON!</h1>
 		<br>
 		<div class="btn-group btn-group-lg">
 				<button type="button" class="btn btn-won" onclick="Game.cancelLastHit();">Cancel last hit</button><button type="button" class="btn btn-won" onclick="Game.new();">New Game</button>

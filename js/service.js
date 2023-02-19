@@ -9,9 +9,6 @@ const Scripts = [
 	"./js/timer.js",
 	"./js/storage.js",
 	"./js/game.js",
-
-	// "./js/interface.js",
-	// "./js/stats.js",
 ];
 
 const ConsoleCSS = `padding: 4px 25px 1px 0; background: rgba(255, 199, 32, .5); color: #222; border-width: 0 2px 3px 0; border-style: groove; border-color: rgba(0,0,0,0.44); border-radius: 0px 50px 0 0;`;
@@ -40,9 +37,14 @@ function addScript(url){
 		gameConsole(error, true);
 	}
 }
-Scripts.forEach(script => {
+
+Scripts.forEach((script,index) => {
 	addScript(script);
+	if (index === Scripts.length-1) {
+
+	}
 });
+
 
 
 
