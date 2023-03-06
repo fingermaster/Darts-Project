@@ -1,143 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Darts Project</title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<script lang="javascript" src="./js/service.js"></script>
-	<link rel="stylesheet"  href="./index.css">
+   <title>Darts Project</title>
+   <meta charset="utf-8">
+   <meta content="width=device-width, initial-scale=1" name="viewport">
+   <script lang="javascript" src="./js/service.js"></script>
+   <link href="./index.css" rel="stylesheet">
 </head>
-<body data-scope="darts" class="">
-	<div class="abs"></div>
-	<nav>
-		<button onclick="modal.toggle()" class="ml-20">Game</button>
-		<button onclick="Game.cancelLastHit();">Cancel last hit</button>
-		<button id="last3"></button>
-	</nav>
-	<div id="gameInfo"></div>
+<body class="" data-scope="darts">
+   <div class="abs"></div>
+   <nav>
+      <button class="ml-20" onclick="modal.toggle()">Game</button>
+      <button onclick="Game.cancelLastHit();">Cancel last hit</button>
+      <button id="latestThrows"></button>
+   </nav>
+   <div id="gameInfo"></div>
 
-<!--	&lt;!&ndash;DEVELOP REPORTER&ndash;&gt;-->
-<!--	<div  id="serviceWrapper">-->
-<!--		<pre><code id="service"></code></pre>-->
-<!--	</div>&lt;!&ndash; /END DEVELOP REPORTER &ndash;&gt;-->
-	<div class="modal">
-		<div class="modal-content bg-custom" id="modal-bg">
-			<div class="modal-header">
-				<h5 class="modal-title">Game Settings</h5>
-<!--				<button onclick="modal.toggle()">Close X</button>-->
-			</div>
-			<div class="modal-body">
-				<form name="InputSettings">
-					<div class="select-player-body-container">
-						<div id="plist" class="plist">
+   <!--	&lt;!&ndash;DEVELOP REPORTER&ndash;&gt;-->
+   <!--	<div  id="serviceWrapper">-->
+   <!--		<pre><code id="service"></code></pre>-->
+   <!--	</div>&lt;!&ndash; /END DEVELOP REPORTER &ndash;&gt;-->
+   <div class="modal">
+      <div class="modal-content bg-custom" id="modal-bg">
+         <div class="modal-header">
+            <h5 class="modal-title">Game Settings</h5>
+            <!--				<button onclick="modal.toggle()">Close X</button>-->
+         </div>
+         <div class="modal-body">
+            <form name="InputSettings">
+               <div class="select-player-body-container">
+                  <div class="plist" id="plist">
 
-						</div>
-						<div class="settings">
-							<div class="versus">
-								<input id="p1input" type="text" class="dark"
-									   list="playersSelect" placeholder="First Player" aria-label="Recipient's username" aria-describedby="confirmP1" onload="this.value = Settings.p1"> vs
-								<input id="p2input" type="text" class="dark"
-									   list="playersSelect" placeholder="Second Player" aria-label="Recipient's username" aria-describedby="confirmP2" onload="this.value = Settings.p2">
-								<datalist id="playersSelect"></datalist>
-							</div>
-							<div class="line">
-								Score to finish
-								<div class="btn-group"  id="toFinish">
-									<button class="btn dark" type="button" onclick="Settings.toFinish = 301">301</button>
-									<button class="btn dark active" type="button" onclick="Settings.toFinish = 501">501</button>
-									<input type="number" class="btn dark" onchange="Settings.toFinish = parseInt(this.value)" placeholder="Custom">
-								</div>
-							</div>
+                  </div>
+                  <div class="settings">
+                     <div class="versus">
+                        <input aria-describedby="confirmP1" aria-label="Recipient's username" class="dark"
+                               id="p1input" list="playersSelect" onload="this.value = Settings.p1"
+                               placeholder="First Player" type="text"> vs
+                        <input aria-describedby="confirmP2" aria-label="Recipient's username" class="dark"
+                               id="p2input" list="playersSelect" onload="this.value = Settings.p2"
+                               placeholder="Second Player" type="text">
+                        <datalist id="playersSelect"></datalist>
+                     </div>
+                     <div class="line">
+                        Score to finish
+                        <div class="btn-group" id="toFinish">
+                           <button class="btn dark" onclick="Settings.toFinish = 301" type="button">301</button>
+                           <button class="btn dark active" onclick="Settings.toFinish = 501" type="button">501</button>
+                           <label>
+                              <input class="btn dark" onchange="Settings.toFinish = parseInt(this.value)" placeholder="Custom"
+                                     type="number">
+                           </label>
+                        </div>
+                     </div>
 
-							<div class="line">
-								Finish mode
-								<div class="btn-group" id="x3and25">
-									<button class="btn dark" type="button" onclick="Settings.x3and25 = 0">Double And Bulls aye</button>
-									<button class="btn dark active" type="button" onclick="Settings.x3and25 = 1">All multipliers</button>
-								</div>
-							</div>
-							<div class="line">
-								Overshoot rules
-								<div class="btn-group" id="overshootSkip">
-									<button class="btn dark active" type="button" onclick="Settings.overshootSkip = 0">Don't skip</button>
-									<button class="btn dark" type="button" onclick="Settings.overshootSkip = 1">Skip after overshot</button>
-								</div>
-							</div>
-						</div>
-					</div>
-				</form>
-			</div>
-			<div class="modal-footer">
-				<button class="btn btn-lg btn-success dark" type="button" id="start" data-bs-dismiss="modal">Let's darts!</button>
-			</div>
-		</div>
-	</div>
+                     <div class="line">
+                        Finish mode
+                        <div class="btn-group" id="x3and25">
+                           <button class="btn dark" onclick="Settings.x3and25 = 0" type="button">Double And Bulls aye
+                           </button>
+                           <button class="btn dark active" onclick="Settings.x3and25 = 1" type="button">All multipliers
+                           </button>
+                        </div>
+                     </div>
+                     <div class="line">
+                        Overshoot rules
+                        <div class="btn-group" id="overshootSkip">
+                           <button class="btn dark active" onclick="Settings.overshootSkip = 0" type="button">Don't skip
+                           </button>
+                           <button class="btn dark" onclick="Settings.overshootSkip = 1" type="button">Skip after
+                              overshot
+                           </button>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </form>
+         </div>
+         <div class="modal-footer">
+            <button class="btn btn-lg btn-success dark" data-bs-dismiss="modal" id="start" type="button">Let's darts!
+            </button>
+         </div>
+      </div>
+   </div>
 
-	<div id="gameplay">
-		<div class="p1">
-			<span class="active" id="p1">Player 1</span>
-			<div class="progress"><div id="p1progress" class="progress-bar progress-bar-striped bg-success" role="progressbar" aria-valuenow="101" aria-valuemin="0" aria-valuemax="501" style="width: 50%"></div></div>
-			<div class="points"><span id="p1temp"></span><span id="p1sX"></span><span id="p1score" data-score="0">0</span></div>
-			<div id="p1last"></div>
-			<div id="p1shots"></div>
-		</div>
-		<div class="p2">
-			<span class="" id="p2">Player 2</span>
-			<div class="progress"><div id="p2progress" class="progress-bar progress-bar-striped bg-danger" role="progressbar" aria-valuenow="201" aria-valuemin="0" aria-valuemax="501" style="width: 50%"></div></div>
-			<div class="points"><span id="p2temp"></span><span id="p2sX"></span><span id="p2score" data-score="0">0</span></div>
-			<div id="p2last"></div>
-			<div id="p2shots"></div>
-		</div>
-		<div class="deck">
-			<div class="wrapper" id="selector"></div>
-			<svg id="pie" viewBox="0 0 230 230">
-				<circle cx="115" cy="115" r="110"></circle>
-			</svg>
-			<div id="timer"><div class="placeholder">Press the Pause button to start the timer</div>
-			</div>
-			<div class="rand">
-				<div class="danger random-title text-center" >Get Random</div>
-				<div class="btn-group">
-					<button id="randInput" class="btn btn-outline-danger" onclick="randomGenerator.all()">All</button>
-					<button id="randInput20" class="btn btn-outline-danger" onclick="randomGenerator.sector()">1-20</button>
-				</div>
-			</div>
-<!--			<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="70%" viewBox="-175 -175 350 350">-->
-<!--				<filter id="displacementFilter">-->
-<!--					<feTurbulence type="turbulence" baseFrequency="1" numOctaves="1" result="turbulence"/>-->
-<!--					<feDisplacementMap in2="turbulence" in="SourceGraphic" scale="2" xChannelSelector="G" yChannelSelector="B"/>-->
-<!--				</filter>-->
-<!--				<defs>-->
-<!--					<circle id="milkarea" cx="0" cy="0" r="180" stroke="none" fill="rgba(0,0,0,0)"/>-->
-<!--					&lt;!&ndash; <path id="x1" d="12 2 -1 356" stroke-width="0.2" stroke="#444"/> &ndash;&gt;-->
-<!--					<path id="x1" d="M  -5,	-30 A 40, 40 0 0 1 5,-30 L 21,-133 A 133,133 1 0 0 -21,	-133 Z" stroke-width="0.2" stroke="#444"/>-->
-<!--					<path id="x2" d="M -21,-133 A 133,133 0 0 1 21,-133 L 24,-152 A 152,152 0 0 0 -24,-152 Z" stroke-width="0.4" stroke="#222"/>-->
-<!--					<path id="x3" d="M -12, -76 A  76, 76 0 0 1 12, -76 L 15, -95 A  95, 95 0 0 0 -15, -95 Z" stroke-width="0.2" stroke="#000"/>-->
-
-<!--					<circle id="points25" cx="0" cy="0" r="32" stroke-width="2" />-->
-<!--					<circle id="bulleye" cx="0" cy="0" r="12" stroke-width="2" />-->
-
-<!--					<path d="M  -110, -110 A -110, -110 0 0 1 110, 110  Z" id="textcircle2" stroke-width="0" stroke="#A00" />-->
-<!--					<text id="milk" transform="scale(1)" x="33" y="0" fill="#FFF"><textPath xlink:href="#textcircle2">Milk</textPath></text>-->
-<!--					<path d="M  -99, -99 A -99, -99 0 0 1 99, 99  Z" id="x2circle" stroke-width="0" stroke="#A00" />-->
-<!--					<text id="x2text" transform="scale(1)" x="10"  fill="#FFF"><textPath xlink:href="#x2circle">X2</textPath></text>-->
-<!--					<path d="M  -58, -58 A -58, -58 0 0 1 58, 58  Z" id="x3circle" stroke-width="0" stroke="#A00" />-->
-<!--					<text id="x3text" transform="scale(1)" x="10"  fill="#FFF"><textPath xlink:href="#x3circle">X3</textPath></text>-->
-<!--					<path d="M  -13, -13 A -13, -13 0 0 1 13, 13  Z" id="textcircle" stroke-width="1" stroke="#A00" />-->
-<!--					<text id="twentyfive" transform="scale(1)" x="10" y="0" fill="#FFF"><textPath xlink:href="#textcircle">25</textPath></text>-->
-<!--				</defs>-->
-
-<!--				<g id="vxBoard" font-size="18" font-weight="500" text-anchor="middle" style="/*filter: url(#displacementFilter)*/"></g>-->
-<!--			</svg>-->
-		</div>
-	</div>
-	<div id="fireworks">
-		<h1 id="winnerName">Jesus Christ WON!</h1>
-		<br>
-		<div class="btn-group btn-group-lg">
-				<button type="button" class="btn btn-won" onclick="Game.cancelLastHit();">Cancel last hit</button><button type="button" class="btn btn-won" onclick="Game.new();">New Game</button>
-		</div>
-	</div>
+   <div id="gameplay">
+      <div class="p1">
+         <span class="active" id="p1">Player 1</span>
+         <div class="progress">
+            <div aria-valuemax="501" aria-valuemin="0" aria-valuenow="101"
+                 class="progress-bar progress-bar-striped bg-success" id="p1progress" role="progressbar" style="width: 50%"></div>
+         </div>
+         <div class="points"><span id="p1temp"></span><span id="p1sX"></span><span data-score="0" id="p1score">0</span>
+         </div>
+         <div id="p1last"></div>
+         <div id="p1shots"></div>
+      </div>
+      <div class="p2">
+         <span class="" id="p2">Player 2</span>
+         <div class="progress">
+            <div aria-valuemax="501" aria-valuemin="0" aria-valuenow="201" class="progress-bar progress-bar-striped bg-danger"
+                 id="p2progress" role="progressbar" style="width: 50%"></div>
+         </div>
+         <div class="points"><span id="p2temp"></span><span id="p2sX"></span><span data-score="0" id="p2score">0</span>
+         </div>
+         <div id="p2last"></div>
+         <div id="p2shots"></div>
+      </div>
+      <div class="deck">
+         <div class="wrapper" id="selector"></div>
+         <svg id="pie" viewBox="0 0 230 230">
+            <circle cx="115" cy="115" r="110"></circle>
+         </svg>
+         <div id="timer">
+            <div class="placeholder">Press the Pause button to start the timer</div>
+         </div>
+         <div class="rand">
+            <div class="danger random-title text-center">Get Random</div>
+            <div class="btn-group">
+               <button class="btn btn-outline-danger" id="randInput" onclick="randomGenerator.all()">All</button>
+               <button class="btn btn-outline-danger" id="randInput20" onclick="randomGenerator.sector()">1-20</button>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div id="fireworks">
+      <h1 id="winnerName">Jesus Christ WON!</h1>
+      <br>
+      <div class="btn-group btn-group-lg">
+         <button class="btn btn-won" onclick="Game.cancelLastHit();" type="button">Cancel last hit</button>
+         <button class="btn btn-won" onclick="Game.new();" type="button">New Game</button>
+      </div>
+   </div>
 </body>
 </html>
 
