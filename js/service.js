@@ -1,14 +1,10 @@
-// import {DB} from "/js/db.js";
-
-
-// import {DB} from "/js/db.js";
-// const DB = new IndexedDB;
-
+/**
+ * ToDo: внести функцию из /myJsLib.js в проект. У нас же Vanilla JS
+ */
 const Scripts = [
    ["./myJsLib.js"],
-   ["./js/db.js",'module'],
-   ["./js/storage.js", 'module'],
-   ["./js/deck.js"],
+   ["./js/db.js"],
+   ["./js/storage.js"],
    ["./js/selector.js"],
    ["./js/timer.js"],
    ["./js/game.js"],
@@ -18,42 +14,33 @@ const ConsoleCSS = `padding: 4px 25px 1px 0; background: rgba(255, 199, 32, .5);
 const BadConsoleCSS = `padding: 4px 25px 1px 0; background: rgba(255, 50, 32, .1); color: #F00; border-width: 0 2px 3px 0; border-style: groove; border-color: rgba(0,0,0,0.44); border-radius: 0px 50px 0 0;`;
 let init = 1;
 
+/**
+ * ToDo: сделать флаг на отключение.
+ */
 const gameConsole = function (message, error = false) {
    console.info(`%c ${init++}. ${message} `, !error ? ConsoleCSS : BadConsoleCSS);
 }
-const loading = {
-   get state() {
-      return this.stateValue;
-   },
-   set state(now) {
-      this.stateValue = now;
-      if (this.scriptsLoaded === Scripts.length) {
-         setTimeout(() => initGame(), 200);
-      }
-   },
-   scriptsLoaded: 0,
-   stateValue: 'begin',
-};
 
-function addScript(data) {
+function loadNext() {
+   const data = Scripts.shift(); // Берем первый элемент и УДАЛЯЕМ его из массива
+   if (!data) return; // Если скриптов больше нет - выходим
+
    let script = document.createElement('script');
-   // script.type = data.length > 1 ? data[1] : ''; //text/javascript
-   script.type = 'text/javascript';
+   script.type = 'text/javascript'; // Оставляем так, если пока боишься модулей
    script.src = data[0];
 
-
    script.onload = () => {
-      loading.scriptsLoaded++;
-      loading.state = data;
+      gameConsole(`Загружен: ${data[0]}`);
+      if (Scripts.length > 0) {
+         loadNext(); // ГРУЗИМ СЛЕДУЮЩИЙ ТОЛЬКО ПОСЛЕ ЗАГРУЗКИ ТЕКУЩЕГО
+      } else {
+         initGame(); // Все загружены строго по очереди
+      }
    }
 
-   document.getElementsByTagName('head')[0].appendChild(script);
+   document.head.appendChild(script);
 }
-
-Scripts.forEach(script => {
-   addScript(script);
-});
-
+loadNext();
 
 function getRandomInt(min, max) {
    min = Math.ceil(min);

@@ -21,11 +21,11 @@ const Storage = {
          Storage.shots = shots;
       });
    },
-   NewShot: (shot, callback = () => {}) => {
-      DB.addData('shots', shot, (id) => {
-         shot.id = id;
+   addShot: (shotData, callback = () => {}) => {
+      DB.addData('shots', shotData, (id) => {
+         shotData.id = id;
          console.warn(`CALLBACK ID ${id}`);
-         Storage.shots.push(shot);
+         Storage.shots.push(shotData);
          callback(Storage.shots);
       });
 
@@ -49,7 +49,7 @@ const Storage = {
          const gameDB = Storage.games[Storage.games.length - 1];
          if (gameDB.id > 0) {
             Settings.current = gameDB.id;
-            console.log(gameDB);
+            // console.log(gameDB);
             if (Object.keys(gameDB).includes('toFinish')) {
                Settings.toFinish = gameDB.toFinish;
                Settings.overshootSkip = gameDB.overshootSkip;
@@ -151,3 +151,13 @@ const Storage = {
 };
 
 Storage.MaxID();
+
+
+/*
+* Временный полукостыль от Google
+* */
+Storage.init = () => {
+   return new Promise((resolve) => {
+      Storage.MaxID(() => resolve());
+   });
+};

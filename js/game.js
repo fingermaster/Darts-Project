@@ -1,37 +1,35 @@
 let player, modal, players, Game;
 
-const ElementID = [
-   'gameInfo',
-   'toFinish',
-   'x3and25',
-   'overshootSkip',
-   'randInput',
-   'randInput20',
-   'p1',
-   'p1progress',
-   'p1shots',
-   'p1score',
-   'p1temp',
-   'p1sX',
-   'p2',
-   'p2progress',
-   'p2shots',
-   'p2score',
-   'p2temp',
-   'p2sX',
-   'p1input',
-   'p2input',
-   'playersSelect',
-   'fireworks',
-   'winnerName',
-   'latestThrows'];
-const View = (id) => {
-   if (ElementID.includes(id)) {
-      return document.getElementById(id)
-   } else {
-      return null;
-   }
-}
+
+// dom.js
+(function() {
+   // Этот массив теперь ПРИВАТНЫЙ, недоступен из консоли или других скриптов
+   const ElementID = [
+      'gameInfo', 'toFinish', 'x3and25', 'overshootSkip', 'randInput',
+      'randInput20', 'p1', 'p1progress', 'p1shots', 'p1score',
+      'p1temp', 'p1sX', 'p2', 'p2progress', 'p2shots', 'p2score',
+      'p2temp', 'p2sX', 'p1input', 'p2input', 'playersSelect',
+      'fireworks', 'winnerName', 'latestThrows'
+   ];
+
+   const View = (id) => {
+      if (ElementID.includes(id)) {
+         return document.getElementById(id);
+      } else {
+         console.warn(`Attempted to access unknown element ID: ${id}`);
+         return null;
+      }
+   };
+
+   // !!! ТОТ САМЫЙ ПРОБРОС:
+   // Мы явно "публикуем" только функцию View в глобальную область видимости (window).
+   window.View = View;
+
+   // TODO: Когда весь проект станет модульным:
+   // 1. Убрать обертку (function() { ... })();
+   // 2. Удалить строку window.View = View;
+   // 3. Добавить в начале: export { View };
+})();
 
 let checkValue = function (value) {
    return value === -1 ? 0 : value;
@@ -109,7 +107,7 @@ const Settings = {
    next: 'p1',
 };
 
-const boardNums = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5];
+// const boardNums = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5];
 const board = {
    0: [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 50],
    1: [2, 3, 4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 22, 24, 25, 26, 27, 28, 30, 32, 33, 34, 36, 38, 39, 40, 42, 45, 48, 50, 51, 54, 57, 60]
@@ -131,11 +129,8 @@ const randomGenerator = {
    }
 }
 
-
-
-
 const initGame = () => {
-   console.warn('******************** initGame ********************');
+   // console.warn('******************** initGame ********************');
    selector.toIndex(0);
    const timer = new Timer(() => {
       sendShot(0, 1);
@@ -151,7 +146,7 @@ const initGame = () => {
       };
       shotData.game = parseInt(Settings.current);
       shotData.date = new Date();
-      Storage.NewShot(shotData, () => {
+      Storage.addShot(shotData, () => {
          let shooter = Game.next === 'p1' ? 'playerOne' : 'playerTwo';
          if (Settings.overshootSkip && shotsByPlayer[shooter].score + shotsByPlayer[shooter].session + shotData.sx > Settings.toFinish - 2) {
             goZero();
@@ -163,7 +158,7 @@ const initGame = () => {
                   shotData.sector = 0;
                   shotData.x = 1;
                   shotData.sx = 0;
-                  Storage.NewShot(shotData);
+                  Storage.addShot(shotData);
                   goZero();
                }
             }
@@ -244,7 +239,7 @@ const initGame = () => {
 
 
    Storage.CheckGameID((game) => {
-      console.log(game);
+      // console.log(game);
       if (game.p1) {
          Settings.first = game.first;
          setGameDataNames(game);
