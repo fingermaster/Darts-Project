@@ -4,7 +4,6 @@ const DB_CONFIG = {
 }
 
 class IndexedDB {
-   Open;
    DB;
    dbState = '...';
    result;
@@ -12,23 +11,39 @@ class IndexedDB {
    maxId = 0;
 
    constructor(Open, DB) {
-      Open = this.Open = window.indexedDB.open(DB_CONFIG.name, DB_CONFIG.version);
-      Open.onerror = (error) => {
-         this.error(error)
-      };
-      Open.onsuccess = async () => {
-         DB = this.DB = Open.result;
-         this.dbState = 'success';
-         DB.onversionchange = () => {
-            DB.close();
-         };
-      };
-      Open.onupgradeneeded = (event) => {
-         this.upgrade(event)
-      };
-      Open.onblocked = () => {
-         this.blocked()
-      }
+      this.openDB(Open, DB)
+            .then((data) => {    console.log(`DATA: ${data}:`, data)})
+            .catch((data) => {   console.log(data)});
+   }
+
+   openDB(Open, DB){
+      return new Promise((resolve, reject) => {
+         if(this.DB === undefined){
+            Open = window.indexedDB.open(DB_CONFIG.name, DB_CONFIG.version);
+
+            Open.onerror = (error) => {
+               reject(Open);
+               this.error(error)
+            };
+            Open.onsuccess = () => {
+               DB = this.DB = Open.result;
+               this.dbState = 'success';
+               resolve(DB);
+               DB.onversionchange = () => {
+                  DB.close();
+               };
+            };
+            Open.onupgradeneeded = (event) => {
+               this.upgrade(event)
+            };
+            Open.onblocked = () => {
+               reject(Open);
+               this.blocked()
+            }
+         } else {
+            resolve(this.DB);
+         }
+      });
    }
 
    error(error) {
@@ -36,118 +51,104 @@ class IndexedDB {
       return error;
    }
 
-   on(callback = () => {
-   }, state = 'success') {
-      let lastState = this.dbState;
-      let interval = setInterval(() => {
-         if (lastState !== this.dbState) {
-            console.log(`State changed. ${lastState} -> ${this.dbState}`);
-            lastState = this.dbState;
+   async addData(requestStore = 'shots', data = {}, callback = () => {  }) {
+      await this.openDB();
+      return new Promise((resolve, reject) => {
+         const transaction = this.DB.transaction(requestStore, 'readwrite');
+         let store = transaction.objectStore(requestStore);
+         let request;
+         if (Object.keys(data).includes('id')) {
+            request = store.put(data)
+         } else {
+            request = store.add(data);
          }
-         if (lastState === state) {
-            callback();
-            clearInterval(interval);
-         }
-      }, 1);
-   }
 
-   state(stateLink, callback = () => {
-   }, onState = 'done') {
-      let lastState = stateLink.readyState;
-      let interval = setInterval(() => {
-         if (lastState !== stateLink.readyState) {
-            // console.log(`State changed. ${lastState} -> ${stateLink.readyState}`);
-            lastState = stateLink.readyState;
-            callback(stateLink.readyState);
-         }
-         if (lastState === onState) {
-            clearInterval(interval);
-         }
-      }, 1);
-   }
-
-   addData(requestStore = 'shots', data = {}, callback = () => {
-   }) {
-      // console.warn(requestStore);
-      const transaction = this.DB.transaction(requestStore, 'readwrite');
-      let store = transaction.objectStore(requestStore);
-      let request;
-      if (Object.keys(data).includes('id')) {
-         request = store.put(data)
-      } else {
-         request = store.add(data);
-      }
-      this.state(request, (state) => {
-         if (state === 'done') {
+         request.onsuccess = () => {
             this.result = request;
             // console.warn(`Data adding result: ${request.result}`);
             this.id = request.result;
-            callback(request.result);
-         }
+            console.warn(`Data adding result: ${request.result}`);
+
+            resolve(request.result);
+            // callback(request.result);
+         };
       });
-      transaction.oncomplete = () => {
-      }
    }
 
-   delete(id, requestStore = 'shots', callback = () => {
-   }) {
-      const transaction = this.DB.transaction(requestStore, 'readwrite');
-      let store = transaction.objectStore(requestStore);
-      let request = store.delete(id);
-      this.state(request, (state) => {
-         if (state === 'done') {
+   async delete(id, requestStore = 'shots') {
+      await this.openDB();
+      return new Promise((resolve, reject) => {
+         const transaction = this.DB.transaction(requestStore, 'readwrite');
+         const store = transaction.objectStore(requestStore);
+         const request = store.delete(id);
+
+         request.onsuccess = () => {
             this.result = request;
-            callback();
-         }
+            resolve(); // Готово!
+         };
+
+         request.onerror = () => reject(request.error);
       });
    }
 
-   read(requestStore = 'games', index = false, callback = (data) => {
-      console.log(data);
-   }) {
-      const transaction = this.DB.transaction(requestStore, 'readwrite');
-      const save = (data) => {
-         callback(data);
-      }
-      if (typeof index === "object") {
-         let store, result;
-         result = [];
-         store = transaction.objectStore(requestStore).index(index[0]);
-         let singleKeyRange = IDBKeyRange.only(index[1]);
-         store.openCursor(singleKeyRange).onsuccess = (event) => {
-            const cursor = event.target.result;
-            if (cursor) {
-               result.push(cursor.value);
-               cursor.continue();
-            } else {
-               save(result);
+   async read(requestStore = 'games', index = false) {
+      await this.openDB();
+      return new Promise((resolve, reject) => {
+         const transaction = this.DB.transaction(requestStore, 'readwrite');
+         const save = (data) => {
+            resolve(data);
+         }
+         if (typeof index === "object") {
+            let store, result;
+            result = [];
+            store = transaction.objectStore(requestStore).index(index[0]);
+            let singleKeyRange = IDBKeyRange.only(index[1]);
+            store.openCursor(singleKeyRange).onsuccess = (event) => {
+               const cursor = event.target.result;
+               if (cursor) {
+                  result.push(cursor.value);
+                  cursor.continue();
+               } else {
+                  save(result);
+               }
+            }
+         } else {
+            let store, request;
+            store = transaction.objectStore(requestStore);
+            request = store.getAll();
+            request.onsuccess = () => save(request.result);
+            request.onerror = (error) => {
+               reject(error);
+               this.error(error);
             }
          }
-      } else {
-         let store, request;
-         store = transaction.objectStore(requestStore);
-         request = store.getAll();
-         request.onsuccess = async () => save(request.result);
-         request.onerror = (error) => reject(this.error(error));
-      }
-      transaction.oncomplete = () => {
-      }
+         transaction.oncomplete = () => {}
+      });
    }
 
-   findMaxId(callback = (e) => console.log(e)) {
-      this.on(() => {
-         const transaction = this.DB.transaction('games', 'readwrite');
-         transaction.oncomplete = () => {
-         }
-         let store = transaction.objectStore('games');
-         let request = store.getAll();
-         request.addEventListener("success", async (event) => {
-            this.maxId = event.target.result.length === 0 ? 0 : event.target.result[request.result.length - 1].id;
-            this.result = event.target.result;
-            callback(this.maxId, this.result);
-         });
-         request.addEventListener("error", (error) => this.error(error));
+   async getLastGame() {
+      await this.openDB();
+      const data = await new Promise((resolve, reject) => {
+         const store = this.DB.transaction('games', 'readonly').objectStore('games');
+         const request = store.openCursor(null, 'prev'); //
+
+         request.onsuccess = (e) => {
+            const cursor = e.target.result;
+            if (cursor) {
+               // Возвращаем ID и саму запись (cursor.value)
+               // console.log(`maxId: ${cursor.value.id}, lastGame: ${cursor.value}`);
+               resolve({ maxId: cursor.value.id, lastGame: cursor.value });
+            } else {
+               resolve({ maxId: 0, lastGame: null });
+            }
+         };
+         request.onerror = () => reject(request.error);
       });
+
+      // Сохраняем состояние
+      this.maxId = data.maxId;
+
+      return data;
    }
 
    upgrade(event) {
@@ -198,5 +199,3 @@ class IndexedDB {
 }
 
 const DB = new IndexedDB;
-
-// export { DB };

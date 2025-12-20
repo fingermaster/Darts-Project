@@ -30,7 +30,7 @@ function loadNext() {
    script.src = data[0];
 
    script.onload = () => {
-      gameConsole(`Загружен: ${data[0]}`);
+      // gameConsole(`Загружен: ${data[0]}`);
       if (Scripts.length > 0) {
          loadNext(); // ГРУЗИМ СЛЕДУЮЩИЙ ТОЛЬКО ПОСЛЕ ЗАГРУЗКИ ТЕКУЩЕГО
       } else {

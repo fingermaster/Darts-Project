@@ -3,7 +3,6 @@ let player, modal, players, Game;
 
 // dom.js
 (function() {
-   // Этот массив теперь ПРИВАТНЫЙ, недоступен из консоли или других скриптов
    const ElementID = [
       'gameInfo', 'toFinish', 'x3and25', 'overshootSkip', 'randInput',
       'randInput20', 'p1', 'p1progress', 'p1shots', 'p1score',
@@ -22,7 +21,6 @@ let player, modal, players, Game;
    };
 
    // !!! ТОТ САМЫЙ ПРОБРОС:
-   // Мы явно "публикуем" только функцию View в глобальную область видимости (window).
    window.View = View;
 
    // TODO: Когда весь проект станет модульным:
@@ -129,7 +127,7 @@ const randomGenerator = {
    }
 }
 
-const initGame = () => {
+const initGame = async () => {
    // console.warn('******************** initGame ********************');
    selector.toIndex(0);
    const timer = new Timer(() => {
@@ -172,6 +170,8 @@ const initGame = () => {
    }
 
    window.document.onkeydown = (event) => {
+      if(modal.state) return;
+
       let selected;
       if(typeof event.code !== "string") return;
       switch (event.code) {
@@ -237,48 +237,44 @@ const initGame = () => {
    };
 
 
+   let game = await Storage.CheckGameID();
 
-   Storage.CheckGameID((game) => {
-      // console.log(game);
-      if (game.p1) {
-         Settings.first = game.first;
-         setGameDataNames(game);
-         calculate(function () {
-         });
-      } else {
-         modal.toggle();
-      }
-      InfoBar();
-   });
-
+   if (game.p1) {
+      Settings.first = game.first;
+      setGameDataNames(game);
+      calculate(function () {
+      });
+   } else {
+      modal.toggle();
+   }
+   InfoBar();
 
    View('playersSelect').innerHTML = '';
    View('p1input').value = Settings.p1;
    View('p2input').value = Settings.p2;
-   Storage.PlayersList((names) => {
-      View('playersSelect').innerHTML = '';
-      names.forEach(function (el) {
-         View('playersSelect').innerHTML += `<option value='${el.name}' class="selectplayer" data-player-name="${el.name}">${el.name}</option>\n`;
-      });
+
+   let names = await Storage.PlayersList();
+   View('playersSelect').innerHTML = '';
+   names.forEach(function (el) {
+      View('playersSelect').innerHTML += `<option value='${el.name}' class="selectplayer" data-player-name="${el.name}">${el.name}</option>\n`;
    });
 }
 
 
-document.onclick = (clickEvent) => {
+document.onclick = async (clickEvent) => {
    if (clickEvent.target.tagName !== 'BUTTON' &&
          modal.state === true &&
          !modal.isOnModal(clickEvent.x, clickEvent.y)) {
       modal.hide();
    }
    if (clickEvent.target.id === 'start') {
-      Storage.NewPlayer([View('p1input').value, View('p2input').value], () => {
-         Settings.p1 = View('p1input').value;
-         Settings.p2 = View('p2input').value;
-         Game.first = 'p1';
-         setGameDataNames();
-         Game.new();
-         modal.toggle();
-      });
+      await Storage.NewPlayer([View('p1input').value, View('p2input').value]);
+      Settings.p1 = View('p1input').value;
+      Settings.p2 = View('p2input').value;
+      Game.first = 'p1';
+      setGameDataNames();
+      await Game.new();
+      modal.toggle();
    }
    if (clickEvent.target.parentNode.dataset.num) {
       selector.toIndex(clickEvent.target.parentNode.dataset.num);
@@ -345,25 +341,24 @@ Game = {
          View('p1').classList.remove('active');
       }
    },
-   cancelLastHit: function () {
+   cancelLastHit: async () => {
       View('fireworks').style.display = 'none';
-      Storage.CancelShot(() => {
+      await Storage.CancelShot();
          calculate(function () {
             // console.log('we are calculate');
          });
-      })
-
    },
    clearX: function () {
       View('p1sX').innerHTML = View('p2sX').innerHTML = '';
    },
-   new: function () {
+   new: async function () {
       Game.clearX();
-      Storage.NewGame();
+      await Storage.NewGame();
       View('p1shots').innerHTML = View('p2shots').innerHTML = '';
       View('p1score').innerHTML = Settings.toFinish;
       View('p2score').innerHTML = Settings.toFinish;
       View('fireworks').style.display = 'none';
+      await initGame();
    },
    end: (winner) => {
       Storage.EndGame();
