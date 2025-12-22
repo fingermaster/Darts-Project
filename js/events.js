@@ -1,71 +1,3 @@
-window.document.onkeydown = (event) => {
-   if(modal.state) return;
-
-   let selected;
-   if(typeof event.code !== "string") return;
-   switch (event.code) {
-      case 'Digit1':
-         Game.first = 'p1';
-         break;
-      case 'Digit2':
-         Game.first = 'p2';
-         break;
-      case 'Space':
-         event.preventDefault();
-         sendShot(0, 1);
-         timer.clearTimer();
-         break;
-      case 'Backspace':
-         event.preventDefault();
-         Game.cancelLastHit();
-         timer.clearTimer();
-         break;
-      case 'Enter':
-         selected = selector.enter();
-         sendShot(selected.sector, selected.x);
-         timer.clearTimer();
-         break;
-      case 'NumpadEnter':
-         selected = selector.enter();
-         sendShot(selected.sector, selected.x);
-         timer.clearTimer();
-         break;
-      case 'Pause':
-         timer.switchTimer();
-         break;
-      case 'NumpadDivide':
-         randomGenerator.all();
-         break;
-      case 'NumpadMultiply':
-         randomGenerator.sector();
-         break;
-      default:
-         if (event.code.includes('Arrow')) {
-            selector.keyDown(event);
-         }
-         if (event.code.includes('Numpad')) {
-            event.preventDefault();
-            let num = (event.code).match(/\d+/g);
-            if (num !== null) {
-               num = parseInt(num[0]);
-               if (num === 0) {
-                  num = 10;
-               }
-               if (event.shiftKey) {
-                  num = num + 10;
-               }
-               selector.toSector(num);
-            }
-            // selector.keyDown(event);
-         }
-         break;
-   }
-}
-onwheel = (event) => {
-   event.deltaY > 0 ? selector.keyDown({code: 'ArrowLeft'}) : selector.keyDown({code: 'ArrowRight'});
-};
-
-//словарь действий
 const clickActions = {
    start: async () => {
       await Storage.NewPlayer([View('p1input').value, View('p2input').value]);
@@ -88,11 +20,9 @@ const clickActions = {
    toFinish: (btn) => {
       const value = parseInt(btn.dataset.value);
       Settings.toFinish = value;
-      console.log(value);
    },
    x3and25: (btn) => {
       const value = parseInt(btn.dataset.value);
-      console.log(typeof value);
       Settings.x3and25 = value;
    },
    overshoot: (btn) => {
@@ -106,12 +36,69 @@ const clickActions = {
       randomGenerator.sector();
    },
 };
+
 const changeActions = {
    toFinishCustom: (input) => {
       const value = parseInt(input.value);
       Settings.toFinish = value;
-      console.log(value);
    },
+};
+
+const keyActions = {
+   Digit1: () => {
+      Game.first = 'p1';
+   },
+   Digit2: () => {
+      Game.first = 'p2';
+   },
+   Space: (event) => {
+      event.preventDefault();
+      sendShot(0, 1);
+      timer.clearTimer();
+   },
+   Backspace: (event) => {
+      event.preventDefault();
+      Game.cancelLastHit();
+      timer.clearTimer();
+   },
+   Enter: () => {
+      let selected = selector.enter();
+      sendShot(selected.sector, selected.x);
+      timer.clearTimer();
+   },
+   NumpadEnter: () => {
+      let selected = selector.enter();
+      sendShot(selected.sector, selected.x);
+      timer.clearTimer();
+   },
+   Pause: () => {
+      timer.switchTimer();
+   },
+   NumpadDivide: () => {
+      randomGenerator.all();
+   },
+   NumpadMultiply: () => {
+      randomGenerator.sector();
+   },
+};
+
+const handleArrows = (event) => {
+   selector.keyDown(event);
+};
+
+const handleNumpadDigits = (event) => {
+   event.preventDefault();
+   let num = (event.code).match(/\d+/g);
+   if (num !== null) {
+      num = parseInt(num[0]);
+      if (num === 0) {
+         num = 10;
+      }
+      if (event.shiftKey) {
+         num = num + 10;
+      }
+      selector.toSector(num);
+   }
 };
 
 document.addEventListener('click', (event) => {
@@ -124,12 +111,12 @@ document.addEventListener('click', (event) => {
    const btn = event.target.closest('[data-action]');
    const action = btn?.dataset.action;
    if (action && typeof clickActions[action] === 'function') {
-      clickActions[action](btn);   //вызываем действие из словаря
+      clickActions[action](btn);
    }
 
-   //Переходим на нужный сектор
-   if (event.target.parentNode.dataset.num) {
-      selector.toIndex(event.target.parentNode.dataset.num);
+   const numContainer = event.target.closest('[data-num]');
+   if (numContainer) {
+      selector.toIndex(numContainer.dataset.num);
    }
 });
 
@@ -140,3 +127,22 @@ document.addEventListener('change', (event) => {
    }
 });
 
+document.addEventListener('wheel', (event) => {
+   event.deltaY > 0 ? selector.keyDown({code: 'ArrowLeft'}) : selector.keyDown({code: 'ArrowRight'});
+});
+
+document.addEventListener('keydown', (event) => {
+   if(modal.state) return;
+
+   const code = event.code;
+
+   if (keyActions[code]) {
+      keyActions[code](event);
+   }
+   else if (code.startsWith('Arrow')) {
+      handleArrows(event);
+   }
+   else if (code.startsWith('Numpad')) {
+      handleNumpadDigits(event);
+   }
+});

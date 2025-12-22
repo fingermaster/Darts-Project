@@ -113,7 +113,6 @@ const board = {
 
 players = [];
 
-
 const selector = new Selector();
 
 const randomGenerator = {
