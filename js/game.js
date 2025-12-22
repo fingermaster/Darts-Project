@@ -134,7 +134,7 @@ const initGame = async () => {
       sendShot(0, 1);
    }, 10, 100);
 
-   function sendShot(sector, x) {
+   async function sendShot(sector, x) {
       console.warn(Game.next);
       let shotData = {
          player: Settings[Game.next],
@@ -144,26 +144,25 @@ const initGame = async () => {
       };
       shotData.game = parseInt(Settings.current);
       shotData.date = new Date();
-      Storage.addShot(shotData, () => {
-         let shooter = Game.next === 'p1' ? 'playerOne' : 'playerTwo';
-         if (Settings.overshootSkip && shotsByPlayer[shooter].score + shotsByPlayer[shooter].session + shotData.sx > Settings.toFinish - 2) {
-            goZero();
+      await Storage.addShot(shotData);
+      let shooter = Game.next === 'p1' ? 'playerOne' : 'playerTwo';
+      if (Settings.overshootSkip && shotsByPlayer[shooter].score + shotsByPlayer[shooter].session + shotData.sx > Settings.toFinish - 2) {
+         goZero();
 
-            function goZero() {
-               if (shotData.shotn < 3) {
-                  shotData.date++;
-                  shotData.shotn++;
-                  shotData.sector = 0;
-                  shotData.x = 1;
-                  shotData.sx = 0;
-                  Storage.addShot(shotData);
-                  goZero();
-               }
+         function goZero() {
+            if (shotData.shotn < 3) {
+               shotData.date++;
+               shotData.shotn++;
+               shotData.sector = 0;
+               shotData.x = 1;
+               shotData.sx = 0;
+               Storage.addShot(shotData);
+               goZero();
             }
          }
-         calculate(function () {
-            // console.log(`looks like calculated`);
-         });
+      }
+      calculate(function () {
+         // console.log(`looks like calculated`);
       });
 
       selector.toIndex(0);

@@ -13,12 +13,12 @@ const Storage = {
       Storage.shots = await DB.read('shots', ['game', Storage.maxGameId]);
    },
 
-   addShot: async (shotData, callback = () => {}) => {
+   addShot: async (shotData) => {
       let id = await DB.addData('shots', shotData);
       shotData.id = id;
       // console.warn(`CALLBACK ID ${id}`);
       Storage.shots.push(shotData);
-      callback(Storage.shots);
+      return Storage.shots;
    },
 
    CancelShot: async () => {
@@ -64,6 +64,7 @@ const Storage = {
 
    GetNext: () => {
       console.log(`%cGetNext`, ConsoleCSS);
+      // console.trace("Откуда пришел вызов?");
       Settings.next = Storage.games[Storage.games.length - 1].next;
    },
 

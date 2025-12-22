@@ -1,8 +1,5 @@
-/**
- * ToDo: внести функцию из /myJsLib.js в проект. У нас же Vanilla JS
- */
 const Scripts = [
-   ["./myJsLib.js"],
+   ["./js/utils.js"],
    ["./js/db.js"],
    ["./js/storage.js"],
    ["./js/selector.js"],
@@ -42,37 +39,3 @@ function loadNext() {
 }
 loadNext();
 
-function getRandomInt(min, max) {
-   min = Math.ceil(min);
-   max = Math.floor(max) + 1;
-   return Math.floor(Math.random() * (max - min)) + min;
-}
-
-function rand20() {
-   return getRandomInt(1, 20);
-}
-
-function rand3() {
-   return getRandomInt(2, 3);
-}
-
-function randDeck() {
-   const res = {sector: 20, multipler: 1};
-   if (getRandomInt(1, 60) > 50) {
-      if (getRandomInt(1, 15) < 10) {
-         res.multipler = 3;
-      } else {
-         res.multipler = 4;
-      }
-   } else if (getRandomInt(1, 40) > 22) {
-      res.multipler = rand3();
-      res.sector = rand20();
-   } else {
-      res.sector = rand20();
-   }
-   return res;
-}
-
-const isEven = function (someNumber) {
-   return (someNumber % 2 === 0);
-};
