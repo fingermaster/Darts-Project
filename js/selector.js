@@ -152,6 +152,9 @@ class Selector {
             subEl.classList.remove('active')
          })
       });
+      /**
+       * ToDo: fix select
+       */
       this.OUTPUT.childNodes[this.position.index].childNodes[this.position.now].classList.add('active');
    }
 
