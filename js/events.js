@@ -65,13 +65,9 @@ onwheel = (event) => {
    event.deltaY > 0 ? selector.keyDown({code: 'ArrowLeft'}) : selector.keyDown({code: 'ArrowRight'});
 };
 
-document.onclick = async (clickEvent) => {
-   if (clickEvent.target.tagName !== 'BUTTON' &&
-         modal.state === true &&
-         !modal.isOnModal(clickEvent.x, clickEvent.y)) {
-      modal.hide();
-   }
-   if (clickEvent.target.id === 'start') {
+//словарь действий
+const clickActions = {
+   start: async () => {
       await Storage.NewPlayer([View('p1input').value, View('p2input').value]);
       Settings.p1 = View('p1input').value;
       Settings.p2 = View('p2input').value;
@@ -79,8 +75,68 @@ document.onclick = async (clickEvent) => {
       setGameDataNames();
       await Game.new();
       modal.toggle();
-   }
-   if (clickEvent.target.parentNode.dataset.num) {
-      selector.toIndex(clickEvent.target.parentNode.dataset.num);
-   }
+   },
+   newGame: () => {
+      Game.new();
+   },
+   cancelHit: () => {
+      Game.cancelLastHit();
+   },
+   modalToggle: () => {
+      modal.toggle();
+   },
+   toFinish: (btn) => {
+      const value = parseInt(btn.dataset.value);
+      Settings.toFinish = value;
+      console.log(value);
+   },
+   x3and25: (btn) => {
+      const value = parseInt(btn.dataset.value);
+      console.log(typeof value);
+      Settings.x3and25 = value;
+   },
+   overshoot: (btn) => {
+      const value = parseInt(btn.dataset.value);
+      Settings.overshootSkip = value;
+   },
+   randomAll: () => {
+      randomGenerator.all();
+   },
+   randomSector: () => {
+      randomGenerator.sector();
+   },
 };
+const changeActions = {
+   toFinishCustom: (input) => {
+      const value = parseInt(input.value);
+      Settings.toFinish = value;
+      console.log(value);
+   },
+};
+
+document.addEventListener('click', (event) => {
+   if (event.target.tagName !== 'BUTTON' &&
+         modal.state === true &&
+         !modal.isOnModal(event.x, event.y)) {
+      modal.hide();
+   }
+
+   const btn = event.target.closest('[data-action]');
+   const action = btn?.dataset.action;
+   if (action && typeof clickActions[action] === 'function') {
+      clickActions[action](btn);   //вызываем действие из словаря
+   }
+
+   //Переходим на нужный сектор
+   if (event.target.parentNode.dataset.num) {
+      selector.toIndex(event.target.parentNode.dataset.num);
+   }
+});
+
+document.addEventListener('change', (event) => {
+   const el = event.target.closest('[data-action]');
+   if (el && changeActions[el.dataset.action]) {
+      changeActions[el.dataset.action](el);
+   }
+});
+

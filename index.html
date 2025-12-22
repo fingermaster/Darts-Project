@@ -10,8 +10,8 @@
 <body class="" data-scope="darts">
    <div class="abs"></div>
    <nav>
-      <button class="ml-20" onclick="modal.toggle()">Game</button>
-      <button onclick="Game.cancelLastHit();">Cancel last hit</button>
+      <button class="ml-20" data-action="modalToggle">Game</button>
+      <button data-action="cancelHit">Cancel last hit</button>
       <button id="latestThrows"></button>
    </nav>
    <div id="gameInfo"></div>
@@ -29,20 +29,20 @@
                   <div class="settings">
                      <div class="versus">
                         <input aria-describedby="confirmP1" aria-label="Recipient's username" class="dark"
-                               id="p1input" list="playersSelect" onload="this.value = Settings.p1"
+                               id="p1input" list="playersSelect"
                                placeholder="First Player" type="text"> vs
                         <input aria-describedby="confirmP2" aria-label="Recipient's username" class="dark"
-                               id="p2input" list="playersSelect" onload="this.value = Settings.p2"
+                               id="p2input" list="playersSelect"
                                placeholder="Second Player" type="text">
                         <datalist id="playersSelect"></datalist>
                      </div>
                      <div class="line">
                         Score to finish
                         <div class="btn-group" id="toFinish">
-                           <button class="btn dark" onclick="Settings.toFinish = 301" type="button">301</button>
-                           <button class="btn dark active" onclick="Settings.toFinish = 501" type="button">501</button>
+                           <button class="btn dark" data-action="toFinish" data-value="301" type="button">301</button>
+                           <button class="btn dark active" data-action="toFinish" data-value="501" type="button">501</button>
                            <label>
-                              <input class="btn dark" onchange="Settings.toFinish = parseInt(this.value)" placeholder="Custom"
+                              <input class="btn dark" data-action="toFinishCustom" placeholder="Custom"
                                      type="number">
                            </label>
                         </div>
@@ -51,18 +51,18 @@
                      <div class="line">
                         Finish mode
                         <div class="btn-group" id="x3and25">
-                           <button class="btn dark" onclick="Settings.x3and25 = 0" type="button">Double And Bulls aye
+                           <button class="btn dark" data-action="x3and25" data-value="0" type="button">Double And Bulls aye
                            </button>
-                           <button class="btn dark active" onclick="Settings.x3and25 = 1" type="button">All multipliers
+                           <button class="btn dark active" data-action="x3and25" data-value="1" type="button">All multipliers
                            </button>
                         </div>
                      </div>
                      <div class="line">
                         Overshoot rules
                         <div class="btn-group" id="overshootSkip">
-                           <button class="btn dark active" onclick="Settings.overshootSkip = 0" type="button">Don't skip
+                           <button class="btn dark active" data-action="overshoot" data-value="0" type="button">Don't skip
                            </button>
-                           <button class="btn dark" onclick="Settings.overshootSkip = 1" type="button">Skip after
+                           <button class="btn dark" data-action="overshoot" data-value="1" type="button">Skip after
                               overshot
                            </button>
                         </div>
@@ -72,7 +72,7 @@
             </form>
          </div>
          <div class="modal-footer">
-            <button class="btn btn-lg btn-success dark" data-bs-dismiss="modal" id="start" type="button">Let's darts!
+            <button class="btn btn-lg btn-success dark" data-bs-dismiss="modal" data-action="start" type="button">Let's darts!
             </button>
          </div>
       </div>
@@ -112,8 +112,8 @@
          <div class="rand">
             <div class="danger random-title text-center">Get Random</div>
             <div class="btn-group">
-               <button class="btn btn-outline-danger" id="randInput" onclick="randomGenerator.all()">All</button>
-               <button class="btn btn-outline-danger" id="randInput20" onclick="randomGenerator.sector()">1-20</button>
+               <button class="btn btn-outline-danger" data-action="randomAll" id="randInput">All</button>
+               <button class="btn btn-outline-danger" data-action="randomSector" id="randInput20">1-20</button>
             </div>
          </div>
       </div>
@@ -122,8 +122,8 @@
       <h1 id="winnerName">Jesus Christ WON!</h1>
       <br>
       <div class="btn-group btn-group-lg">
-         <button class="btn btn-won" onclick="Game.cancelLastHit();" type="button">Cancel last hit</button>
-         <button class="btn btn-won" onclick="Game.new();" type="button">New Game</button>
+         <button class="btn btn-won" data-action="cancelHit" type="button">Cancel last hit</button>
+         <button class="btn btn-won" data-action="newGame" type="button">New Game</button>
       </div>
    </div>
 </body>
