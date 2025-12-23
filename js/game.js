@@ -14,7 +14,7 @@ const randomGenerator = {
    all: () => {
       let rand = randDeck();
       selector.toSector(rand.sector);
-      selector.toPosition(rand.multipler);
+      selector.toPosition(rand.multiplier);
    },
    sector: () => {
       selector.toSector(rand20());
@@ -27,38 +27,35 @@ const timer = new Timer(() => {
 
 
 const sendShot = async function (sector, x) {
-   console.warn(Game.next);
-   let shotData = {
-      player: Settings[Game.next],
+   const currentPlayerKey = Game.next; // 'p1' или 'p2'
+   const shooter = currentPlayerKey === 'p1' ? 'playerOne' : 'playerTwo';
+
+   const shotData = {
+      player: Settings[currentPlayerKey],
       sector: sector,
       x: x,
       sx: sector * x,
+      game: parseInt(Settings.current),
+      date: new Date()
    };
-   shotData.game = parseInt(Settings.current);
-   shotData.date = new Date();
-   await Storage.addShot(shotData);
-   let shooter = Game.next === 'p1' ? 'playerOne' : 'playerTwo';
-   if (Settings.overshootSkip && shotsByPlayer[shooter].score + shotsByPlayer[shooter].session + shotData.sx > Settings.toFinish - 2) {
-      goZero();
 
-      function goZero() {
-         if (shotData.shotn < 3) {
-            shotData.date++;
-            shotData.shotn++;
-            shotData.sector = 0;
-            shotData.x = 1;
-            shotData.sx = 0;
-            Storage.addShot(shotData);
-            goZero();
-         }
-      }
+   // 1. Сохраняем основной бросок
+   const updatedShots = await Storage.addShot(shotData);
+   const lastShot = updatedShots[updatedShots.length - 1]; // Получаем бросок с уже присвоенным shotn
+
+   // 2. Логика перебора (Overshoot)
+   const currentTotal = shotsByPlayer[shooter].score + shotsByPlayer[shooter].session + shotData.sx;
+   const isOvershoot = Settings.overshootSkip && currentTotal > (Settings.toFinish - 2);
+
+   if (isOvershoot) {
+      await Game.processOvershoot(lastShot);
    }
-   calculate(function () {
-      // console.log(`looks like calculated`);
-   });
 
-   selector.toIndex(0);
-}
+   // 3. Пересчет и сброс селектора
+   calculate(() => {
+      selector.toIndex(0);
+   });
+};
 
 
 const initGame = async () => {
@@ -150,6 +147,21 @@ Game = {
    end: (winner) => {
       Storage.EndGame();
       UI.showWinScreen(winner);
+   },
+   processOvershoot: async (shotData) => {
+      // Если нужно докидать нули до конца серии (3 броска)
+      let currentShotN = shotData.shotn;
+      while (currentShotN < 3) {
+         currentShotN++;
+         await Storage.addShot({
+            ...shotData,
+            date: new Date(shotData.date.getTime() + currentShotN), // немного смещаем время
+            shotn: currentShotN,
+            sector: 0,
+            x: 1,
+            sx: 0
+         });
+      }
    },
 };
 
