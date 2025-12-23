@@ -65,6 +65,65 @@ const UI = {
          div.innerHTML = html; // Здесь уже собранный внутренний HTML
          container.append(div);
       });
+   },
+
+   toggleActivePlayer: (player) => {
+      View('p1').classList.toggle('active', player === 'p1');
+      View('p2').classList.toggle('active', player === 'p2');
+   },
+
+   clearHints: () => {
+      View('p1sX').innerHTML = View('p2sX').innerHTML = '';
+   },
+
+   resetBoard: (toFinish) => {
+      View('p1shots').innerHTML = View('p2shots').innerHTML = '';
+      View('p1score').innerHTML = toFinish;
+      View('p2score').innerHTML = toFinish;
+      View('fireworks').style.display = 'none';
+   },
+
+   showWinScreen: (winner) => {
+      View('fireworks').style.display = 'flex';
+      View('winnerName').innerHTML = `${winner} WON!`;
+   },
+
+   hideWinScreen: () => {
+      View('fireworks').style.display = 'none';
+   },
+
+   updateTempScore: (playerKey, sessionValue) => {
+      const id = playerKey === 'playerOne' ? 'p1temp' : 'p2temp';
+      View(id).innerHTML = sessionValue !== 0 ? sessionValue : '';
+   },
+   clearGameDisplay: () => {
+      View('p1shots').innerHTML = '';
+      View('p2shots').innerHTML = '';
+      View('p1score').innerHTML = '';
+      View('p2score').innerHTML = '';
+      View('p1temp').innerHTML = '';
+      View('p2temp').innerHTML = '';
+   },
+
+   drawPlayerHeaders: (p1, p2) => {
+      View('p1').innerHTML = p1;
+      View('p2').innerHTML = p2;
+   },
+
+   setupPlayerForm: (p1, p2, playersList) => {
+      View('p1input').value = p1;
+      View('p2input').value = p2;
+
+      const select = View('playersSelect');
+      select.innerHTML = '';
+      playersList.forEach(el => {
+         const option = document.createElement('option');
+         option.value = el.name;
+         option.className = 'selectplayer';
+         option.dataset.playerName = el.name;
+         option.textContent = el.name;
+         select.append(option);
+      });
    }
 };
 

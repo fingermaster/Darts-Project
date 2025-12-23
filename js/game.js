@@ -1,9 +1,5 @@
 let player, players, Game;
 
-let checkValue = function (value) {
-   return value === -1 ? 0 : value;
-}
-
 const Settings = {
    isInitializing: false,
    data: {
@@ -135,7 +131,7 @@ const sendShot = async function (sector, x) {
 
 
 const initGame = async () => {
-   Settings.isInitializing = true; //Ставим флаг инициализации
+   Settings.isInitializing = true;
    selector.toIndex(0);
 
    let game = await Storage.CheckGameID();
@@ -143,22 +139,15 @@ const initGame = async () => {
    if (game.p1) {
       Settings.first = game.first;
       setGameDataNames(game);
-      calculate(function () {
-      });
+      calculate(() => {});
    } else {
       modal.toggle();
    }
-
-   View('playersSelect').innerHTML = '';
-   View('p1input').value = Settings.p1;
-   View('p2input').value = Settings.p2;
-
    let names = await Storage.PlayersList();
-   View('playersSelect').innerHTML = '';
-   names.forEach(function (el) {
-      View('playersSelect').innerHTML += `<option value='${el.name}' class="selectplayer" data-player-name="${el.name}">${el.name}</option>\n`;
-   });
-   Settings.isInitializing = false; //Снимаем флаг инициализации
+
+   UI.setupPlayerForm(Settings.p1, Settings.p2, names);
+
+   Settings.isInitializing = false;
 }
 
 function setGameDataNames(data = {}) {
@@ -166,23 +155,21 @@ function setGameDataNames(data = {}) {
       Settings.p1 = data.p1;
       Settings.p2 = data.p2;
    }
-   View('p1').innerHTML = Settings.p1;
-   View('p2').innerHTML = Settings.p2;
+   UI.drawPlayerHeaders(Settings.p1, Settings.p2);
 }
 
 const modal = {
-   el: document.querySelector('.modal'),
+   // el: document.querySelector('.modal'), // Если это константа, лучше оставить в UI или кэшировать
    state: false,
 
    show() {
-      View('p1input').value = Settings.p1;
-      View('p2input').value = Settings.p2;
-      this.el.classList.add('show');
+      UI.setupPlayerForm(Settings.p1, Settings.p2, []);
+      document.querySelector('.modal').classList.add('show');
       this.state = true;
    },
 
    hide() {
-      this.el.classList.remove('show');
+      document.querySelector('.modal').classList.remove('show');
       this.state = false;
    },
 
@@ -191,7 +178,7 @@ const modal = {
    },
 
    isOnModal(x, y) {
-      const rect = this.el.getBoundingClientRect();
+      const rect = document.querySelector('.modal').getBoundingClientRect();
       return x > rect.left && x < rect.right && y > rect.top && y < rect.bottom;
    }
 };
@@ -211,37 +198,27 @@ Game = {
       Game.setActivePlayer(player);
    },
    setActivePlayer: (player) => {
-      if (player === 'p1') {
-         View('p1').classList.add('active');
-         View('p2').classList.remove('active');
-      } else {
-         View('p2').classList.add('active');
-         View('p1').classList.remove('active');
-      }
+      UI.toggleActivePlayer(player);
    },
    cancelLastHit: async () => {
-      View('fireworks').style.display = 'none';
+      UI.hideWinScreen();
       await Storage.CancelShot();
-         calculate(function () {
-            // console.log('we are calculate');
-         });
+      calculate(function () {
+         // console.log('we are calculate');
+      });
    },
    clearX: function () {
-      View('p1sX').innerHTML = View('p2sX').innerHTML = '';
+      UI.clearHints();
    },
    new: async function () {
       Game.clearX();
       await Storage.NewGame();
-      View('p1shots').innerHTML = View('p2shots').innerHTML = '';
-      View('p1score').innerHTML = Settings.toFinish;
-      View('p2score').innerHTML = Settings.toFinish;
-      View('fireworks').style.display = 'none';
+      UI.resetBoard(Settings.toFinish);
       await initGame();
    },
    end: (winner) => {
       Storage.EndGame();
-      View('fireworks').style.display = 'flex';
-      View('winnerName').innerHTML = `${winner} WON!`;
+      UI.showWinScreen(winner);
    },
 };
 
@@ -260,7 +237,8 @@ const shotsByPlayer = {
 }
 
 function clearData() {
-   View('p1shots').innerHTML = View('p2shots').innerHTML = View('p1score').innerHTML = View('p2score').innerHTML = '';
+   UI.clearGameDisplay();
+
    shotsByPlayer.playerOne.all = [];
    shotsByPlayer.playerTwo.all = [];
    shotsByPlayer.playerOne.score = 0;
@@ -274,71 +252,59 @@ function calculate(callback) {
    let shots = Storage.shots;
 
    if (shots.length > 0) {
-      let playerOne = Storage.games[Storage.games.length - 1].p1;
+      let playerOneName = Storage.games[Storage.games.length - 1].p1;
 
       function shotCheck(player, shot) {
          shot.status = true;
-         switch (shot.shotn) {
-            case 1: {
-               shotsByPlayer[player].session = shot.sx;
-               break;
-            }
-            case 2: {
-               shotsByPlayer[player].session = shotsByPlayer[player].session + shot.sx;
-               break;
-            }
-            case 3: {
-               shotsByPlayer[player].session = shotsByPlayer[player].session + shot.sx;
-               break;
-            }
-         }
-         if (Settings.toFinish - shotsByPlayer[player].score - shotsByPlayer[player].session === 0) {
-            function isItWon(shot) {
-               if (Settings.x3and25 === 1) {
-                  return shot.x > 1 || shot.sector === 25 || shot.sector === 50;
-               } else {
-                  return shot.x === 2 || shot.sector === 50;
-               }
-            }
 
-            if (isItWon(shot)) {
-               shotsByPlayer[player].score = shotsByPlayer[player].score + shotsByPlayer[player].session;
+         // Упрощаем расчет сессии
+         shotsByPlayer[player].session += shot.sx;
+
+         let remaining = Settings.toFinish - shotsByPlayer[player].score - shotsByPlayer[player].session;
+
+         if (remaining === 0) {
+            const isItWon = (Settings.x3and25 === 1)
+                  ? (shot.x > 1 || shot.sector === 25 || shot.sector === 50)
+                  : (shot.x === 2 || shot.sector === 50);
+
+            if (isItWon) {
+               shotsByPlayer[player].score += shotsByPlayer[player].session;
                shotsByPlayer[player].session = 0;
-               console.log(shotsByPlayer[player].all[1]['player']);
-               Game.end(shotsByPlayer[player].all[1]['player']);
+               // ВМЕСТО all[1] используем имя напрямую из объекта shot
+               Game.end(shot.player);
                shot.status = true;
             } else {
                shotsByPlayer[player].session = 0;
                shot.status = false;
             }
-         } else if (Settings.toFinish - shotsByPlayer[player].score - shotsByPlayer[player].session < 2) {
+         } else if (remaining < 2) {
             shotsByPlayer[player].session = 0;
             shot.status = false;
          }
+
          if (shot.shotn === 3) {
-            shotsByPlayer[player].score = shotsByPlayer[player].score + shotsByPlayer[player].session;
+            shotsByPlayer[player].score += shotsByPlayer[player].session;
             shotsByPlayer[player].session = 0;
          }
+
          shotsByPlayer[player].all.push(shot);
-         View(player === 'playerOne' ? 'p1temp' : 'p2temp').innerHTML = shotsByPlayer[player].session !== 0 ? shotsByPlayer[player].session : '';
+
+         UI.updateTempScore(player, shotsByPlayer[player].session);
       }
 
       shots.forEach((shotItem, index) => {
          shotItem.shotn = (index + 1) % 3 === 0 ? 3 : (index + 1) % 3;
-         let currentPlayer = shotItem.player === playerOne ? 'playerOne' : 'playerTwo';
+         let currentPlayer = shotItem.player === playerOneName ? 'playerOne' : 'playerTwo';
          shotCheck(currentPlayer, shotItem);
       });
-      // console.log(shotsByPlayer);
    }
-
 
    whoseTurn();
    getPlayerPoints();
-   getPlayerPoints('playerTwo');
    latestThrows();
    getMainInfo();
 
-   callback('done');
+   if (callback) callback('done');
 }
 
 function whoseTurn(){
