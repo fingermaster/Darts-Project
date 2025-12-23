@@ -1,5 +1,4 @@
-let player, modal, players, Game;
-
+let player, players, Game;
 
 // dom.js
 (function() {
@@ -33,76 +32,44 @@ let checkValue = function (value) {
    return value === -1 ? 0 : value;
 }
 
-const InfoBar = () => {
-   View('gameInfo').innerHTML = `
-        <div class="name">#${Settings.current} ${Settings.toFinish}</div>
-        <div>
-            <div class="players">${Settings.p1} vs ${Settings.p2}</div>
-            (   finish mode: ${Settings.x3and25 === 1 ? 'x3 and 25' : 'without x3 and 25'}; 
-                overshot: ${Settings.overshootSkip === 1 ? 'skip' : 'don\'t skip'}   )
-        </div>`;
-}
-
 const Settings = {
-   get toFinish() {
-      return this.toFinishValue;
+   data: {
+      toFinish: 501,
+      x3and25: 1,
+      overshootSkip: 0,
+      p1: 'Player One',
+      p2: 'Player Two',
+      current: 1,
+      first: 'p1',
+      next: 'p1',
    },
-   set toFinish(num) {
-      if (this.toFinishValue !== num) {
-         for (let i = 0; i < View('toFinish').children.length; i++) {
-            View('toFinish').children[i].classList.remove('active')
-         }
-         switch (num) {
-            case 301:
-               View('toFinish').children[0].classList.add('active');
-               break;
-            case 501:
-               View('toFinish').children[1].classList.add('active');
-               break;
-            default: {
-               View('toFinish').children[2].classList.add('active');
-               console.log('default')
-               break;
-            }
-         }
-         this.toFinishValue = num;
-         InfoBar();
-         this.updateInDB();
+
+   set(key, value) {
+      if (this.data[key] === value) return;
+
+      this.data[key] = value;
+
+      if (['toFinish', 'x3and25', 'overshootSkip'].includes(key)) {
+         UI.updateSettingsView(key, value);
       }
+
+      UI.renderInfoBar(this.data);
+      Storage.SetSettings(); // Сохраняем
    },
-   get x3and25() {
-      return this.x3and25Value;
-   },
-   set x3and25(num) {
-      if (this.x3and25Value !== num) {
-         View('x3and25').children[checkValue(this.x3and25Value)].classList.remove('active');
-         View('x3and25').children[num].classList.add('active');
-         this.x3and25Value = num;
-         InfoBar();
-         this.updateInDB();
-      }
-   },
-   get overshootSkip() {
-      return this.overshootSkipValue;
-   },
-   set overshootSkip(num) {
-      if (this.overshootSkipValue !== num) {
-         View('overshootSkip').children[checkValue(this.overshootSkipValue)].classList.remove('active');
-         View('overshootSkip').children[num].classList.add('active');
-         this.overshootSkipValue = num;
-         InfoBar();
-         this.updateInDB();
-      }
-   },
-   updateInDB: () => Storage.SetSettings(),
-   toFinishValue: 501,
-   x3and25Value: 1,
-   overshootSkipValue: 0,
-   p1: 'Player One',
-   p2: 'Player Two',
-   current: 1,
-   first: 'p1',
-   next: 'p1',
+
+   get toFinish() { return this.data.toFinish; },
+   set toFinish(v) { this.set('toFinish', v); },
+   get x3and25() { return this.data.x3and25; },
+   set x3and25(v) { this.set('x3and25', v); },
+   get overshootSkip() { return this.data.overshootSkip; },
+   set overshootSkip(v) { this.set('overshootSkip', v); },
+
+   get current() { return this.data.current; },
+   set current(v) { this.set('current', v); },
+   get first() { return this.data.first; },
+   set first(v) { this.set('first', v); },
+   get next() { return this.data.next; },
+   set next(v) { this.set('next', v); },
 };
 
 // const boardNums = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5];
@@ -180,7 +147,6 @@ const initGame = async () => {
    } else {
       modal.toggle();
    }
-   InfoBar();
 
    View('playersSelect').innerHTML = '';
    View('p1input').value = Settings.p1;
@@ -202,33 +168,31 @@ function setGameDataNames(data = {}) {
    View('p2').innerHTML = Settings.p2;
 }
 
-modal = {
-   show: function () {
+const modal = {
+   el: document.querySelector('.modal'),
+   state: false,
+
+   show() {
       View('p1input').value = Settings.p1;
       View('p2input').value = Settings.p2;
-      document.getElementsByClassName('modal').item(0).classList.add('show');
-      modal.state = true;
+      this.el.classList.add('show');
+      this.state = true;
    },
-   hide: function () {
-      document.getElementsByClassName('modal').item(0).classList.remove('show');
-      modal.state = false;
+
+   hide() {
+      this.el.classList.remove('show');
+      this.state = false;
    },
-   toggle: function () {
-      if (document.getElementsByClassName('modal').item(0).classList.contains('show')) {
-         this.hide();
-      } else {
-         this.show();
-      }
+
+   toggle() {
+      this.state ? this.hide() : this.show();
    },
-   isOnModal: function (x, y) {
-      let mSize = document.getElementsByClassName('modal').item(0).getBoundingClientRect();
-      return x > mSize.left &&
-            x < (mSize.left + mSize.width) &&
-            y > mSize.top &&
-            y < (mSize.top + mSize.height);
-   },
-   state: false
-}
+
+   isOnModal(x, y) {
+      const rect = this.el.getBoundingClientRect();
+      return x > rect.left && x < rect.right && y > rect.top && y < rect.bottom;
+   }
+};
 
 Game = {
    get next() {
