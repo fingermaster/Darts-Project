@@ -1,5 +1,5 @@
 const DB_CONFIG = {
-   name: 'd',
+   name: 'a',
    version: 1
 }
 
@@ -51,9 +51,9 @@ class IndexedDB {
       return error;
    }
 
-   async addData(requestStore = 'shots', data = {}, callback = () => {  }) {
+   async addData(requestStore = 'shots', data = {}) {
       await this.openDB();
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
          const transaction = this.DB.transaction(requestStore, 'readwrite');
          let store = transaction.objectStore(requestStore);
          let request;
@@ -65,12 +65,10 @@ class IndexedDB {
 
          request.onsuccess = () => {
             this.result = request;
-            // console.warn(`Data adding result: ${request.result}`);
             this.id = request.result;
             console.warn(`Data adding result: ${request.result}`);
 
             resolve(request.result);
-            // callback(request.result);
          };
       });
    }

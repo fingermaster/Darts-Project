@@ -4,9 +4,17 @@ const Storage = {
    shots: [],
    LastGame: async () => {
       let lastGame = await DB.getLastGame();
-      Storage.maxGameId = lastGame['maxId'];
-      Storage.games[0] = lastGame['lastGame'];
-      await Storage.GetShots();
+
+      // Проверяем, что база вообще что-то вернула
+      if (lastGame && lastGame['lastGame']) {
+         Storage.maxGameId = lastGame['maxId'];
+         Storage.games[0] = lastGame['lastGame'];
+         await Storage.GetShots();
+      } else {
+         // Если база пуста, гарантируем, что массив останется чистым
+         Storage.maxGameId = 0;
+         Storage.games = [];
+      }
    },
 
    GetShots: async () => {
@@ -30,27 +38,30 @@ const Storage = {
    },
 
    CheckGameID: async function () {
-      if (Storage.games.length === 0) {
+      // Если массив пуст ИЛИ первый элемент пустой (результат неудачного LastGame)
+      if (Storage.games.length === 0 || !Storage.games[0]) {
          await Storage.NewGame();
+         return Storage.games[0]; // Возвращаем созданную игру
       } else {
          const gameDB = Storage.games[Storage.games.length - 1];
-         if (gameDB.id > 0) {
+
+         // БЕЗОПАСНАЯ ПРОВЕРКА: сначала проверяем наличие объекта
+         if (gameDB && gameDB.id > 0) {
             Settings.current = gameDB.id;
-            console.log(gameDB);
+
+            // Используем метод load, чтобы не зациклить сеттеры
             if (Object.keys(gameDB).includes('toFinish')) {
-               Settings.toFinish = gameDB.toFinish;
-               Settings.overshootSkip = gameDB.overshootSkip;
-               Settings.x3and25 = gameDB.x3and25;
+               Settings.load(gameDB); // Предполагаем, что вы внедрили метод load
             } else {
-               Settings.toFinish = 501;
-               Settings.overshootSkip = 0;
-               Settings.x3and25 = 1;
+               Settings.load({ toFinish: 501, overshootSkip: 0, x3and25: 1 });
             }
+
             gameConsole(`Game ID ${gameDB.id} OK`);
             return gameDB;
          } else {
-            console.trace(`Game ID is not defined`);
-            return undefined;
+            // Если объект есть, но id кривой — создаем новую игру
+            await Storage.NewGame();
+            return Storage.games[Storage.games.length - 1];
          }
       }
    },
@@ -92,6 +103,7 @@ const Storage = {
       gameDB.x3and25 = Settings.x3and25;
       gameDB.overshootSkip = Settings.overshootSkip;
       gameDB.toFinish = Settings.toFinish;
+      console.log(gameDB);
       await DB.addData('games', gameDB);
    },
 

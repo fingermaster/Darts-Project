@@ -1,38 +1,11 @@
 let player, players, Game;
 
-// dom.js
-(function() {
-   const ElementID = [
-      'gameInfo', 'toFinish', 'x3and25', 'overshootSkip', 'randInput',
-      'randInput20', 'p1', 'p1progress', 'p1shots', 'p1score',
-      'p1temp', 'p1sX', 'p2', 'p2progress', 'p2shots', 'p2score',
-      'p2temp', 'p2sX', 'p1input', 'p2input', 'playersSelect',
-      'fireworks', 'winnerName', 'latestThrows'
-   ];
-
-   const View = (id) => {
-      if (ElementID.includes(id)) {
-         return document.getElementById(id);
-      } else {
-         console.warn(`Attempted to access unknown element ID: ${id}`);
-         return null;
-      }
-   };
-
-   // !!! ТОТ САМЫЙ ПРОБРОС:
-   window.View = View;
-
-   // TODO: Когда весь проект станет модульным:
-   // 1. Убрать обертку (function() { ... })();
-   // 2. Удалить строку window.View = View;
-   // 3. Добавить в начале: export { View };
-})();
-
 let checkValue = function (value) {
    return value === -1 ? 0 : value;
 }
 
 const Settings = {
+   isInitializing: false,
    data: {
       toFinish: 501,
       x3and25: 1,
@@ -42,6 +15,28 @@ const Settings = {
       current: 1,
       first: 'p1',
       next: 'p1',
+   },
+
+   load(dbData) {
+      // 1. Обновляем данные в объекте напрямую, минуя сеттеры
+      Object.assign(this.data, {
+         toFinish: dbData.toFinish ?? 501,
+         x3and25: dbData.x3and25 ?? 1,
+         overshootSkip: dbData.overshootSkip ?? 0,
+         p1: dbData.p1 ?? 'Player One',
+         p2: dbData.p2 ?? 'Player Two',
+         current: dbData.id ?? 1,
+         first: dbData.first ?? 'p1',
+         next: dbData.next ?? 'p1'
+      });
+
+      // 2. Обновляем интерфейс, так как автоматика сеттеров была пропущена
+      UI.renderInfoBar(this.data);
+      UI.updateSettingsView('toFinish', this.data.toFinish);
+      UI.updateSettingsView('x3and25', this.data.x3and25);
+      UI.updateSettingsView('overshootSkip', this.data.overshootSkip);
+
+      console.log("Settings loaded from DB successfully");
    },
 
    set(key, value) {
@@ -54,7 +49,10 @@ const Settings = {
       }
 
       UI.renderInfoBar(this.data);
-      Storage.SetSettings(); // Сохраняем
+      //Если идёт инициализация, то в базу не записываем.
+      if(!this.isInitializing) {
+         Storage.SetSettings();
+      }
    },
 
    get toFinish() { return this.data.toFinish; },
@@ -63,7 +61,10 @@ const Settings = {
    set x3and25(v) { this.set('x3and25', v); },
    get overshootSkip() { return this.data.overshootSkip; },
    set overshootSkip(v) { this.set('overshootSkip', v); },
-
+   get p1() { return this.data.p1; },
+   set p1(v) { this.set('p1', v); },
+   get p2() { return this.data.p2; },
+   set p2(v) { this.set('p2', v); },
    get current() { return this.data.current; },
    set current(v) { this.set('current', v); },
    get first() { return this.data.first; },
@@ -134,7 +135,7 @@ const sendShot = async function (sector, x) {
 
 
 const initGame = async () => {
-   // console.warn('******************** initGame ********************');
+   Settings.isInitializing = true; //Ставим флаг инициализации
    selector.toIndex(0);
 
    let game = await Storage.CheckGameID();
@@ -157,6 +158,7 @@ const initGame = async () => {
    names.forEach(function (el) {
       View('playersSelect').innerHTML += `<option value='${el.name}' class="selectplayer" data-player-name="${el.name}">${el.name}</option>\n`;
    });
+   Settings.isInitializing = false; //Снимаем флаг инициализации
 }
 
 function setGameDataNames(data = {}) {
@@ -361,80 +363,69 @@ function whoseTurn(){
 }
 
 function getMainInfo() {
-   View('p1score').innerHTML = `${Settings.toFinish - shotsByPlayer.playerOne.score - shotsByPlayer.playerOne.session} <span>${shotsByPlayer.playerOne.score}</span>`;
-   View('p2score').innerHTML = `${Settings.toFinish - shotsByPlayer.playerTwo.score - shotsByPlayer.playerTwo.session} <span>${shotsByPlayer.playerTwo.score}</span>`;
-   View('p1progress').style.width = `${(shotsByPlayer.playerOne.score + shotsByPlayer.playerOne.session) * 100 / Settings.toFinish}%`;
-   View('p2progress').style.width = `${(shotsByPlayer.playerTwo.score + shotsByPlayer.playerTwo.session) * 100 / Settings.toFinish}%`;
+   const p1 = shotsByPlayer.playerOne;
+   const p2 = shotsByPlayer.playerTwo;
+
+   UI.drawMainInfo(
+         {
+            scoreHtml: `${Settings.toFinish - p1.score - p1.session} <span>${p1.score}</span>`,
+            width: `${(p1.score + p1.session) * 100 / Settings.toFinish}%`
+         },
+         {
+            scoreHtml: `${Settings.toFinish - p2.score - p2.session} <span>${p2.score}</span>`,
+            width: `${(p2.score + p2.session) * 100 / Settings.toFinish}%`
+         }
+   );
 
    showHint({
-      playerOne: Settings.toFinish - shotsByPlayer.playerOne.score - shotsByPlayer.playerOne.session,
-      playerTwo: Settings.toFinish - shotsByPlayer.playerTwo.score - shotsByPlayer.playerTwo.session,
+      playerOne: Settings.toFinish - p1.score - p1.session,
+      playerTwo: Settings.toFinish - p2.score - p2.session,
    });
 }
+
 
 function getPlayerPoints() {
    getPoints('playerOne');
    getPoints('playerTwo');
-   function getPoints(player) {
-      View(player === 'playerOne' ? 'p1shots' : 'p2shots').innerHTML = '';
-      shotsByPlayer[player === 'playerOne' ? 'playerOne' : 'playerTwo'].all.forEach(item => {
-         let div = document.createElement('div');
-         div.className = !item.status ? 'bad' : '';
-         div.innerHTML = `${item.sector}${item.x > 1 ? 'x' + item.x : ''}`;
 
-         View(player === 'playerOne' ? 'p1shots' : 'p2shots').append(div);
-      })
+   function getPoints(player) {
+      UI.drawPlayerPoints(player, shotsByPlayer[player].all);
    }
 }
 
 function showHint(score) {
-   View('p1sX').innerHTML = '';
-   View('p2sX').innerHTML = '';
+   let h1 = '', h2 = '';
 
    function hintShot(num) {
-      function hintForPlayer(output) {
-         if (num - Math.trunc(num / 2) * 2 === 0 && Math.trunc(num / 2) <= 20) {
-            output.innerHTML = `${num / 2}X2`;
-         }
-         if (num === 50) {
-            output.innerHTML += ` ${num}`;
-         }
+      const check = (n) => {
+         let res = "";
+         if (n % 2 === 0 && n / 2 <= 20) res += `${n / 2}X2 `;
+         if (n === 50) res += `${n} `;
          if (Settings.x3and25) {
-            if (num - Math.trunc(num / 3) * 3 === 0) {
-               output.innerHTML += ` ${num / 3}X3`;
-            }
-            if (num === 25) {
-               output.innerHTML += ` ${num}`;
-            }
+            if (n % 3 === 0) res += `${n / 3}X3 `;
+            if (n === 25) res += `${n}`;
          }
-      }
-
-      if (num === score.playerOne) {
-         hintForPlayer(View('p1sX'));
-      }
-      if (num === score.playerTwo) {
-         hintForPlayer(View('p2sX'));
-      }
+         return res;
+      };
+      if (num === score.playerOne) h1 += check(num);
+      if (num === score.playerTwo) h2 += check(num);
    }
 
    board[Settings.x3and25].find(hintShot);
+   UI.drawHint(h1, h2);
 }
 
 function latestThrows() {
-   View('latestThrows').innerHTML = '';
+   const shotsMarkup = [];
    for (let i = Storage.shots.length - 1; i >= Storage.shots.length - 6; i--) {
-      if (Storage.shots.at(i) !== undefined && Storage.shots[i] !== undefined) {
-         let val = Storage.shots[i];
-         let div = document.createElement('div');
-         div.className = 'shot';
-         let player = document.createElement('div');
-         let shot = document.createElement('div');
-         player.className = 'player';
-         player.innerHTML = val['player'] ?? '';
-         shot.className = 'value';
-         shot.innerHTML = val.x !== undefined ? `${val.sector}${val.x !== 1 ? 'x' + val.x : ''}` : '';
-         div.append(player, shot);
-         View('latestThrows').append(div);
+      let val = Storage.shots[i];
+      if (val) {
+         // Формируем строку, которую UI просто вставит
+         shotsMarkup.push(`
+            <div class="player">${val.player ?? ''}</div>
+            <div class="value">${val.sector}${val.x !== 1 ? 'x' + val.x : ''}</div>
+         `);
       }
    }
+   UI.drawLatestThrows(shotsMarkup);
 }
