@@ -255,25 +255,19 @@ function calculate(callback) {
    if (callback) callback('done');
 }
 
-function whoseTurn(){
-   let second = 'p2'
-   if (Settings.first === 'p2') second = 'p1'
+function whoseTurn() {
+   const second = Settings.first === 'p1' ? 'p2' : 'p1';
 
-   let diffMod = Storage.shots.length % 6;
-   switch (true) {
-      case diffMod < 3:
-         if (Game.next !== Settings.first) {
-            Game.next = Settings.first;
-         }
-         Game.setActivePlayer(Settings.first);
-         break;
-      case diffMod >= 3:
-         if (Game.next !== second) {
-            Game.next = second;
-         }
-         Game.setActivePlayer(second);
-         break;
+   // Математика: 0-2 — первый игрок, 3-5 — второй
+   const currentPlayer = (Storage.shots.length % 6 < 3) ? Settings.first : second;
+
+   // 1. Логическое обновление (база и состояние)
+   if (Game.next !== currentPlayer) {
+      Game.next = currentPlayer;
    }
+
+   // 2. Визуальное обновление (всегда, для надежности при инициализации)
+   UI.toggleActivePlayer(currentPlayer);
 }
 
 function getMainInfo() {
