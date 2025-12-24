@@ -25,6 +25,25 @@ This project is built using **Pure Vanilla JavaScript**.
 - **No External Libraries**: All logic, including the IndexedDB wrapper, game engine, and timer, is implemented from scratch.
 - **Native Web APIs**: Utilizes modern browser standards like ES6 Modules, IndexedDB, and CSS Variables.
 
+## 🎮 Keyboard Controls
+
+The game supports full keyboard control for selecting segments, making throws, and navigating settings.
+
+| Key Combination           | Action                                                                                |
+|---------------------------|---------------------------------------------------------------------------------------|
+| Arrows (`←` `→` `↑` `↓`)	 | Navigate the segments and multipliers on the dartboard.                               |
+| `Enter` / `NumpadEnter`	  | Confirm the selected segment and multiplier (make a throw).                           |
+| `Space`	                  | Throw in the "miss" area (0 points, x1 multiplier).                                   |
+| `Backspace`	              | Cancel the last recorded throw.                                                       |
+| `Digit1` / `Digit2`	      | Quickly switch the first player in settings (P1 / P2).                                |
+| `Pause`                   | Pause/resume the throw timer.                                                         |
+| NumpadDivide (`/`)	       | Reset the random generator settings ("Random All").                                   |
+| NumpadMultiply (`*`)      | Select a random sector ("Random Sector").                                             |
+| Numpad `0-9`              | Select a specific sector on the board (e.g., Numpad1 selects sector 1, Numpad0 - 10). |
+| `Shift` + `Numpad digit`	 | Select a sector + 10 points (e.g., Shift+Numpad1 selects 11).                         |
+| Mouse Wheel	              | Rotates the selector wheel                                                            |
+
+
 ## 🚀 How to Run
 1. Clone the repository.
 2. Use a local server to run the project (due to ES Modules):
