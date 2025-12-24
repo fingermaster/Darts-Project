@@ -994,6 +994,7 @@ nav.navbar.fixed-bottom.navbar-dark {
    align-items: center;
    height: 100vh;
    //background: rgba(60, 60, 60, 0.9) repeating-linear-gradient(to bottom, #50998800 7px, rgb(30 134 139 / 45%) 39px, rgb(0 0 0) 5px, rgb(0 0 0 / 0%) 43px);
+   background: #080808ba;
    flex-wrap: nowrap;
    flex-direction: column;
    align-content: flex-start;
@@ -1021,7 +1022,7 @@ nav.navbar.fixed-bottom.navbar-dark {
       padding: 0.1em 1em;
       background: none;
       box-shadow: none;
-      opacity: 0.5;
+      //opacity: 0.5;
 
       &:hover {
          opacity: 1;

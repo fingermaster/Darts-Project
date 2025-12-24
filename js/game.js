@@ -78,7 +78,6 @@ const initGame = async () => {
       modal.toggle();
    }
    let names = await Storage.PlayersList();
-
    UI.setupPlayerForm(Settings.p1, Settings.p2, names);
 
    Settings.isInitializing = false;
@@ -96,8 +95,9 @@ const modal = {
    // el: document.querySelector('.modal'), // Если это константа, лучше оставить в UI или кэшировать
    state: false,
 
-   show() {
-      UI.setupPlayerForm(Settings.p1, Settings.p2, []);
+   async show() {
+      let names = await Storage.PlayersList();
+      UI.setupPlayerForm(Settings.p1, Settings.p2, names);
       document.querySelector('.modal').classList.add('show');
       this.state = true;
    },

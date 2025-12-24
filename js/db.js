@@ -1,5 +1,5 @@
 const DB_CONFIG = {
-   name: 'aa',
+   name: 'd',
    version: 1
 }
 

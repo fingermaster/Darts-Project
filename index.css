@@ -862,6 +862,7 @@ nav.navbar.fixed-bottom.navbar-dark {
   justify-content: space-evenly;
   align-items: center;
   height: 100vh;
+  background: rgba(8, 8, 8, 0.7294117647);
   flex-wrap: nowrap;
   flex-direction: column;
   align-content: flex-start;
@@ -888,7 +889,6 @@ nav.navbar.fixed-bottom.navbar-dark {
   padding: 0.1em 1em;
   background: none;
   box-shadow: none;
-  opacity: 0.5;
 }
 #fireworks button:hover {
   opacity: 1;
