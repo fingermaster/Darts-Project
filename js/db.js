@@ -5,41 +5,37 @@ const DB_CONFIG = {
 
 class IndexedDB {
    DB;
-   dbState = '...';
-   result;
-   id;
-   maxId = 0;
 
-   constructor(Open, DB) {
-      this.openDB(Open, DB)
-            .then((data) => {    console.log(`DATA: ${data}:`, data)})
-            .catch((data) => {   console.log(data)});
+   constructor() {
+      this.openDB()
+            .then((data) => { console.log(`DATA: ${data}:`, data)})
+            .catch((error) => { console.error("DB Constructor Error:", error)});
    }
 
-   openDB(Open, DB){
+   openDB(){
       return new Promise((resolve, reject) => {
          if(this.DB === undefined){
-            Open = window.indexedDB.open(DB_CONFIG.name, DB_CONFIG.version);
+            const Open = window.indexedDB.open(DB_CONFIG.name, DB_CONFIG.version);
 
             Open.onerror = (error) => {
-               reject(Open);
-               this.error(error)
+               this.error(error);
+               reject(error);
             };
             Open.onsuccess = () => {
-               DB = this.DB = Open.result;
-               this.dbState = 'success';
-               resolve(DB);
-               DB.onversionchange = () => {
-                  DB.close();
+               this.DB = Open.result;
+               // this.dbState = 'success';
+               resolve(this.DB);
+               this.DB.onversionchange = () => {
+                  this.DB.close();
                };
             };
             Open.onupgradeneeded = (event) => {
                this.upgrade(event)
             };
             Open.onblocked = () => {
-               reject(Open);
-               this.blocked()
-            }
+               this.blocked();
+               reject("DB connection blocked");
+            };
          } else {
             resolve(this.DB);
          }
@@ -47,13 +43,13 @@ class IndexedDB {
    }
 
    error(error) {
-      console.log(error);
+      console.error(error);
       return error;
    }
 
    async addData(requestStore = 'shots', data = {}) {
       await this.openDB();
-      return new Promise((resolve) => {
+      return new Promise((resolve, reject) => {
          const transaction = this.DB.transaction(requestStore, 'readwrite');
          let store = transaction.objectStore(requestStore);
          let request;
@@ -64,12 +60,10 @@ class IndexedDB {
          }
 
          request.onsuccess = () => {
-            this.result = request;
-            this.id = request.result;
             console.warn(`Data adding result: ${request.result}`);
-
             resolve(request.result);
          };
+         request.onerror = (error) => reject(error);
       });
    }
 
@@ -81,22 +75,23 @@ class IndexedDB {
          const request = store.delete(id);
 
          request.onsuccess = () => {
-            this.result = request;
-            resolve(); // Готово!
+            resolve();
          };
-
-         request.onerror = () => reject(request.error);
+         request.onerror = (error) => reject(error);
       });
    }
 
    async read(requestStore = 'games', index = false) {
       await this.openDB();
       return new Promise((resolve, reject) => {
-         const transaction = this.DB.transaction(requestStore, 'readwrite');
+         const transaction = this.DB.transaction(requestStore, 'readonly');
          const save = (data) => {
             resolve(data);
          }
          if (typeof index === "object") {
+            // Эта логика поиска по индексу требует доработки,
+            // так как "index" используется и как имя индекса, и как значение
+            // Но пока оставим как есть
             let store, result;
             result = [];
             store = transaction.objectStore(requestStore).index(index[0]);
@@ -116,37 +111,30 @@ class IndexedDB {
             request = store.getAll();
             request.onsuccess = () => save(request.result);
             request.onerror = (error) => {
-               reject(error);
                this.error(error);
+               reject(error);
             }
          }
-         transaction.oncomplete = () => {}
+         transaction.onerror = (error) => reject(error);
       });
    }
 
    async getLastGame() {
       await this.openDB();
-      const data = await new Promise((resolve, reject) => {
+      return await new Promise((resolve, reject) => {
          const store = this.DB.transaction('games', 'readonly').objectStore('games');
-         const request = store.openCursor(null, 'prev'); //
+         const request = store.openCursor(null, 'prev');
 
          request.onsuccess = (e) => {
             const cursor = e.target.result;
             if (cursor) {
-               // Возвращаем ID и саму запись (cursor.value)
-               // console.log(`maxId: ${cursor.value.id}, lastGame: ${cursor.value}`);
                resolve({ maxId: cursor.value.id, lastGame: cursor.value });
             } else {
                resolve({ maxId: 0, lastGame: null });
             }
          };
-         request.onerror = () => reject(request.error);
+         request.onerror = (error) => reject(error);
       });
-
-      // Сохраняем состояние
-      this.maxId = data.maxId;
-
-      return data;
    }
 
    upgrade(event) {
