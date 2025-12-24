@@ -1,23 +1,18 @@
-// game.js
-// Dependencies:
-// - storage.js (Storage: для работы с бросками, игроками и текущей игрой)
-// - ui.js (UI, View: для обновления заголовков, модалок и отрисовки инфо-панелей)
-// - settings.js (Settings: для получения/изменения игровых параметров)
-// - selector.js (Selector: класс для создания экземпляра управления доской)
-// - timer.js (Timer: класс для создания экземпляра контроля времени)
-// - utils.js (вспомогательные функции математики, если они используются в расчетах)
+import { Storage } from "./storage.js";
+import { Settings} from "./settings.js";
+import { rand20, randDeck } from "./utils.js";
+import { UI } from "./ui.js";
+import { Selector } from "./selector.js";
+import { Timer } from "./timer.js";
 
-// Exports: Game, selector (instance), timer (instance), sendShot (function)
-
-// const boardNums = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5];
 const board = {
    0: [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 50],
    1: [2, 3, 4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 22, 24, 25, 26, 27, 28, 30, 32, 33, 34, 36, 38, 39, 40, 42, 45, 48, 50, 51, 54, 57, 60]
 };
 
-const selector = new Selector();
+export const selector = new Selector();
 
-const randomGenerator = {
+export const randomGenerator = {
    all: () => {
       let rand = randDeck();
       selector.toSector(rand.sector);
@@ -28,12 +23,12 @@ const randomGenerator = {
    }
 }
 
-const timer = new Timer(() => {
+export const timer = new Timer(() => {
    sendShot(0, 1);
 }, 10, 100);
 
 
-const sendShot = async function (sector, x) {
+export const sendShot = async function (sector, x) {
    const currentPlayerKey = Game.next;
    const shooter = currentPlayerKey === 'p1' ? 'playerOne' : 'playerTwo';
 
@@ -71,7 +66,7 @@ const sendShot = async function (sector, x) {
 
 
 
-const initGame = async () => {
+export const initGame = async () => {
    selector.toIndex(0);
 
    let game = await Storage.CheckGameID();
@@ -95,7 +90,7 @@ const setGameDataNames = (data = {}) => {
    UI.drawPlayerHeaders(Settings.p1, Settings.p2);
 }
 
-const modal = {
+export const modal = {
    state: false,
 
    async toggle() {
@@ -119,7 +114,7 @@ const modal = {
    }
 };
 
-const Game = {
+export const Game = {
    get next() {
       Storage.GetNext();
       return Settings.next;

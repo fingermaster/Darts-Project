@@ -6,8 +6,7 @@ const ElementID = [
    'fireworks', 'winnerName', 'latestThrows'
 ];
 
-//export
-const View = (id) => {
+export const View = (id) => {
    if (ElementID.includes(id)) {
       return document.getElementById(id);
    } else {
@@ -16,8 +15,7 @@ const View = (id) => {
    }
 };
 
-//export
-const UI = {
+export const UI = {
    updateSettingsView: (key, value) => {
       const container = View(key);
       if (!container) return;

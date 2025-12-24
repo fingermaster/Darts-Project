@@ -1,7 +1,6 @@
-// settings.js
-// Dependencies: UI
-// Exports: Settings
-const Settings = {
+import { UI } from "./ui.js";
+
+export const Settings = {
    data: {
       toFinish: 501,
       x3and25: 1,

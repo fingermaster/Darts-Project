@@ -1,8 +1,4 @@
-// selector.js
-// Dependencies:
-// - utils.js (функция pointOnCircle: необходима для расчета координат секторов)
-//
-// Exports: Selector (class)
+import { pointOnCircle } from "./utils.js";
 
 const CONFIG = {
    output: 'selector',
@@ -20,7 +16,7 @@ const CONFIG = {
    boardNums: [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5],
 }
 
-class Selector {
+export class Selector {
    OUTPUT;
    sector;
    offset = {

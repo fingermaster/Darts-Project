@@ -1,12 +1,8 @@
-// events.js
-// Dependencies:
-// - ui.js (View, UI)
-// - game.js (Game, sendShot, modal)
-// - storage.js (Storage)
-// - settings.js (Settings)
-// - selector.js (экземпляр selector)
-// - timer.js (экземпляр timer)
-// - utils.js (randomGenerator и вспомогательная математика)
+import { Storage } from './storage.js';
+import { Game, modal, randomGenerator, selector, sendShot, timer } from "./game.js";
+import { Settings } from "./settings.js";
+import { View } from "./ui.js";
+
 
 const clickActions = {
    start: async () => {

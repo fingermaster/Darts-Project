@@ -1,9 +1,5 @@
-// timer.js
-// Dependencies: NONE (самодостаточный класс)
-// Exports: Timer (class)
-class Timer {
+export class Timer {
    #interval = null;
-   // Кэшируем ID, чтобы не искать каждый раз
    #pieId = 'pie';
    #output = document.getElementById('timer');
 

@@ -1,9 +1,5 @@
-// db.js
-// Dependencies: NONE
-// Exports: DB (instance of IndexedDB)
-
 const DB_SCHEMA = {
-   name: 'd234',
+   name: 'd',
    version: 1,
    stores: {
       games: {
@@ -21,7 +17,7 @@ const DB_SCHEMA = {
          indexes: [
             { name: 'player', key: 'player' },
             { name: 'game', key: 'game' },
-            { name: 'date', key: 'date', options: { unique: true } }
+            { name: 'date', key: 'date', options: { unique: false } }
          ]
       }
    }
@@ -159,4 +155,4 @@ class IndexedDB {
    }
 }
 
-const DB = new IndexedDB();
+export const DB = new IndexedDB();

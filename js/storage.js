@@ -1,13 +1,8 @@
-// storage.js
-// Dependencies:
-// - db.js (объект DB: для выполнения всех операций add, read, delete)
-// - settings.js (объект Settings: для синхронизации текущих настроек игры и имен игроков)
-// - utils.js (ConsoleCSS: если стили консоли лежат там)
-//
-// Exports: Storage (object)
-// убрать бомбу в конце файла (вызвать из main.js)
+import { DB } from "./db.js";
+import { Settings } from "./settings.js";
+import { ConsoleCSS, gameConsole } from "./utils.js";
 
-const Storage = {
+export const Storage = {
    maxGameId: 0,
    games: [],
    shots: [],
@@ -142,8 +137,7 @@ const Storage = {
    },
 
    PlayersList: async () => {
-      players = await DB.read('players', false);
-      return players;
+      return await DB.read('players', false);
    },
 
    NewPlayer: async function (data) {
@@ -156,5 +150,3 @@ const Storage = {
       return await this.PlayersList();
    }
 };
-
-Storage.LastGame();
