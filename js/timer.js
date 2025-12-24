@@ -1,56 +1,64 @@
 class Timer {
-   passed = 0;
-   limit = 10;
-   stepMs = 1000;
-   left = this.limit;
-   interval = null;
-   output = document.getElementById('timer');
-   switcher = false;
+   #interval = null;
+   // Кэшируем ID, чтобы не искать каждый раз
+   #pieId = 'pie';
+   #output = document.getElementById('timer');
 
    constructor(onTimesUpEvent, timeLimitSec = 10, stepMs = 1000) {
-      if (typeof onTimesUpEvent === "function") {
-         this.onTimesUp = onTimesUpEvent;
-      }
+      this.onTimesUp = typeof onTimesUpEvent === "function" ? onTimesUpEvent : () => {};
       this.limit = timeLimitSec * 1000;
       this.stepMs = stepMs;
+      this.passed = 0;
+      this.left = this.limit;
+      this.switcher = false;
    }
 
-   onTimesUp = (e) => {
-      console.log(e)
-   };
+   #getPie() {
+      return document.getElementById(this.#pieId);
+   }
 
    switchTimer() {
+      const pie = this.#getPie();
       if (!this.switcher) {
-         document.getElementById('pie').classList.remove('paused');
+         pie?.classList.remove('paused');
          this.startTimer();
       } else {
-         document.getElementById('pie').classList.add('paused');
-         clearInterval(this.interval);
+         pie?.classList.add('paused');
+         clearInterval(this.#interval);
       }
       this.switcher = !this.switcher;
    }
 
    clearTimer() {
-      clearInterval(this.interval);
+      clearInterval(this.#interval);
       this.left = this.limit;
       this.passed = 0;
+
       if (this.switcher) {
-         let parent = document.getElementById('pie').parentNode;
-         let clone = document.getElementById('pie').cloneNode(3);
-         document.getElementById('pie').remove();
-         parent.append(clone);
+         const pie = this.#getPie();
+         if (pie) {
+            const parent = pie.parentNode;
+            const clone = pie.cloneNode(true); // true вместо 3, так как это булево значение
+            pie.remove();
+            parent.append(clone);
+         }
          this.startTimer();
       }
    }
 
    startTimer() {
-      // this.switcher = true;
-      document.getElementById('pie').classList.add('active');
-      this.interval = setInterval(() => {
-         this.passed = this.passed + this.stepMs;
-         this.left = this.limit - this.passed;
-         this.output.innerHTML = (this.left / 1000).toFixed(1);
-         if (this.left === 0) {
+      clearInterval(this.#interval); // Защита от наслоения интервалов
+      this.#getPie()?.classList.add('active');
+
+      this.#interval = setInterval(() => {
+         this.passed += this.stepMs;
+         this.left = Math.max(0, this.limit - this.passed);
+
+         if (this.#output) {
+            this.#output.innerHTML = (this.left / 1000).toFixed(1);
+         }
+
+         if (this.left <= 0) {
             this.clearTimer();
             this.onTimesUp();
          }
