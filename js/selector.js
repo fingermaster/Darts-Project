@@ -17,8 +17,6 @@ const CONFIG = {
 class Selector {
    OUTPUT;
    sector;
-   level = 1;
-   step = 360 / CONFIG.boardNums.length;
    offset = {
       x: CONFIG.radius - 20,
       y: CONFIG.radius - 20,
@@ -141,21 +139,14 @@ class Selector {
    }
 
    updateActive() {
-      // console.log(this.position.index);
+      // Находим единственный элемент с классом active и удаляем его (если он есть)
+      this.OUTPUT.querySelector('.active')?.classList.remove('active');
 
-      this.OUTPUT.childNodes.forEach(el => {
-         el.childNodes.forEach(subEl => {
-            subEl.classList.remove('active')
-         })
-      });
-      /**
-       * ToDo: fix select
-       */
-      this.OUTPUT.childNodes[this.position.index].childNodes[this.position.now].classList.add('active');
-   }
+      // Находим новый нужный элемент по индексам и добавляем класс
+      const sector = this.OUTPUT.childNodes[this.position.index];
+      const item = sector?.childNodes[this.position.now];
 
-   keyUp(event) {
-      this.keyDown(event)
+      item?.classList.add('active');
    }
 
    enter() {
@@ -188,9 +179,5 @@ class Selector {
          }
       }
       return output;
-   }
-
-   space() {
-      return {x: 1, sector: 0};
    }
 }
