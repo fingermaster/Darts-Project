@@ -93,35 +93,28 @@ class Selector {
    }
 
    keyDown(event) {
-      switch (event.code) {
-         case 'ArrowLeft': {
-            this.position.index--;
-            if (this.position.index < 0) {
-               this.position.index = 19;
-            }
+      const actions = {
+         'ArrowLeft': () => {
+            this.position.index = (this.position.index <= 0) ? 19 : this.position.index - 1;
             this.toIndex(this.position.index, true, 1);
-            break;
-         }
-         case 'ArrowRight': {
-            this.position.index++;
-            if (this.position.index > 19) {
-               this.position.index = 0;
-            }
+         },
+         'ArrowRight': () => {
+            this.position.index = (this.position.index >= 19) ? 0 : this.position.index + 1;
             this.toIndex(this.position.index, true, -1);
-            break;
-         }
-         case 'ArrowUp': {
+         },
+         'ArrowUp': () => {
             this.position.up();
             this.updateActive();
-            break;
-         }
-         case 'ArrowDown': {
+         },
+         'ArrowDown': () => {
             this.position.down();
             this.updateActive();
-            break;
          }
-      }
+      };
+
+      actions[event.code]?.();
    }
+
 
    toIndex(index, byStep = false, direction = 1) {
       let angle = byStep ?
@@ -150,34 +143,14 @@ class Selector {
    }
 
    enter() {
-      let output = {x: 1, sector: 20}
-      switch (this.position.now) {
-         case 0: {
-            output.x = 2;
-            output.sector = this.position.sector;
-            break
-         }
-         case 1: {
-            output.x = 1;
-            output.sector = this.position.sector;
-            break
-         }
-         case 2: {
-            output.x = 3;
-            output.sector = this.position.sector;
-            break
-         }
-         case 3: {
-            output.x = 1;
-            output.sector = 25;
-            break
-         }
-         case 4: {
-            output.x = 1;
-            output.sector = 50;
-            break
-         }
-      }
-      return output;
+      const multiplierMap = [
+         { x: 2, sector: this.position.sector }, // 0 (x2)
+         { x: 1, sector: this.position.sector }, // 1 (num)
+         { x: 3, sector: this.position.sector }, // 2 (x3)
+         { x: 1, sector: 25 },                   // 3 (25)
+         { x: 1, sector: 50 }                    // 4 (50)
+      ];
+
+      return multiplierMap[this.position.now] || { x: 1, sector: 0 };
    }
 }
