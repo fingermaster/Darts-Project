@@ -48,9 +48,13 @@ The game supports full keyboard control for selecting segments, making throws, a
 | Mouse Wheel	              | Rotates the selector wheel                                                            |
 
 
-## 🚀 How to Run
+## 🚀 Live Demo
+You can try the application here: **[fingermaster.github.io](fingermaster.github.io)**
+
+## 🛠 How to Run Locally
 1. Clone the repository.
 2. Use a local server to run the project (due to ES Modules):
-    - **VS Code**: Use "Live Server" extension.
-    - **Node.js**: `npx serve .`
-    - **Python**: `python -m http.server`
+   - **VS Code**: Use "Live Server" extension.
+   - **Node.js**: `npx serve .`
+   - **Python**: `python -m http.server`
+
