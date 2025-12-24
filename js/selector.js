@@ -1,15 +1,16 @@
 const CONFIG = {
    output: 'selector',
    radius: 400,
-   cssVariables: `
-    --angle: 90deg; 
-    --circle: 800px; 
-    --sector: calc(var(--circle) / 20); 
-    --sector-item: calc(var(--circle) / 20); 
-    --border-radius: 35px; 
-    --transition: 350ms; 
-    --selector-width: 80px; 
-    --selector-height: 320px;`,
+   cssVariables: {
+      '--angle': '90deg',
+      '--circle': '800px',
+      '--sector': 'calc(var(--circle) / 20)',
+      '--sector-item': 'calc(var(--circle) / 20)',
+      '--border-radius': '35px',
+      '--transition': '350ms',
+      '--selector-width': '80px',
+      '--selector-height': '320px',
+   },
    boardNums: [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5],
 }
 
@@ -48,15 +49,10 @@ class Selector {
       this.drawDeck();
    }
 
-   async setCssProperty() {
-      let props = CONFIG.cssVariables.split(/;\s*/);
-      props.forEach(prop => {
-         if (prop.length > 0) {
-            let newProp = prop.split(':');
-            document.documentElement.style.setProperty(newProp[0], newProp[1]);
-         }
-      })
-      // console.log(props);
+   setCssProperty() {
+      Object.entries(CONFIG.cssVariables).forEach(([key, value]) => {
+         document.documentElement.style.setProperty(key, value);
+      });
    }
 
    sectorElement(text, step, multiplier, className) {
