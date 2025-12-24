@@ -135,10 +135,10 @@ const Game = {
          // console.log('we are calculate');
       });
    },
-   clearX: function () {
+   clearX: () => {
       UI.clearHints();
    },
-   new: async function () {
+   new: async () => {
       Game.clearX();
       await Storage.NewGame();
       UI.resetBoard(Settings.toFinish);
@@ -148,7 +148,17 @@ const Game = {
       Storage.EndGame();
       UI.showWinScreen(winner);
    },
-   processOvershoot: async function (lastShot) {
+   start: async (p1, p2) => {
+      await Storage.NewPlayer([p1, p2]);
+      Settings.p1 = p1;
+      Settings.p2 = p2;
+      Game.first = 'p1';
+
+      setGameDataNames();
+      await Game.new();
+      UI.toggleModal(false);
+   },
+   processOvershoot: async (lastShot) => {
       let n = lastShot.shotn; // Это 1 или 2 (если 3 — цикл не начнется)
       while (n < 3) {
          n++;

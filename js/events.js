@@ -1,12 +1,8 @@
 const clickActions = {
    start: async () => {
-      await Storage.NewPlayer([View('p1input').value, View('p2input').value]);
-      Settings.p1 = View('p1input').value;
-      Settings.p2 = View('p2input').value;
-      Game.first = 'p1';
-      setGameDataNames();
-      await Game.new();
-      modal.toggle();
+      const p1 = View('p1input').value;
+      const p2 = View('p2input').value;
+      await Game.start(p1, p2);
    },
    newGame: () => {
       Game.new();
