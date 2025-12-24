@@ -83,7 +83,7 @@ const initGame = async () => {
    Settings.isInitializing = false;
 }
 
-function setGameDataNames(data = {}) {
+const setGameDataNames = (data = {}) => {
    if (data.p1) {
       Settings.p1 = data.p1;
       Settings.p2 = data.p2;
@@ -183,7 +183,7 @@ const shotsByPlayer = {
    },
 }
 
-function clearData() {
+const clearData = () => {
    UI.clearGameDisplay();
 
    shotsByPlayer.playerOne.all = [];
@@ -194,7 +194,7 @@ function clearData() {
    shotsByPlayer.playerTwo.session = 0;
 }
 
-function calculate(callback) {
+const calculate = (callback) => {
    clearData();
    let shots = Storage.shots;
 
@@ -253,7 +253,7 @@ function calculate(callback) {
    if (callback) callback('done');
 }
 
-function whoseTurn() {
+const whoseTurn = () => {
    const second = Settings.first === 'p1' ? 'p2' : 'p1';
 
    // Математика: 0-2 — первый игрок, 3-5 — второй
@@ -268,7 +268,7 @@ function whoseTurn() {
    UI.toggleActivePlayer(currentPlayer);
 }
 
-function getMainInfo() {
+const getMainInfo = () => {
    const p1 = shotsByPlayer.playerOne;
    const p2 = shotsByPlayer.playerTwo;
 
@@ -290,7 +290,7 @@ function getMainInfo() {
 }
 
 
-function getPlayerPoints() {
+const getPlayerPoints = () => {
    getPoints('playerOne');
    getPoints('playerTwo');
 
@@ -299,7 +299,7 @@ function getPlayerPoints() {
    }
 }
 
-function showHint(score) {
+const showHint = (score) => {
    let h1 = '', h2 = '';
 
    function hintShot(num) {
@@ -321,7 +321,7 @@ function showHint(score) {
    UI.drawHint(h1, h2);
 }
 
-function latestThrows() {
+const latestThrows = () => {
    const shotsMarkup = [];
    for (let i = Storage.shots.length - 1; i >= Storage.shots.length - 6; i--) {
       let val = Storage.shots[i];
