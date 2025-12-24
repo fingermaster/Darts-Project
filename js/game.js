@@ -92,27 +92,25 @@ function setGameDataNames(data = {}) {
 }
 
 const modal = {
-   // el: document.querySelector('.modal'), // Если это константа, лучше оставить в UI или кэшировать
    state: false,
 
-   async show() {
-      let names = await Storage.PlayersList();
-      UI.setupPlayerForm(Settings.p1, Settings.p2, names);
-      document.querySelector('.modal').classList.add('show');
-      this.state = true;
-   },
+   async toggle() {
+      this.state = !this.state;
 
-   hide() {
-      document.querySelector('.modal').classList.remove('show');
-      this.state = false;
-   },
+      let data = null;
+      if (this.state) {
+         data = {
+            p1: Settings.p1,
+            p2: Settings.p2,
+            names: await Storage.PlayersList()
+         };
+      }
 
-   toggle() {
-      this.state ? this.hide() : this.show();
+      UI.toggleModal(this.state, data);
    },
 
    isOnModal(x, y) {
-      const rect = document.querySelector('.modal').getBoundingClientRect();
+      const rect = UI.getModalBounds();
       return x > rect.left && x < rect.right && y > rect.top && y < rect.bottom;
    }
 };

@@ -138,14 +138,14 @@ const Storage = {
    },
 
    NewPlayer: async function (data) {
-      data.forEach((row) => {
-         if (row.length > 0) {
-            DB.addData('players', {name: row});
-         }
-      });
-      players = await this.PlayersList();
-      return players;
-   },
+      // Используем Promise.all, чтобы подождать сохранения всех игроков
+      const promises = data
+            .filter(name => name.length > 0)
+            .map(name => DB.addData('players', { name }));
+
+      await Promise.all(promises);
+      return await this.PlayersList();
+   }
 };
 
 Storage.LastGame();

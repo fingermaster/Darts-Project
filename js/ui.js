@@ -124,6 +124,20 @@ const UI = {
          option.textContent = el.name;
          select.append(option);
       });
+   },
+
+   toggleModal(state, data) {
+      const modalEl = document.querySelector('.modal');
+      if (state) {
+         if (data) this.setupPlayerForm(data.p1, data.p2, data.names);
+         modalEl.classList.add('show');
+      } else {
+         modalEl.classList.remove('show');
+      }
+   },
+
+   getModalBounds() {
+      return document.querySelector('.modal').getBoundingClientRect();
    }
 };
 

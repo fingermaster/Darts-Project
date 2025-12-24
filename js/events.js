@@ -105,7 +105,7 @@ document.addEventListener('click', (event) => {
    if (event.target.tagName !== 'BUTTON' &&
          modal.state === true &&
          !modal.isOnModal(event.x, event.y)) {
-      modal.hide();
+      modal.toggle();
    }
 
    const btn = event.target.closest('[data-action]');

@@ -25,14 +25,21 @@ const DB_SCHEMA = {
 
 class IndexedDB {
    DB;
+   #initPromise; // Приватное поле для хранения единого промиса инициализации
 
    constructor() {
-      this.openDB()
-            .then((data) => console.log("DB Initialized"))
+      // Инициализируем один раз и сохраняем сам промис
+      this.#initPromise = this.openDB();
+
+      this.#initPromise
+            .then(() => console.log("DB Initialized"))
             .catch((error) => console.error("DB Constructor Error:", error));
    }
 
    openDB() {
+      // Если метод вызван повторно, пока база открывается — возвращаем текущий промис
+      if (this.#initPromise) return this.#initPromise;
+
       return new Promise((resolve, reject) => {
          if (this.DB) return resolve(this.DB);
 
@@ -50,96 +57,76 @@ class IndexedDB {
       });
    }
 
-   error(error) {
-      console.error(error);
-      return error;
+   // Вспомогательный метод для ожидания готовности базы (чтобы не дублировать код)
+   async #ensureDB() {
+      return await this.#initPromise;
    }
 
    async addData(requestStore = 'shots', data = {}) {
-      await this.openDB();
+      const db = await this.#ensureDB();
       return new Promise((resolve, reject) => {
-         const transaction = this.DB.transaction(requestStore, 'readwrite');
-         let store = transaction.objectStore(requestStore);
-         let request;
-         if (Object.keys(data).includes('id')) {
-            request = store.put(data)
-         } else {
-            request = store.add(data);
-         }
+         const transaction = db.transaction(requestStore, 'readwrite');
+         const store = transaction.objectStore(requestStore);
 
-         request.onsuccess = () => {
-            console.warn(`Data adding result: ${request.result}`);
-            resolve(request.result);
-         };
+         // Нам не нужно проверять ключи.
+         // .put() сам найдет первичный ключ (id или name) в объекте data.
+         const request = store.put(data);
+
+         request.onsuccess = () => resolve(request.result);
          request.onerror = (error) => reject(error);
       });
    }
 
    async delete(id, requestStore = 'shots') {
-      await this.openDB();
+      const db = await this.#ensureDB();
       return new Promise((resolve, reject) => {
-         const transaction = this.DB.transaction(requestStore, 'readwrite');
+         const transaction = db.transaction(requestStore, 'readwrite');
          const store = transaction.objectStore(requestStore);
          const request = store.delete(id);
 
-         request.onsuccess = () => {
-            resolve();
-         };
+         request.onsuccess = () => resolve();
          request.onerror = (error) => reject(error);
       });
    }
 
    async read(requestStore = 'games', index = false) {
-      await this.openDB();
+      const db = await this.#ensureDB();
       return new Promise((resolve, reject) => {
-         const transaction = this.DB.transaction(requestStore, 'readonly');
-         const save = (data) => {
-            resolve(data);
-         }
+         const transaction = db.transaction(requestStore, 'readonly');
+
          if (typeof index === "object") {
-            // Эта логика поиска по индексу требует доработки,
-            // так как "index" используется и как имя индекса, и как значение
-            // Но пока оставим как есть
-            let store, result;
-            result = [];
-            store = transaction.objectStore(requestStore).index(index[0]);
-            let singleKeyRange = IDBKeyRange.only(index[1]);
-            store.openCursor(singleKeyRange).onsuccess = (event) => {
+            const result = [];
+            const store = transaction.objectStore(requestStore).index(index[0]);
+            const range = IDBKeyRange.only(index[1]);
+
+            store.openCursor(range).onsuccess = (event) => {
                const cursor = event.target.result;
                if (cursor) {
                   result.push(cursor.value);
                   cursor.continue();
                } else {
-                  save(result);
+                  resolve(result);
                }
-            }
+            };
          } else {
-            let store, request;
-            store = transaction.objectStore(requestStore);
-            request = store.getAll();
-            request.onsuccess = () => save(request.result);
-            request.onerror = (error) => {
-               this.error(error);
-               reject(error);
-            }
+            const store = transaction.objectStore(requestStore);
+            const request = store.getAll();
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = (error) => reject(error);
          }
          transaction.onerror = (error) => reject(error);
       });
    }
 
    async getLastGame() {
-      await this.openDB();
-      return await new Promise((resolve, reject) => {
-         const store = this.DB.transaction('games', 'readonly').objectStore('games');
+      const db = await this.#ensureDB();
+      return new Promise((resolve, reject) => {
+         const store = db.transaction('games', 'readonly').objectStore('games');
          const request = store.openCursor(null, 'prev');
 
          request.onsuccess = (e) => {
             const cursor = e.target.result;
-            if (cursor) {
-               resolve({ maxId: cursor.value.id, lastGame: cursor.value });
-            } else {
-               resolve({ maxId: 0, lastGame: null });
-            }
+            resolve(cursor ? { maxId: cursor.value.id, lastGame: cursor.value } : { maxId: 0, lastGame: null });
          };
          request.onerror = (error) => reject(error);
       });
@@ -149,10 +136,8 @@ class IndexedDB {
       const db = event.target.result;
       const tx = event.currentTarget.transaction;
 
-      // Теперь мы просто берем структуру из DB_SCHEMA
       for (const [storeName, config] of Object.entries(DB_SCHEMA.stores)) {
          let store;
-
          if (!db.objectStoreNames.contains(storeName)) {
             store = db.createObjectStore(storeName, config.options);
          } else {
@@ -170,4 +155,4 @@ class IndexedDB {
    }
 }
 
-const DB = new IndexedDB;
+const DB = new IndexedDB();
