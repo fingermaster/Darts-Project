@@ -1,12 +1,8 @@
-let player, players, Game;
-
 // const boardNums = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5];
 const board = {
    0: [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 50],
    1: [2, 3, 4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 22, 24, 25, 26, 27, 28, 30, 32, 33, 34, 36, 38, 39, 40, 42, 45, 48, 50, 51, 54, 57, 60]
 };
-
-players = [];
 
 const selector = new Selector();
 
@@ -115,7 +111,7 @@ const modal = {
    }
 };
 
-Game = {
+const Game = {
    get next() {
       Storage.GetNext();
       return Settings.next;
