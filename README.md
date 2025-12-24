@@ -49,7 +49,7 @@ The game supports full keyboard control for selecting segments, making throws, a
 
 
 ## 🚀 Live Demo
-You can try the application here: **[Launch App](fingermaster.github.io)**
+You can try the application here: **[Launch App](https://fingermaster.github.io/Darts-Project/)**
 
 ## 🛠 How to Run Locally
 1. Clone the repository.
