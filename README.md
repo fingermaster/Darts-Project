@@ -1,8 +1,12 @@
-# Advanced Darts Scorer & Trainer
+# Advanced Darts Scorer & Trainer (Desktop only)
 
 A professional-grade web application for darts players, featuring flexible game modes, training modules, and real-time performance tracking.
 
 ## 🎯 Key Features
+
+> [!IMPORTANT]  
+> **Note**: This application is currently optimized for **desktop use only**. Mobile responsiveness is planned for future updates.
+
 
 - **Versatile Game Modes**: Support for 301, 501, or custom starting scores.
 - **Dynamic Ruleset**: Toggle between Classic (Double-Out) and Free (Any-Out) finishing rules.
