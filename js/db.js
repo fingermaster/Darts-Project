@@ -1,44 +1,52 @@
-const DB_CONFIG = {
+const DB_SCHEMA = {
    name: 'd',
-   version: 1
-}
+   version: 1,
+   stores: {
+      games: {
+         options: { keyPath: 'id', autoIncrement: true },
+         indexes: [
+            { name: 'p1', key: 'p1' },
+            { name: 'p2', key: 'p2' }
+         ]
+      },
+      players: {
+         options: { keyPath: 'name' }
+      },
+      shots: {
+         options: { keyPath: 'id', autoIncrement: true },
+         indexes: [
+            { name: 'player', key: 'player' },
+            { name: 'game', key: 'game' },
+            { name: 'date', key: 'date', options: { unique: true } }
+         ]
+      }
+   }
+};
 
 class IndexedDB {
    DB;
 
    constructor() {
       this.openDB()
-            .then((data) => { console.log(`DATA: ${data}:`, data)})
-            .catch((error) => { console.error("DB Constructor Error:", error)});
+            .then((data) => console.log("DB Initialized"))
+            .catch((error) => console.error("DB Constructor Error:", error));
    }
 
-   openDB(){
+   openDB() {
       return new Promise((resolve, reject) => {
-         if(this.DB === undefined){
-            const Open = window.indexedDB.open(DB_CONFIG.name, DB_CONFIG.version);
+         if (this.DB) return resolve(this.DB);
 
-            Open.onerror = (error) => {
-               this.error(error);
-               reject(error);
-            };
-            Open.onsuccess = () => {
-               this.DB = Open.result;
-               // this.dbState = 'success';
-               resolve(this.DB);
-               this.DB.onversionchange = () => {
-                  this.DB.close();
-               };
-            };
-            Open.onupgradeneeded = (event) => {
-               this.upgrade(event)
-            };
-            Open.onblocked = () => {
-               this.blocked();
-               reject("DB connection blocked");
-            };
-         } else {
+         const request = window.indexedDB.open(DB_SCHEMA.name, DB_SCHEMA.version);
+
+         request.onsuccess = () => {
+            this.DB = request.result;
+            this.DB.onversionchange = () => this.DB.close();
             resolve(this.DB);
-         }
+         };
+
+         request.onupgradeneeded = (event) => this.upgrade(event);
+         request.onerror = (e) => reject(e);
+         request.onblocked = () => console.warn("DB connection blocked");
       });
    }
 
@@ -138,49 +146,27 @@ class IndexedDB {
    }
 
    upgrade(event) {
-      console.log(event);
-      console.log(`Upgrade v${event.oldVersion} to v${event.newVersion}`);
-      let db = event.currentTarget.result;
-      let tx = event.currentTarget.transaction;
+      const db = event.target.result;
+      const tx = event.currentTarget.transaction;
 
-      switch (event.oldVersion) {
-         case 0: {
-            let games = db.createObjectStore('games', {keyPath: 'id', autoIncrement: true});
-            games.createIndex("p1", "p1", {unique: false});
-            games.createIndex("p2", "p2", {unique: false});
+      // Теперь мы просто берем структуру из DB_SCHEMA
+      for (const [storeName, config] of Object.entries(DB_SCHEMA.stores)) {
+         let store;
 
-            // let players =
-            db.createObjectStore('players', {keyPath: 'name', unique: true});
-
-            let shots = db.createObjectStore('shots', {keyPath: 'id', autoIncrement: true});
-            shots.createIndex("player", "player", {unique: false});
-            shots.createIndex("game", "game", {unique: false});
-            shots.createIndex("date", "date", {unique: true});
-
-            break;
+         if (!db.objectStoreNames.contains(storeName)) {
+            store = db.createObjectStore(storeName, config.options);
+         } else {
+            store = tx.objectStore(storeName);
          }
-         case 1: {
-            if (!tx.objectStoreNames.contains('games')) {
-               let games = tx.createObjectStore('games', {keyPath: 'id', autoIncrement: true});
-               games.createIndex("p1", "p1", {unique: false});
-               games.createIndex("p2", "p2", {unique: false});
-            }
 
-            if (!tx.objectStoreNames.contains('players')) {
-               tx.createObjectStore('players', {keyPath: 'name', unique: true});
-            }
-            if (!tx.objectStoreNames.contains('shots')) {
-               let shots = tx.createObjectStore('shots', {keyPath: 'id', autoIncrement: true});
-               shots.createIndex("player", "player", {unique: false});
-               shots.createIndex("game", "game", {unique: false});
-            }
-            break;
+         if (config.indexes) {
+            config.indexes.forEach(idx => {
+               if (!store.indexNames.contains(idx.name)) {
+                  store.createIndex(idx.name, idx.key, idx.options || { unique: false });
+               }
+            });
          }
       }
-   }
-
-   blocked() {
-      console.log('blocked');
    }
 }
 
