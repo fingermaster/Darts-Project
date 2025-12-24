@@ -1,3 +1,12 @@
+// storage.js
+// Dependencies:
+// - db.js (объект DB: для выполнения всех операций add, read, delete)
+// - settings.js (объект Settings: для синхронизации текущих настроек игры и имен игроков)
+// - utils.js (ConsoleCSS: если стили консоли лежат там)
+//
+// Exports: Storage (object)
+// убрать бомбу в конце файла (вызвать из main.js)
+
 const Storage = {
    maxGameId: 0,
    games: [],

@@ -1,5 +1,7 @@
+// settings.js
+// Dependencies: UI
+// Exports: Settings
 const Settings = {
-   isInitializing: false,
    data: {
       toFinish: 501,
       x3and25: 1,
@@ -43,10 +45,6 @@ const Settings = {
       }
 
       UI.renderInfoBar(this.data);
-      //Если идёт инициализация, то в базу не записываем.
-      if(!this.isInitializing) {
-         Storage.SetSettings();
-      }
    },
 
    get toFinish() { return this.data.toFinish; },

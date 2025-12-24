@@ -1,29 +1,42 @@
+// events.js
+// Dependencies:
+// - ui.js (View, UI)
+// - game.js (Game, sendShot, modal)
+// - storage.js (Storage)
+// - settings.js (Settings)
+// - selector.js (экземпляр selector)
+// - timer.js (экземпляр timer)
+// - utils.js (randomGenerator и вспомогательная математика)
+
 const clickActions = {
    start: async () => {
       const p1 = View('p1input').value;
       const p2 = View('p2input').value;
       await Game.start(p1, p2);
    },
-   newGame: () => {
-      Game.new();
+   newGame: async () => {
+      await Game.new();
    },
-   cancelHit: () => {
-      Game.cancelLastHit();
+   cancelHit: async () => {
+      await Game.cancelLastHit();
    },
-   modalToggle: () => {
-      modal.toggle();
+   modalToggle: async () => {
+      await modal.toggle();
    },
-   toFinish: (btn) => {
+   toFinish: async (btn) => {
       const value = parseInt(btn.dataset.value);
       Settings.toFinish = value;
+      await Storage.SetSettings();
    },
-   x3and25: (btn) => {
+   x3and25: async (btn) => {
       const value = parseInt(btn.dataset.value);
       Settings.x3and25 = value;
+      await Storage.SetSettings();
    },
-   overshoot: (btn) => {
+   overshoot: async (btn) => {
       const value = parseInt(btn.dataset.value);
       Settings.overshootSkip = value;
+      await Storage.SetSettings();
    },
    randomAll: () => {
       randomGenerator.all();

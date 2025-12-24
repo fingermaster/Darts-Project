@@ -1,3 +1,22 @@
+const ElementID = [
+   'gameInfo', 'toFinish', 'x3and25', 'overshootSkip', 'randInput',
+   'randInput20', 'p1', 'p1progress', 'p1shots', 'p1score',
+   'p1temp', 'p1sX', 'p2', 'p2progress', 'p2shots', 'p2score',
+   'p2temp', 'p2sX', 'p1input', 'p2input', 'playersSelect',
+   'fireworks', 'winnerName', 'latestThrows'
+];
+
+//export
+const View = (id) => {
+   if (ElementID.includes(id)) {
+      return document.getElementById(id);
+   } else {
+      console.warn(`Attempted to access unknown element ID: ${id}`);
+      return null;
+   }
+};
+
+//export
 const UI = {
    updateSettingsView: (key, value) => {
       const container = View(key);
@@ -140,31 +159,3 @@ const UI = {
       return document.querySelector('.modal').getBoundingClientRect();
    }
 };
-
-
-(function() {
-   const ElementID = [
-      'gameInfo', 'toFinish', 'x3and25', 'overshootSkip', 'randInput',
-      'randInput20', 'p1', 'p1progress', 'p1shots', 'p1score',
-      'p1temp', 'p1sX', 'p2', 'p2progress', 'p2shots', 'p2score',
-      'p2temp', 'p2sX', 'p1input', 'p2input', 'playersSelect',
-      'fireworks', 'winnerName', 'latestThrows'
-   ];
-
-   const View = (id) => {
-      if (ElementID.includes(id)) {
-         return document.getElementById(id);
-      } else {
-         console.warn(`Attempted to access unknown element ID: ${id}`);
-         return null;
-      }
-   };
-
-   // !!! ТОТ САМЫЙ ПРОБРОС:
-   window.View = View;
-
-   // TODO: Когда весь проект станет модульным:
-   // 1. Убрать обертку (function() { ... })();
-   // 2. Удалить строку window.View = View;
-   // 3. Добавить в начале: export { View };
-})();

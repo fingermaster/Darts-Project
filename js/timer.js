@@ -1,3 +1,6 @@
+// timer.js
+// Dependencies: NONE (самодостаточный класс)
+// Exports: Timer (class)
 class Timer {
    #interval = null;
    // Кэшируем ID, чтобы не искать каждый раз

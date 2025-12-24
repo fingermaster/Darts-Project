@@ -1,3 +1,6 @@
+// utils.js
+// Dependencies: NONE
+// Exports: pointOnCircle, getRandomInt, rand20, rand3, randDeck, isEven
 /**
  * @param radius number -  circle radius
  * @param angle number -  angle for calc

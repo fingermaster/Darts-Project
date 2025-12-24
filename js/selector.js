@@ -1,3 +1,9 @@
+// selector.js
+// Dependencies:
+// - utils.js (функция pointOnCircle: необходима для расчета координат секторов)
+//
+// Exports: Selector (class)
+
 const CONFIG = {
    output: 'selector',
    radius: 400,

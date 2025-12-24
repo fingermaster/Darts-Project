@@ -1,3 +1,9 @@
+// main.js
+// Dependencies:
+// - storage.js (Storage: для вызова LastGame)
+// - game.js (функция initGame)
+// - utils.js (после переноса туда ConsoleCSS и gameConsole)
+
 const Scripts = [
    ["./js/utils.js"],
    ["./js/db.js"],
@@ -15,7 +21,7 @@ const BadConsoleCSS = `padding: 4px 25px 1px 0; background: rgba(255, 50, 32, .1
 let init = 1;
 
 /**
- * ToDo: сделать флаг на отключение.
+ * ToDo: сделать флаг на отключение консоли, чтобы не выводить её без необходимости
  */
 const gameConsole = function (message, error = false) {
    console.info(`%c ${init++}. ${message} `, !error ? ConsoleCSS : BadConsoleCSS);
@@ -42,3 +48,7 @@ function loadNext() {
 }
 loadNext();
 
+
+// В будущем main.js
+// await Storage.LastGame();
+// initGame();

@@ -1,3 +1,14 @@
+// game.js
+// Dependencies:
+// - storage.js (Storage: для работы с бросками, игроками и текущей игрой)
+// - ui.js (UI, View: для обновления заголовков, модалок и отрисовки инфо-панелей)
+// - settings.js (Settings: для получения/изменения игровых параметров)
+// - selector.js (Selector: класс для создания экземпляра управления доской)
+// - timer.js (Timer: класс для создания экземпляра контроля времени)
+// - utils.js (вспомогательные функции математики, если они используются в расчетах)
+
+// Exports: Game, selector (instance), timer (instance), sendShot (function)
+
 // const boardNums = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5];
 const board = {
    0: [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 50],
@@ -61,7 +72,6 @@ const sendShot = async function (sector, x) {
 
 
 const initGame = async () => {
-   Settings.isInitializing = true;
    selector.toIndex(0);
 
    let game = await Storage.CheckGameID();
@@ -75,8 +85,6 @@ const initGame = async () => {
    }
    let names = await Storage.PlayersList();
    UI.setupPlayerForm(Settings.p1, Settings.p2, names);
-
-   Settings.isInitializing = false;
 }
 
 const setGameDataNames = (data = {}) => {

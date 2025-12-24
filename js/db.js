@@ -1,5 +1,9 @@
+// db.js
+// Dependencies: NONE
+// Exports: DB (instance of IndexedDB)
+
 const DB_SCHEMA = {
-   name: 'd',
+   name: 'd234',
    version: 1,
    stores: {
       games: {
