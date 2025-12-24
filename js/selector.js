@@ -73,8 +73,8 @@ class Selector {
       }
       div.setAttribute('style', `
       position: absolute; 
-      left: ${mjsl.pointOnCircle(CONFIG.radius / multiplier, (360 / this.total) * step, 180, true, this.offset).x}px; 
-      top: ${mjsl.pointOnCircle(CONFIG.radius / multiplier, (360 / this.total) * step, 180, true, this.offset).y}px;`);
+      left: ${pointOnCircle(CONFIG.radius / multiplier, (360 / this.total) * step, 180, true, this.offset).x}px; 
+      top: ${pointOnCircle(CONFIG.radius / multiplier, (360 / this.total) * step, 180, true, this.offset).y}px;`);
       div.innerText = text;
       return div;
    }
