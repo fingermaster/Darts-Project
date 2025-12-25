@@ -47,6 +47,9 @@ The game supports full keyboard control for selecting segments, making throws, a
 | `Shift` + `Numpad digit`	 | Select a sector + 10 points (e.g., Shift+Numpad1 selects 11).                         |
 | Mouse Wheel	              | Rotates the selector wheel                                                            |
 
+> [!IMPORTANT]
+> **Numpad & Shift Modifier**
+> When **Num Lock is ON**, Windows suppresses the `Shift` signal for Numpad keys to provide legacy navigation (e.g., treating `Shift + Numpad 1` as `End`). To use Numpad shortcuts with Shift in this application, please ensure **Num Lock is OFF**.
 
 ## 🚀 Live Demo
 You can try the application here: **[Launch App](https://fingermaster.github.io/Darts-Project/)**
