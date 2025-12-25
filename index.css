@@ -423,11 +423,10 @@ nav {
   font-size: 3em;
   color: rgba(255, 235, 90, 0.28);
   font-weight: 600;
+  -webkit-background-clip: text;
 }
 #p1.active, #p2.active {
-  color: #FFA500;
-  color: rgb(250, 208, 1);
-  text-shadow: rgb(102, 102, 102) 1px 1px 0px, rgb(255, 165, 0) 0px 0px 5px, rgb(255, 165, 0) 0px 0px 15px, rgb(255, 165, 0) 0px 0px 20px, rgb(255, 165, 0) 0px 0px 40px, rgb(255, 0, 0) 0px 0px 60px, rgb(255, 141, 0) 0px 0px 10px, rgb(255, 0, 0) 0px 0px 98px;
+  color: #FAD001;
 }
 
 #gameplay {

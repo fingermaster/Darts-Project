@@ -479,19 +479,9 @@ nav {
    font-size: 3em;
    color: rgba(255, 235, 90, 0.28);
    font-weight: 600;
-   //background: linear-gradient(217deg, rgba(255, 0, 0, .8), rgba(255, 0, 0, 0) 70.71%),
-   //            linear-gradient(127deg, rgba(0, 255, 0, .8), rgba(0, 255, 0, 0) 70.71%),
-   //            linear-gradient(336deg, rgba(0, 0, 255, .8), rgba(0, 0, 255, 0) 70.71%);
-   //-webkit-background-clip: text;
+   -webkit-background-clip: text;
    &.active {
-      //animation-name: activePlayerGlow;
-      //animation-direction: alternate;
-      //animation-duration: 0.8s;
-      //animation-iteration-count: infinite;
-      //animation-timing-function: ease-in-out;
-      color: #FFA500;
-      color: rgb(250, 208, 1);
-      text-shadow: rgb(102, 102, 102) 1px 1px 0px, rgb(255, 165, 0) 0px 0px 5px, rgb(255, 165, 0) 0px 0px 15px, rgb(255, 165, 0) 0px 0px 20px, rgb(255, 165, 0) 0px 0px 40px, rgb(255, 0, 0) 0px 0px 60px, rgb(255, 141, 0) 0px 0px 10px, rgb(255, 0, 0) 0px 0px 98px;
+      color: #FAD001;
    }
 }
 
