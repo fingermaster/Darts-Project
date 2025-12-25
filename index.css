@@ -183,7 +183,6 @@ svg#pie {
   font-weight: bold;
   text-shadow: 2px 1px 2px black;
   color: rgb(250, 208, 1);
-  text-shadow: rgb(102, 102, 102) 1px 1px 0px, rgb(255, 165, 0) 0px 0px 5px, rgb(255, 165, 0) 0px 0px 15px, rgb(255, 165, 0) 0px 0px 20px, rgb(255, 165, 0) 0px 0px 40px, rgb(255, 0, 0) 0px 0px 60px, rgb(255, 141, 0) 0px 0px 10px, rgb(255, 0, 0) 0px 0px 98px;
 }
 #selectorCircle .num {
   font-size: 50px;
@@ -311,7 +310,7 @@ nav {
   z-index: -15;
   background: linear-gradient(135deg, rgb(40, 40, 40), rgba(0, 0, 0, 0.21) 80%);
 }
-.abs ::after {
+.abs::after {
   z-index: -15;
   background-position: -250px -250px;
   background-size: 1250px 1250px;
