@@ -517,29 +517,25 @@ nav {
    font-weight: 500;
    display: flex;
    flex: 60%;
-   text-shadow: 1px 1px 0 #0009, 0 0 5px #ffa500, 0 0 98px #ff0000;
+   text-shadow: 2px 2px 0 #0009;
    color: #fff6a9;
    justify-content: flex-end;
 
    span {
       font-size: .5em;
       color: #188754;
-      text-shadow: 1px 1px 0 #0009, 0 0 5px #188754;
+      text-shadow: 1px 1px 0 #0009;
    }
 }
 
 
 #p1sX, #p2sX {
    display: flex;
-
    font-size: 40px;
    font-weight: bold;
    flex: 70%;
    justify-content: flex-end;
-
    color: red;
-   //animation: blink ease-out 8s infinite ;
-   //animation: hue ease-out 8s infinite ;
 }
 
 .progress {
@@ -549,7 +545,7 @@ nav {
    display: flex;
    border-radius: 5px;
    background: rgba(90, 90, 90, 0.6) !important;
-   box-shadow: 1px 1px 0 #000, 0 0 20px #FA52, 10px 0 25px #EEE1;
+   box-shadow: 1px 1px 0 #000;
 
    & > div {
       display: flex;
