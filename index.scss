@@ -39,12 +39,7 @@ body {
    }
 }
 
-.ml-20 {
-   margin-left: 20px
-}
-
-
-button, .btn {
+.btn {
    cursor: pointer;
    fill: #9d4848;
    background: radial-gradient(#1c3c40, transparent);
@@ -111,21 +106,52 @@ nav {
    padding-right: 20px;
 }
 
-#gameInfo {
+.app-controls {
    display: flex;
-   position: fixed;
-   left: calc(50% - 300px);
-   top: 10px;
+   justify-content: space-between;
+   align-items: stretch;
+   width: 100%;
+   padding: 0 20px;
+   box-sizing: border-box;
+
+   .controls-zone {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+
+      .btn-settings {
+         font-size: 36px;
+         color: #1c8f9f;
+         text-shadow: 1px 1px 0 #01282d;
+         background: none;
+         border: none;
+         cursor: pointer;
+      }
+
+      .game-info-display {
+         color: #FFF;
+         font-size: 14px;
+      }
+
+      .button-cancel {
+         /* Стили для кнопки отмены */
+      }
+
+      .rand-group-label {
+         /* Стили для надписи Get Random */
+      }
+   }
+}
+
+#gameInfo {
+   height: 100%;
+   display: flex;
+   padding: 0 15px;
+   gap: 15px;
    background: rgba(5, 53, 72, 0.3);
-   padding: 10px 50px 10px 30px;
-   border-radius: 30px;
-   align-content: center;
    align-items: center;
    flex-direction: row;
    justify-content: space-between;
-   box-shadow: inset 6px 0px 0px rgba(0,0,0,.5);
-   border: 1px solid rgba(0,0,0,.5);
-
    user-select: none;
 
    .name {
@@ -134,7 +160,6 @@ nav {
 
    & > div {
       font-size: 14px;
-      padding: 0 0 0 30px;
    }
 
    .players {
@@ -143,10 +168,7 @@ nav {
 }
 
 .rand {
-   position: fixed;
    user-select: none;
-   top: 20px;
-   right: 20px;
    width: 220px;
    display: flex;
    flex-direction: column;

@@ -1,3 +1,4 @@
+@charset "UTF-8";
 :root {
   --code-token-tag: #0069c2;
   --code-token-punctuation: #858585;
@@ -36,11 +37,7 @@ body::after {
   z-index: -10;
 }
 
-.ml-20 {
-  margin-left: 20px;
-}
-
-button, .btn {
+.btn {
   cursor: pointer;
   fill: #9d4848;
   background: radial-gradient(#1c3c40, transparent);
@@ -56,14 +53,14 @@ button, .btn {
   transition-timing-function: ease-out;
   transition-property: background;
 }
-button.active, .btn.active {
+.btn.active {
   background: #138d4f;
   box-shadow: 0 1px 1px rgb(0, 0, 0);
 }
-button:hover, .btn:hover {
+.btn:hover {
   background: radial-gradient(#1c8f9f, transparent);
 }
-button.disabled, .btn.disabled {
+.btn.disabled {
   cursor: auto;
 }
 
@@ -103,20 +100,47 @@ nav {
   padding-right: 20px;
 }
 
-#gameInfo {
+.app-controls {
   display: flex;
-  position: fixed;
-  left: calc(50% - 300px);
-  top: 10px;
+  justify-content: space-between;
+  align-items: stretch;
+  width: 100%;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+.app-controls .controls-zone {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.app-controls .controls-zone .btn-settings {
+  font-size: 36px;
+  color: #1c8f9f;
+  text-shadow: 1px 1px 0 #01282d;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.app-controls .controls-zone .game-info-display {
+  color: #FFF;
+  font-size: 14px;
+}
+.app-controls .controls-zone .button-cancel {
+  /* Стили для кнопки отмены */
+}
+.app-controls .controls-zone .rand-group-label {
+  /* Стили для надписи Get Random */
+}
+
+#gameInfo {
+  height: 100%;
+  display: flex;
+  padding: 0 15px;
+  gap: 15px;
   background: rgba(5, 53, 72, 0.3);
-  padding: 10px 50px 10px 30px;
-  border-radius: 30px;
-  align-content: center;
   align-items: center;
   flex-direction: row;
   justify-content: space-between;
-  box-shadow: inset 6px 0px 0px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(0, 0, 0, 0.5);
   user-select: none;
 }
 #gameInfo .name {
@@ -124,17 +148,13 @@ nav {
 }
 #gameInfo > div {
   font-size: 14px;
-  padding: 0 0 0 30px;
 }
 #gameInfo .players {
   font-size: 21px;
 }
 
 .rand {
-  position: fixed;
   user-select: none;
-  top: 20px;
-  right: 20px;
   width: 220px;
   display: flex;
   flex-direction: column;

@@ -9,17 +9,23 @@
 </head>
 <body class="" data-scope="darts">
    <div class="abs"></div>
-   <nav>
-      <button class="ml-20" data-action="modalToggle">Game</button>
-      <button data-action="cancelHit">Cancel last hit</button>
-      <div class="rand">
-         <div>Get Random</div>
+   <nav class="app-controls">
+      <div class="controls-zone zone-info">
+         <button class="btn-settings" data-action="modalToggle" aria-label="Game Settings">⚙</button>
+         <div id="gameInfo" class="game-info-display"></div>
+      </div>
+
+      <div class="controls-zone zone-actions-main">
+         <button class="btn" data-action="cancelHit">Cancel last hit</button>
+      </div>
+
+      <div class="controls-zone zone-actions-random">
+         <div class="rand-group-label">Get Random</div>
          <div class="btn-group">
-            <button data-action="randomAll" id="randInput">All</button>
-            <button data-action="randomSector" id="randInput20">1-20</button>
+            <button class="btn" data-action="randomAll">All</button>
+            <button class="btn" data-action="randomSector">1-20</button>
          </div>
       </div>
-      <div id="gameInfo"></div>
    </nav>
 
    <div class="modal">
@@ -42,8 +48,8 @@
                   <div class="line">
                      Score to finish
                      <div class="btn-group" id="toFinish">
-                        <button class="btn dark" data-action="toFinish" data-value="301" type="button">301</button>
-                        <button class="btn dark active" data-action="toFinish" data-value="501" type="button">501</button>
+                        <button class="btn" data-action="toFinish" data-value="301" type="button">301</button>
+                        <button class="btn" data-action="toFinish" data-value="501" type="button">501</button>
                         <label>
                            <input class="btn dark" data-action="toFinishCustom" placeholder="Custom"
                                   type="number">
@@ -54,28 +60,22 @@
                   <div class="line">
                      Finish mode
                      <div class="btn-group" id="x3and25">
-                        <button class="btn dark" data-action="x3and25" data-value="0" type="button">Double And Bulls aye
-                        </button>
-                        <button class="btn dark active" data-action="x3and25" data-value="1" type="button">All multipliers
-                        </button>
+                        <button class="btn" data-action="x3and25" data-value="0" type="button">Double And Bulls aye</button>
+                        <button class="btn" data-action="x3and25" data-value="1" type="button">All multipliers</button>
                      </div>
                   </div>
                   <div class="line">
                      Overshoot rules
                      <div class="btn-group" id="overshootSkip">
-                        <button class="btn dark active" data-action="overshoot" data-value="0" type="button">Don't skip
-                        </button>
-                        <button class="btn dark" data-action="overshoot" data-value="1" type="button">Skip after
-                           overshot
-                        </button>
+                        <button class="btn" data-action="overshoot" data-value="0" type="button">Don't skip</button>
+                        <button class="btn" data-action="overshoot" data-value="1" type="button">Skip after overshot</button>
                      </div>
                   </div>
                </div>
             </form>
          </div>
          <div class="modal-footer">
-            <button class="btn btn-lg btn-success dark" data-bs-dismiss="modal" data-action="start" type="button">Let's darts!
-            </button>
+            <button  class="btn" data-bs-dismiss="modal" data-action="start" type="button">Let's darts!</button>
          </div>
       </div>
    </div>
