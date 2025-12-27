@@ -515,34 +515,6 @@ div.sector:nth-child(odd) div:nth-child(odd) {
    }
 }
 
-#latestThrows {
-   display: flex;
-   background: #f7ff82;
-   border: 2px dashed rgb(255 0 0);
-   box-sizing: border-box;
-   box-shadow: inset -2px -4px 11px #0000002e, inset 0 0 29px #f900008c;
-   justify-content: space-around;
-   align-items: center;
-   min-width: 500px;
-
-   .shot {
-      padding: 0 7px;
-      display: flex;
-      flex-direction: column-reverse;
-      color: #222;
-      text-shadow: 1px 1px 2px #FFF4;
-
-      .player {
-         font-size: 10px;
-      }
-
-      .value {
-         font-size: 24px;
-         /*font-size: small;*/
-      }
-   }
-}
-
 #fireworks {
    display: none;
    position: fixed;

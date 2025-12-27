@@ -3,7 +3,7 @@ const ElementID = [
    'randInput20', 'p1', 'p1progress', 'p1shots', 'p1score',
    'p1temp', 'p1sX', 'p2', 'p2progress', 'p2shots', 'p2score',
    'p2temp', 'p2sX', 'p1input', 'p2input', 'playersSelect',
-   'fireworks', 'winnerName', 'latestThrows'
+   'fireworks', 'winnerName'
 ];
 
 export const View = (id) => {
@@ -54,7 +54,6 @@ export const UI = {
       View('p2progress').style.width = p2Data.width;
    },
 
-   // Заменяет манипуляции в getPlayerPoints
    drawPlayerPoints: (playerKey, items) => {
       const container = View(playerKey === 'playerOne' ? 'p1shots' : 'p2shots');
       container.innerHTML = '';
@@ -66,22 +65,9 @@ export const UI = {
       });
    },
 
-   // Заменяет манипуляции в showHint
    drawHint: (p1Html, p2Html) => {
       View('p1sX').innerHTML = p1Html;
       View('p2sX').innerHTML = p2Html;
-   },
-
-   // Заменяет манипуляции в latestThrows
-   drawLatestThrows: (shotsHtml) => {
-      const container = View('latestThrows');
-      container.innerHTML = '';
-      shotsHtml.forEach(html => {
-         let div = document.createElement('div');
-         div.className = 'shot';
-         div.innerHTML = html; // Здесь уже собранный внутренний HTML
-         container.append(div);
-      });
    },
 
    toggleActivePlayer: (player) => {

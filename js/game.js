@@ -256,7 +256,6 @@ const calculate = (callback) => {
 
    whoseTurn();
    getPlayerPoints();
-   latestThrows();
    getMainInfo();
 
    if (callback) callback('done');
@@ -328,19 +327,4 @@ const showHint = (score) => {
 
    board[Settings.x3and25].find(hintShot);
    UI.drawHint(h1, h2);
-}
-
-const latestThrows = () => {
-   const shotsMarkup = [];
-   for (let i = Storage.shots.length - 1; i >= Storage.shots.length - 6; i--) {
-      let val = Storage.shots[i];
-      if (val) {
-         // Формируем строку, которую UI просто вставит
-         shotsMarkup.push(`
-            <div class="player">${val.player ?? ''}</div>
-            <div class="value">${val.sector}${val.x !== 1 ? 'x' + val.x : ''}</div>
-         `);
-      }
-   }
-   UI.drawLatestThrows(shotsMarkup);
 }
