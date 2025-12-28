@@ -254,13 +254,10 @@ nav {
    }
 }
 
-
-
-
 .wrapper {
    scale: 1;
    position: fixed;
-   //top: calc(50% - 550px);
+   top: 60px;
    height: var(--selector-height);
    border-radius: var(--border-radius);
    background: #7b648d5c;
@@ -459,12 +456,13 @@ div.sector:nth-child(odd) div:nth-child(odd) {
 
 #gameplay {
    margin: 50px 30px;
-   display: flex;
-   flex-direction: row;
+   display: grid;
+   grid-template-columns: clamp(300px, 25vw, 400px) clamp(300px, 25vw, 400px) 1fr;
+   //flex-direction: row;
    .p1, .p2 {
       margin-right: 15px;
       user-select: none;
-      width: 20%;
+      min-width: 280px;
       font-weight: 600;
    }
    .deck {
@@ -475,6 +473,14 @@ div.sector:nth-child(odd) div:nth-child(odd) {
       justify-content: center;
       align-items: center;
       position: relative;
+   }
+}
+@media (max-width: 1440px) {
+   #gameplay {
+      margin: 20px;
+      .p1, .p2 {
+         min-width: 240px;
+      }
    }
 }
 

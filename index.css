@@ -234,6 +234,7 @@ nav {
 .wrapper {
   scale: 1;
   position: fixed;
+  top: 60px;
   height: var(--selector-height);
   border-radius: var(--border-radius);
   background: rgba(123, 100, 141, 0.3607843137);
@@ -397,13 +398,13 @@ nav {
 
 #gameplay {
   margin: 50px 30px;
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: clamp(300px, 25vw, 400px) clamp(300px, 25vw, 400px) 1fr;
 }
 #gameplay .p1, #gameplay .p2 {
   margin-right: 15px;
   user-select: none;
-  width: 20%;
+  min-width: 280px;
   font-weight: 600;
 }
 #gameplay .deck {
@@ -416,6 +417,14 @@ nav {
   position: relative;
 }
 
+@media (max-width: 1440px) {
+  #gameplay {
+    margin: 20px;
+  }
+  #gameplay .p1, #gameplay .p2 {
+    min-width: 240px;
+  }
+}
 .points {
   display: flex;
   flex-direction: row;
