@@ -3,7 +3,7 @@ const ElementID = [
    'randInput20', 'p1', 'p1progress', 'p1shots', 'p1score',
    'p1temp', 'p1sX', 'p2', 'p2progress', 'p2shots', 'p2score',
    'p2temp', 'p2sX', 'p1input', 'p2input', 'playersSelect',
-   'fireworks', 'winnerName'
+   'fireworks', 'winnerName', 'scoreTable'
 ];
 
 export const View = (id) => {
@@ -62,6 +62,14 @@ export const UI = {
          div.className = !item.status ? 'bad' : '';
          div.innerHTML = `${item.sector}${item.x > 1 ? 'x' + item.x : ''}`;
          container.append(div);
+      });
+
+      requestAnimationFrame(() => {
+         const scoreContainer = View('scoreTable');
+         scoreContainer.scrollTo({
+            top: scoreContainer.scrollHeight,
+            behavior: 'smooth'
+         });
       });
    },
 
