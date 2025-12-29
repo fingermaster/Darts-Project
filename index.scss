@@ -257,7 +257,7 @@ nav {
 .wrapper {
    scale: 1;
    position: fixed;
-   top: 60px;
+   top: 80px;
    height: var(--selector-height);
    border-radius: var(--border-radius);
    background: #7b648d5c;
@@ -277,7 +277,11 @@ nav {
       z-index: 2;
    }
 }
-
+@media (max-width: 1700px) {
+   .wrapper {
+      position: relative;
+   }
+}
 #selectorCircle {
    position: absolute;
    left: var(--sector);
@@ -490,6 +494,7 @@ div.sector:nth-child(odd) div:nth-child(odd) {
    }
 
    .deck {
+      overflow: hidden;
       display: flex;
       flex: auto;
       flex-direction: column;
