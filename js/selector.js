@@ -46,7 +46,6 @@ export class Selector {
       this.OUTPUT.id = 'selectorCircle';
       await document.getElementById(CONFIG.output).appendChild(this.OUTPUT);
       await this.setCssProperty();
-      this.drawDeck();
    }
 
    setCssProperty() {
@@ -87,6 +86,7 @@ export class Selector {
          wrapper.append(this.sectorElement('50', i, 1.6, 'fifty'));
          this.OUTPUT.append(wrapper);
       }
+      document.getElementById(CONFIG.output).classList.toggle('wrapper');
    }
 
    toPosition(position) {

@@ -78,13 +78,12 @@ export const Storage = {
    },
 
    GetNext: () => {
-      console.log(`%cGetNext`, ConsoleCSS);
-      // console.trace("Откуда пришел вызов?");
+      // console.log(`%cGetNext`, ConsoleCSS);
       Settings.next = Storage.games[Storage.games.length - 1].next;
    },
 
    SetNext: async (next) => {
-      console.log(`%cSetNext`, ConsoleCSS);
+      // console.log(`%cSetNext`, ConsoleCSS);
       let gameDB = Storage.games[Storage.games.length - 1];
       Settings.next = next;
       gameDB.next = next;

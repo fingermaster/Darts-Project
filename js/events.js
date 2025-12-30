@@ -106,7 +106,7 @@ const handleNumpadDigits = (event) => {
    }
 };
 
-document.addEventListener('click', (event) => {
+document.addEventListener('click', async (event) => {
    if (event.target.tagName !== 'BUTTON' &&
          modal.state === true &&
          !modal.isOnModal(event.x, event.y)) {
@@ -122,6 +122,11 @@ document.addEventListener('click', (event) => {
    const numContainer = event.target.closest('[data-num]');
    if (numContainer) {
       selector.toIndex(numContainer.dataset.num);
+   }
+
+   const boardClick = event.target.closest('[data-point]');
+   if(boardClick) {
+      await sendShot(parseInt(boardClick.dataset.point), parseInt(boardClick.dataset.x));
    }
 });
 

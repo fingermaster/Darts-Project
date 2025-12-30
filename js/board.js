@@ -56,18 +56,16 @@ export function generateDartsBoard(containerElement, boardNums = [20, 1, 18, 4, 
    content += `<use href="#p25" class="green-sector" />`;
    content += `<use href="#p50" class="red-sector" />`;
 
-
    boardNums.forEach((num, i) => {
       const angle = (360 / boardNums.length) * i - 90;
       const rad = angle * Math.PI / 180;
       const x = 115 * Math.cos(rad); // Числа внутри секторов как в оригинале
       const y = 115 * Math.sin(rad);
-      content += `<text x="${x}" y="${y}" fill="${isEven(i) ? '#333' : '#eee'}" font-size="14" text-anchor="middle" dominant-baseline="middle">${num}</text>`;
+      content += `<text x="${x}" y="${y}" fill="${isEven(i) ? '#eee' : '#333'}" font-size="14" text-anchor="middle" dominant-baseline="middle">${num}</text>`;
    });
 
-
    boardNums.forEach((num, i) => {
-      const angle = (360 / boardNums.length) * i - 90;
+      const angle = (360 / boardNums.length) * i;
       content += `<use href="#x1" class="alpha" transform="rotate(${angle})" data-point="${num}" data-x="1" />`;
       content += `<use href="#x2" class="alpha" transform="rotate(${angle})" data-point="${num}" data-x="2" />`;
       content += `<use href="#x3" class="alpha" transform="rotate(${angle})" data-point="${num}" data-x="3" />`;

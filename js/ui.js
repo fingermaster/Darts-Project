@@ -1,8 +1,6 @@
 import { generateDartsBoard } from "./board.js";
 import { Selector } from "./selector.js";
 
-export const selector = new Selector();
-
 const ElementID = [
    'gameInfo', 'toFinish', 'x3and25', 'overshootSkip', 'randInput',
    'randInput20', 'p1', 'p1progress', 'p1shots', 'p1score',
@@ -168,3 +166,7 @@ export const UI = {
       selector.toSector(sector);
    }
 };
+
+export const selector = new Selector();
+selector.drawDeck();
+// UI.drawBoard();
