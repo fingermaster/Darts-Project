@@ -1,9 +1,14 @@
+import { generateDartsBoard } from "./board.js";
+import { Selector } from "./selector.js";
+
+export const selector = new Selector();
+
 const ElementID = [
    'gameInfo', 'toFinish', 'x3and25', 'overshootSkip', 'randInput',
    'randInput20', 'p1', 'p1progress', 'p1shots', 'p1score',
    'p1temp', 'p1sX', 'p2', 'p2progress', 'p2shots', 'p2score',
    'p2temp', 'p2sX', 'p1input', 'p2input', 'playersSelect',
-   'fireworks', 'winnerName', 'scoreTable'
+   'fireworks', 'winnerName', 'scoreTable', 'dartboard'
 ];
 
 export const View = (id) => {
@@ -149,5 +154,17 @@ export const UI = {
 
    getModalBounds() {
       return document.querySelector('.modal').getBoundingClientRect();
+   },
+
+   drawBoard(){
+      generateDartsBoard(View('dartboard'));
+   },
+
+   randomAll: (sector, multiplier) => {
+      selector.toSector(sector);
+      selector.toPosition(multiplier);
+   },
+   randomSector: (sector) => {
+      selector.toSector(sector);
    }
 };

@@ -1,7 +1,7 @@
 import { Storage } from './storage.js';
-import { Game, modal, randomGenerator, selector, sendShot, timer } from "./game.js";
+import { Game, modal, randomGenerator, sendShot, timer } from "./game.js";
 import { Settings } from "./settings.js";
-import { View } from "./ui.js";
+import { selector, View } from "./ui.js";
 
 
 const clickActions = {

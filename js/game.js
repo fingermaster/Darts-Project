@@ -2,7 +2,6 @@ import { Storage } from "./storage.js";
 import { Settings} from "./settings.js";
 import { rand20, randDeck } from "./utils.js";
 import { UI } from "./ui.js";
-import { Selector } from "./selector.js";
 import { Timer } from "./timer.js";
 
 const board = {
@@ -10,23 +9,7 @@ const board = {
    1: [2, 3, 4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 22, 24, 25, 26, 27, 28, 30, 32, 33, 34, 36, 38, 39, 40, 42, 45, 48, 50, 51, 54, 57, 60]
 };
 
-export const selector = new Selector();
-
-export const randomGenerator = {
-   all: () => {
-      let rand = randDeck();
-      selector.toSector(rand.sector);
-      selector.toPosition(rand.multiplier);
-   },
-   sector: () => {
-      selector.toSector(rand20());
-   }
-}
-
-export const timer = new Timer(() => {
-   sendShot(0, 1);
-}, 10, 100);
-
+// UI.drawBoard();
 
 export const sendShot = async function (sector, x) {
    const currentPlayerKey = Game.next;
@@ -51,18 +34,14 @@ export const sendShot = async function (sector, x) {
    // 2. Считаем остаток (на основе текущих очков + новый бросок)
    const remaining = Settings.toFinish - (shotsByPlayer[shooter].score + shotsByPlayer[shooter].session + shotData.sx);
 
-   // 3. Проверка перебора
    if (Settings.overshootSkip && (remaining < 0 || remaining === 1)) {
       console.warn(`[OVERSHOOT] Remaining: ${remaining}. Shot #${shotData.shotn}`);
       // Теперь shotData.shotn ТОЧНО существует (1 или 2)
       await Game.processOvershoot(shotData);
    }
 
-   // 4. Финальный расчет и обновление UI
    calculate();
 }
-
-
 
 export const initGame = async () => {
    let game = await Storage.CheckGameID();
@@ -320,3 +299,17 @@ const showHint = (score) => {
    board[Settings.x3and25].find(hintShot);
    UI.drawHint(h1, h2);
 }
+
+export const randomGenerator = {
+   all: () => {
+      let rand = randDeck();
+      UI.randomAll(rand.sector, rand.multiplier);
+   },
+   sector: () => {
+      UI.randomSector(rand20());
+   }
+}
+
+export const timer = new Timer(() => {
+   sendShot(0, 1);
+}, 10, 100);
