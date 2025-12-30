@@ -184,73 +184,39 @@ nav {
 }
 .timerWrapper {
    position: fixed;
-   top: 50px;
-   right: 30px;
+   top: 0;
+   right: 0;
 
-   svg#pie {
-      width: 180px;
-      height: 180px;
+   #line {
+      width: 100vw;
+      height: 4px;
+      background-color: greenyellow;
+      opacity: 0.8;
 
-      circle {
-         fill: transparent;
-         stroke: greenyellow;
-         stroke-width: 5;
-         stroke-dasharray: 302% 0;
-         stroke-dashoffset: 0;
-         stroke-linecap: round;
-         stroke-opacity: 0.8;
-         transform-origin: 50% 50%;
-         transform: rotate(270deg);
-      }
+      transform-origin: left;
+      transform: scaleX(1);
 
       &.active {
-         circle {
-            animation: timer linear 10s;
-         }
+         animation: timer linear 10s forwards;
 
-         &.paused circle {
+         &.paused {
             animation-play-state: paused;
          }
       }
    }
-   #timer {
-      position: fixed;
-      top: 50px;
-      right: 30px;
-      user-select: none;
-      font-size: 40px;
-      width: 180px;
-      height: 180px;
-      border-radius: 90px;
-      display: flex;
-      flex-wrap: nowrap;
-      justify-content: center;
-      align-items: center;
-      color: #efefef;
-      text-shadow: 1px 2px #c3a587, 1px 1px 10px #000;
-      z-index: 4;
-      .placeholder {
-         font-size: 19px;
-         padding: 19px;
-         align-self: center;
-      }
-   }
 }
 
-
 @keyframes timer {
-   0% {
-      stroke-dasharray: 302% 0;
-      transform: rotate(270deg);
-      stroke: greenyellow;
+   from {
+      transform: scaleX(1);
+      background: greenyellow;
    }
    70% {
-      stroke: yellow;
+      background: yellow;
    }
-   100% {
-      stroke-dasharray: 0 302%;
-      stroke: orangered;
-      transform: rotate(calc(270deg + 360deg));
+   to {
+      transform: scaleX(0);
+      background: orangered;
    }
 }
 
@@ -451,11 +417,14 @@ div.sector:nth-child(odd) div:nth-child(odd) {
    flex-direction: row;
    height: calc(100vh - 150px);
    overflow: hidden;
+   @media (orientation: portrait) {
+      flex-direction: column;
+   }
 
    .scoreSide {
       display: flex;
       flex-direction: column;
-      height: 100%;
+      //height: 100%;
 
       .scoreHead {
          display: flex;
@@ -474,12 +443,18 @@ div.sector:nth-child(odd) div:nth-child(odd) {
          overflow-y: auto;
          scrollbar-width: thin;
          scrollbar-color: #888 #333;
+         @media (orientation: portrait) {
+            height: 200px;
+         }
 
+         #p1shots {
+            border-right: dashed 2px rgba(255, 255, 255, .3);
+         }
          #p1shots, #p2shots {
             width: 50%;
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            font-size: 36px;
+            font-size: 30px;
             font-weight: normal;
             align-content: start;
 
@@ -493,7 +468,7 @@ div.sector:nth-child(odd) div:nth-child(odd) {
       }
    }
 
-   .deck {
+   #deck {
       overflow: hidden;
       display: flex;
       flex: auto;
@@ -502,6 +477,14 @@ div.sector:nth-child(odd) div:nth-child(odd) {
       justify-content: center;
       align-items: center;
       position: relative;
+
+      &.touch {
+         flex-direction: row;
+         align-items: normal;
+      }
+      #dartboard {
+         z-index: 9;
+      }
    }
 }
 
@@ -513,7 +496,7 @@ div.sector:nth-child(odd) div:nth-child(odd) {
    flex: auto;
    align-content: start;
    white-space: nowrap;
-   font-size: 3em;
+   font-size: 2.5em;
    color: rgba(255, 235, 90, 0.28);
    font-weight: 600;
    -webkit-background-clip: text;
@@ -528,7 +511,7 @@ div.sector:nth-child(odd) div:nth-child(odd) {
 }
 
 #p1score, #p2score {
-   font-size: 3em;
+   font-size: 2em;
    font-weight: 500;
    display: flex;
    flex: 60%;

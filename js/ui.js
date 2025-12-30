@@ -6,7 +6,7 @@ const ElementID = [
    'randInput20', 'p1', 'p1progress', 'p1shots', 'p1score',
    'p1temp', 'p1sX', 'p2', 'p2progress', 'p2shots', 'p2score',
    'p2temp', 'p2sX', 'p1input', 'p2input', 'playersSelect',
-   'fireworks', 'winnerName', 'scoreTable', 'dartboard'
+   'fireworks', 'winnerName', 'scoreTable', 'deck', 'dartboard'
 ];
 
 export const View = (id) => {
@@ -155,6 +155,8 @@ export const UI = {
    },
 
    drawBoard(){
+      //пробрасываем класс для контейнера
+      View('deck').classList.toggle('touch');
       generateDartsBoard(View('dartboard'));
    },
 
@@ -168,5 +170,10 @@ export const UI = {
 };
 
 export const selector = new Selector();
-selector.drawDeck();
-// UI.drawBoard();
+
+const isTouchDevice = false;
+if(isTouchDevice){
+   UI.drawBoard();
+} else {
+   selector.drawDeck();
+}

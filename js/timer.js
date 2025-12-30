@@ -1,7 +1,6 @@
 export class Timer {
    #interval = null;
-   #pieId = 'pie';
-   #output = document.getElementById('timer');
+   #lineId = 'line';
 
    constructor(onTimesUpEvent, timeLimitSec = 10, stepMs = 1000) {
       this.onTimesUp = typeof onTimesUpEvent === "function" ? onTimesUpEvent : () => {};
@@ -13,7 +12,7 @@ export class Timer {
    }
 
    #getPie() {
-      return document.getElementById(this.#pieId);
+      return document.getElementById(this.#lineId);
    }
 
    switchTimer() {
@@ -52,10 +51,6 @@ export class Timer {
       this.#interval = setInterval(() => {
          this.passed += this.stepMs;
          this.left = Math.max(0, this.limit - this.passed);
-
-         if (this.#output) {
-            this.#output.innerHTML = (this.left / 1000).toFixed(1);
-         }
 
          if (this.left <= 0) {
             this.clearTimer();

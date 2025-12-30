@@ -169,66 +169,35 @@ nav {
 
 .timerWrapper {
   position: fixed;
-  top: 50px;
-  right: 30px;
+  top: 0;
+  right: 0;
 }
-.timerWrapper svg#pie {
-  width: 180px;
-  height: 180px;
+.timerWrapper #line {
+  width: 100vw;
+  height: 4px;
+  background-color: greenyellow;
+  opacity: 0.8;
+  transform-origin: left;
+  transform: scaleX(1);
 }
-.timerWrapper svg#pie circle {
-  fill: transparent;
-  stroke: greenyellow;
-  stroke-width: 5;
-  stroke-dasharray: 302% 0;
-  stroke-dashoffset: 0;
-  stroke-linecap: round;
-  stroke-opacity: 0.8;
-  transform-origin: 50% 50%;
-  transform: rotate(270deg);
+.timerWrapper #line.active {
+  animation: timer linear 10s forwards;
 }
-.timerWrapper svg#pie.active circle {
-  animation: timer linear 10s;
-}
-.timerWrapper svg#pie.active.paused circle {
+.timerWrapper #line.active.paused {
   animation-play-state: paused;
-}
-.timerWrapper #timer {
-  position: fixed;
-  top: 50px;
-  right: 30px;
-  user-select: none;
-  font-size: 40px;
-  width: 180px;
-  height: 180px;
-  border-radius: 90px;
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: center;
-  align-items: center;
-  color: #efefef;
-  text-shadow: 1px 2px #c3a587, 1px 1px 10px #000;
-  z-index: 4;
-}
-.timerWrapper #timer .placeholder {
-  font-size: 19px;
-  padding: 19px;
-  align-self: center;
 }
 
 @keyframes timer {
-  0% {
-    stroke-dasharray: 302% 0;
-    transform: rotate(270deg);
-    stroke: greenyellow;
+  from {
+    transform: scaleX(1);
+    background: greenyellow;
   }
   70% {
-    stroke: yellow;
+    background: yellow;
   }
-  100% {
-    stroke-dasharray: 0 302%;
-    stroke: orangered;
-    transform: rotate(630deg);
+  to {
+    transform: scaleX(0);
+    background: orangered;
   }
 }
 .wrapper {
@@ -393,10 +362,14 @@ nav {
   height: calc(100vh - 150px);
   overflow: hidden;
 }
+@media (orientation: portrait) {
+  #gameplay {
+    flex-direction: column;
+  }
+}
 #gameplay .scoreSide {
   display: flex;
   flex-direction: column;
-  height: 100%;
 }
 #gameplay .scoreSide .scoreHead {
   display: flex;
@@ -415,11 +388,19 @@ nav {
   scrollbar-width: thin;
   scrollbar-color: #888 #333;
 }
+@media (orientation: portrait) {
+  #gameplay .scoreSide .score {
+    height: 200px;
+  }
+}
+#gameplay .scoreSide .score #p1shots {
+  border-right: dashed 2px rgba(255, 255, 255, 0.3);
+}
 #gameplay .scoreSide .score #p1shots, #gameplay .scoreSide .score #p2shots {
   width: 50%;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  font-size: 36px;
+  font-size: 30px;
   font-weight: normal;
   align-content: start;
 }
@@ -429,7 +410,7 @@ nav {
 #gameplay .scoreSide .score #p1shots .bad, #gameplay .scoreSide .score #p2shots .bad {
   color: red;
 }
-#gameplay .deck {
+#gameplay #deck {
   overflow: hidden;
   display: flex;
   flex: auto;
@@ -439,6 +420,13 @@ nav {
   align-items: center;
   position: relative;
 }
+#gameplay #deck.touch {
+  flex-direction: row;
+  align-items: normal;
+}
+#gameplay #deck #dartboard {
+  z-index: 9;
+}
 
 #p1, #p2 {
   box-sizing: border-box;
@@ -446,7 +434,7 @@ nav {
   flex: auto;
   align-content: start;
   white-space: nowrap;
-  font-size: 3em;
+  font-size: 2.5em;
   color: rgba(255, 235, 90, 0.28);
   font-weight: 600;
   -webkit-background-clip: text;
@@ -462,7 +450,7 @@ nav {
 }
 
 #p1score, #p2score {
-  font-size: 3em;
+  font-size: 2em;
   font-weight: 500;
   display: flex;
   flex: 60%;
