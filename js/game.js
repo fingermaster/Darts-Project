@@ -59,22 +59,18 @@ export const sendShot = async function (sector, x) {
    }
 
    // 4. Финальный расчет и обновление UI
-   calculate(() => {
-      selector.toIndex(0);
-   });
+   calculate();
 }
 
 
 
 export const initGame = async () => {
-   selector.toIndex(0);
-
    let game = await Storage.CheckGameID();
 
    if (game.p1) {
       Settings.first = game.first;
       setGameDataNames(game);
-      calculate(() => {});
+      calculate();
    } else {
       modal.toggle();
    }
@@ -203,7 +199,7 @@ const clearData = () => {
    shotsByPlayer.playerTwo.session = 0;
 }
 
-const calculate = (callback) => {
+const calculate = () => {
    clearData();
    let shots = Storage.shots;
 
@@ -257,8 +253,6 @@ const calculate = (callback) => {
    whoseTurn();
    getPlayerPoints();
    getMainInfo();
-
-   if (callback) callback('done');
 }
 
 const whoseTurn = () => {
