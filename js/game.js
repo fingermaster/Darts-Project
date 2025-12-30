@@ -130,9 +130,7 @@ export const Game = {
    cancelLastHit: async () => {
       UI.hideWinScreen();
       await Storage.CancelShot();
-      calculate(function () {
-         // console.log('we are calculate');
-      });
+      calculate();
    },
    clearX: () => {
       UI.clearHints();
