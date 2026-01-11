@@ -35,10 +35,10 @@ export function generateDartsBoard(containerElement, boardNums = [20, 1, 18, 4, 
    content += `<circle cx="0" cy="0" r="180" class="alpha" data-point="0" data-x="1" />`;
 
    // Текст Milk (повторяется 4 раза по кругу)
-   for (let i = 0; i < 4; i++) {
+   for (let i = 0; i < 10; i++) {
       content += `
             <text class="milk-text">
-                <textPath href="#milkCircle" startOffset="${i * 25 + 12}%">Milk</textPath>
+                <textPath href="#milkCircle" startOffset="${i * 10}%">Milk</textPath>
             </text>`;
    }
 
@@ -74,7 +74,7 @@ export function generateDartsBoard(containerElement, boardNums = [20, 1, 18, 4, 
    content += `<use href="#p50" class="alpha" data-point="50" data-x="1" />`;
 
    const fullSvg = `
-        <svg viewBox="-200 -200 400 400" xmlns="www.w3.org" style="width:100%; height:100%; display:block; background: transparent;">
+        <svg viewBox="-180 -180 360 360" xmlns="www.w3.org" style="width:100%; height:100%; display:block; background: transparent;">
             ${styles}
             ${defs}
             <g id="dartboard-ui">${content}</g>

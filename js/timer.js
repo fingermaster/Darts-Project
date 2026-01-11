@@ -11,12 +11,12 @@ export class Timer {
       this.switcher = false;
    }
 
-   #getPie() {
+   #getLine() {
       return document.getElementById(this.#lineId);
    }
 
    switchTimer() {
-      const pie = this.#getPie();
+      const pie = this.#getLine();
       if (!this.switcher) {
          pie?.classList.remove('paused');
          this.startTimer();
@@ -33,11 +33,11 @@ export class Timer {
       this.passed = 0;
 
       if (this.switcher) {
-         const pie = this.#getPie();
-         if (pie) {
-            const parent = pie.parentNode;
-            const clone = pie.cloneNode(true); // true вместо 3, так как это булево значение
-            pie.remove();
+         const line = this.#getLine();
+         if (line) {
+            const parent = line.parentNode;
+            const clone = line.cloneNode(true);
+            line.remove();
             parent.append(clone);
          }
          this.startTimer();
@@ -46,7 +46,7 @@ export class Timer {
 
    startTimer() {
       clearInterval(this.#interval); // Защита от наслоения интервалов
-      this.#getPie()?.classList.add('active');
+      this.#getLine()?.classList.add('active');
 
       this.#interval = setInterval(() => {
          this.passed += this.stepMs;

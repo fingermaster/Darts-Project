@@ -1,4 +1,3 @@
-@charset "UTF-8";
 :root {
   --code-token-tag: #0069c2;
   --code-token-punctuation: #858585;
@@ -18,10 +17,23 @@
   --selector-height: 320px;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   color: #FFF;
   font-family: "Tw Cen MT", serif;
+  font-size: 16px;
+  padding: 0;
+  margin: 0;
   outline: 0 none !important;
+}
+body.is-mobile {
+  font-size: 14px;
 }
 body div {
   outline: 0 none !important;
@@ -84,29 +96,22 @@ body::after {
   background-size: 1250px 1250px;
 }
 
-nav {
-  box-sizing: border-box;
-  user-select: none;
+.app-controls {
+  position: fixed;
   bottom: 0;
   left: 0;
-  position: fixed;
-  display: flex;
-  width: 100%;
-  height: 70px;
-  background: rgba(59, 60, 59, 0.25);
   z-index: 100;
-  justify-content: space-between;
-  align-items: center;
-  padding-right: 20px;
-}
-
-.app-controls {
   display: flex;
+  background: rgba(59, 60, 59, 0.25);
   justify-content: space-between;
   align-items: stretch;
   width: 100%;
   padding: 0 20px;
   box-sizing: border-box;
+  user-select: none;
+}
+.is-mobile .app-controls {
+  padding: 0 5px;
 }
 .app-controls .controls-zone {
   display: flex;
@@ -125,13 +130,9 @@ nav {
   color: #FFF;
   font-size: 14px;
 }
-.app-controls .controls-zone .button-cancel {
-  /* Стили для кнопки отмены */
+.is-mobile .app-controls .controls-zone.zone-actions-random {
+  display: none;
 }
-.app-controls .controls-zone .rand-group-label {
-  /* Стили для надписи Get Random */
-}
-
 #gameInfo {
   height: 100%;
   display: flex;
@@ -146,25 +147,20 @@ nav {
 #gameInfo .name {
   font-size: 28px;
 }
+.is-mobile #gameInfo .name {
+  font-size: 12px;
+}
 #gameInfo > div {
   font-size: 14px;
+}
+.is-mobile #gameInfo > div {
+  font-size: 7px;
 }
 #gameInfo .players {
   font-size: 21px;
 }
-
-.rand {
-  user-select: none;
-  width: 220px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-.rand button {
-  white-space: nowrap;
-}
-.rand .btn-group {
-  margin-bottom: 5px;
+.is-mobile #gameInfo .players {
+  font-size: 14px;
 }
 
 .timerWrapper {
@@ -210,6 +206,11 @@ nav {
   box-sizing: border-box;
   width: var(--selector-width);
 }
+@media (max-width: 1700px) {
+  .wrapper {
+    position: relative;
+  }
+}
 .wrapper::before {
   content: " ";
   box-sizing: border-box;
@@ -222,13 +223,7 @@ nav {
   box-shadow: 0 0 20px 0 rgb(58, 0, 0) inset;
   z-index: 2;
 }
-
-@media (max-width: 1700px) {
-  .wrapper {
-    position: relative;
-  }
-}
-#selectorCircle {
+.wrapper #selectorCircle {
   position: absolute;
   left: var(--sector);
   top: calc(var(--sector) + 100px);
@@ -243,30 +238,12 @@ nav {
   transition-timing-function: ease-out;
   user-select: none;
 }
-#selectorCircle .active {
+.wrapper #selectorCircle .active {
   font-weight: bold;
   text-shadow: 2px 1px 2px black;
   color: rgb(250, 208, 1);
 }
-#selectorCircle .num {
-  font-size: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: var(--sector);
-  height: var(--sector);
-  width: calc(var(--sector));
-}
-#selectorCircle .twentyFive {
-  font-size: 30px;
-}
-#selectorCircle .fifty {
-  font-size: 36px;
-}
-#selectorCircle .x2, #selectorCircle .x3 {
-  font-size: 24px;
-}
-#selectorCircle div div {
+.wrapper #selectorCircle div div {
   box-sizing: border-box;
   rotate: calc(var(--angle) * -1);
   transition: var(--transition);
@@ -278,6 +255,38 @@ nav {
   align-items: center;
   justify-content: center;
   color: rgba(255, 255, 255, 0.6);
+}
+.wrapper #selectorCircle .sector:nth-child(even) div {
+  text-shadow: 2px 2px rgba(0, 0, 0, 0.1);
+}
+.wrapper #selectorCircle .sector:nth-child(even) div:nth-child(odd) {
+  color: green;
+  text-shadow: 2px 2px rgba(0, 0, 0, 0.5);
+}
+.wrapper #selectorCircle .sector:nth-child(odd) div {
+  text-shadow: 2px 2px rgba(0, 0, 0, 0.5);
+}
+.wrapper #selectorCircle .sector:nth-child(odd) div:nth-child(odd) {
+  color: red;
+  text-shadow: 2px 2px rgba(0, 0, 0, 0.5);
+}
+.wrapper #selectorCircle .sector .num {
+  font-size: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: var(--sector);
+  height: var(--sector);
+  width: calc(var(--sector));
+}
+.wrapper #selectorCircle .sector .x2, .wrapper #selectorCircle .sector .x3 {
+  font-size: 24px;
+}
+.wrapper #selectorCircle .sector .twentyFive {
+  font-size: 30px;
+}
+.wrapper #selectorCircle .sector .fifty {
+  font-size: 36px;
 }
 
 .modal {
@@ -364,12 +373,16 @@ nav {
 }
 @media (orientation: portrait) {
   #gameplay {
+    margin: 10px 5px;
     flex-direction: column;
   }
 }
 #gameplay .scoreSide {
   display: flex;
   flex-direction: column;
+}
+.is-mobile #gameplay .scoreSide {
+  flex: auto;
 }
 #gameplay .scoreSide .scoreHead {
   display: flex;
@@ -379,7 +392,82 @@ nav {
   margin-right: 15px;
   user-select: none;
   min-width: 280px;
+}
+@media (orientation: portrait) {
+  #gameplay .scoreSide .scoreHead .p1, #gameplay .scoreSide .scoreHead .p2 {
+    min-width: 120px;
+  }
+}
+.is-mobile #gameplay .scoreSide .scoreHead .p1, .is-mobile #gameplay .scoreSide .scoreHead .p2 {
+  min-width: 120px;
+}
+#gameplay .scoreSide .scoreHead .p1 #p1, #gameplay .scoreSide .scoreHead .p1 #p2, #gameplay .scoreSide .scoreHead .p2 #p1, #gameplay .scoreSide .scoreHead .p2 #p2 {
+  box-sizing: border-box;
+  display: flex;
+  flex: auto;
+  align-content: start;
+  white-space: nowrap;
+  font-size: 36px;
+  color: rgba(255, 235, 90, 0.28);
   font-weight: 600;
+  -webkit-background-clip: text;
+}
+.is-mobile #gameplay .scoreSide .scoreHead .p1 #p1, .is-mobile #gameplay .scoreSide .scoreHead .p1 #p2, .is-mobile #gameplay .scoreSide .scoreHead .p2 #p1, .is-mobile #gameplay .scoreSide .scoreHead .p2 #p2 {
+  font-size: 24px;
+}
+#gameplay .scoreSide .scoreHead .p1 #p1.active, #gameplay .scoreSide .scoreHead .p1 #p2.active, #gameplay .scoreSide .scoreHead .p2 #p1.active, #gameplay .scoreSide .scoreHead .p2 #p2.active {
+  color: #FAD001;
+}
+#gameplay .scoreSide .scoreHead .p1 .progress, #gameplay .scoreSide .scoreHead .p2 .progress {
+  height: 8px;
+  margin: 7px 0;
+  width: 100%;
+  display: flex;
+  border-radius: 5px;
+  background: rgba(90, 90, 90, 0.6) !important;
+  box-shadow: 1px 1px 0 #000;
+}
+.is-mobile #gameplay .scoreSide .scoreHead .p1 .progress, .is-mobile #gameplay .scoreSide .scoreHead .p2 .progress {
+  height: 4px;
+  border-radius: 2px;
+}
+#gameplay .scoreSide .scoreHead .p1 .progress > div, #gameplay .scoreSide .scoreHead .p2 .progress > div {
+  display: flex;
+  background: linear-gradient(90deg, red 0, yellow 250px, green 490px);
+  border-radius: 5px;
+  opacity: 0.8;
+}
+#gameplay .scoreSide .scoreHead .p1 .points, #gameplay .scoreSide .scoreHead .p2 .points {
+  display: flex;
+  flex-direction: row;
+}
+#gameplay .scoreSide .scoreHead .p1 .points #p1temp, #gameplay .scoreSide .scoreHead .p1 .points #p2temp, #gameplay .scoreSide .scoreHead .p2 .points #p1temp, #gameplay .scoreSide .scoreHead .p2 .points #p2temp {
+  font-size: 36px;
+}
+#gameplay .scoreSide .scoreHead .p1 .points #p1sX, #gameplay .scoreSide .scoreHead .p1 .points #p2sX, #gameplay .scoreSide .scoreHead .p2 .points #p1sX, #gameplay .scoreSide .scoreHead .p2 .points #p2sX {
+  display: flex;
+  font-size: 40px;
+  font-weight: bold;
+  flex: 70%;
+  justify-content: flex-end;
+  color: red;
+}
+.is-mobile #gameplay .scoreSide .scoreHead .p1 .points #p1sX, .is-mobile #gameplay .scoreSide .scoreHead .p1 .points #p2sX, .is-mobile #gameplay .scoreSide .scoreHead .p2 .points #p1sX, .is-mobile #gameplay .scoreSide .scoreHead .p2 .points #p2sX {
+  font-size: 20px;
+}
+#gameplay .scoreSide .scoreHead .p1 .points #p1score, #gameplay .scoreSide .scoreHead .p1 .points #p2score, #gameplay .scoreSide .scoreHead .p2 .points #p1score, #gameplay .scoreSide .scoreHead .p2 .points #p2score {
+  font-size: 36px;
+  font-weight: 500;
+  display: flex;
+  flex: 60%;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.6);
+  color: #fff6a9;
+  justify-content: flex-end;
+}
+#gameplay .scoreSide .scoreHead .p1 .points #p1score span, #gameplay .scoreSide .scoreHead .p1 .points #p2score span, #gameplay .scoreSide .scoreHead .p2 .points #p1score span, #gameplay .scoreSide .scoreHead .p2 .points #p2score span {
+  font-size: 20px;
+  color: #188754;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.6);
 }
 #gameplay .scoreSide .score {
   display: flex;
@@ -388,9 +476,28 @@ nav {
   scrollbar-width: thin;
   scrollbar-color: #888 #333;
 }
+#gameplay .scoreSide .score::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+#gameplay .scoreSide .score::-webkit-scrollbar-track {
+  background: #333;
+  border-radius: 10px;
+}
+#gameplay .scoreSide .score::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 10px;
+  border: 2px solid #333;
+}
+#gameplay .scoreSide .score::-webkit-scrollbar-thumb:hover {
+  background-color: #aaa;
+}
 @media (orientation: portrait) {
   #gameplay .scoreSide .score {
     height: 200px;
+  }
+  .is-mobile #gameplay .scoreSide .score {
+    height: 150px;
   }
 }
 #gameplay .scoreSide .score #p1shots {
@@ -403,6 +510,9 @@ nav {
   font-size: 30px;
   font-weight: normal;
   align-content: start;
+}
+.is-mobile #gameplay .scoreSide .score #p1shots, .is-mobile #gameplay .scoreSide .score #p2shots {
+  font-size: 14px;
 }
 #gameplay .scoreSide .score #p1shots div, #gameplay .scoreSide .score #p2shots div {
   justify-self: center;
@@ -423,70 +533,17 @@ nav {
 #gameplay #deck.touch {
   flex-direction: row;
   align-items: normal;
+  width: 100vmin;
+  height: 100vmin;
+}
+@media (orientation: landscape) {
+  #gameplay #deck.touch {
+    width: calc(100vmin - 140px);
+    height: calc(100vmin - 140px);
+  }
 }
 #gameplay #deck #dartboard {
   z-index: 9;
-}
-
-#p1, #p2 {
-  box-sizing: border-box;
-  display: flex;
-  flex: auto;
-  align-content: start;
-  white-space: nowrap;
-  font-size: 2.5em;
-  color: rgba(255, 235, 90, 0.28);
-  font-weight: 600;
-  -webkit-background-clip: text;
-}
-#p1.active, #p2.active {
-  color: #FAD001;
-}
-
-.points {
-  display: flex;
-  flex-direction: row;
-  font-size: xx-large;
-}
-
-#p1score, #p2score {
-  font-size: 2em;
-  font-weight: 500;
-  display: flex;
-  flex: 60%;
-  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.6);
-  color: #fff6a9;
-  justify-content: flex-end;
-}
-#p1score span, #p2score span {
-  font-size: 0.5em;
-  color: #188754;
-  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.6);
-}
-
-.progress {
-  height: 8px;
-  margin: 7px 0;
-  width: 100%;
-  display: flex;
-  border-radius: 5px;
-  background: rgba(90, 90, 90, 0.6) !important;
-  box-shadow: 1px 1px 0 #000;
-}
-.progress > div {
-  display: flex;
-  background: linear-gradient(90deg, red 0, yellow 250px, green 490px);
-  border-radius: 5px;
-  opacity: 0.8;
-}
-
-#p1sX, #p2sX {
-  display: flex;
-  font-size: 40px;
-  font-weight: bold;
-  flex: 70%;
-  justify-content: flex-end;
-  color: red;
 }
 
 #fireworks {
@@ -523,7 +580,7 @@ nav {
   text-shadow: 0 0 5px #000000, 0 0 15px #ff0000, 0 0 20px #0027ff, 0 0 40px #ff00eb;
   color: #fff6a9;
   text-align: center;
-  padding: 0.1em 1em;
+  padding: 30px;
   background: none;
   box-shadow: none;
 }
@@ -531,26 +588,6 @@ nav {
   opacity: 1;
   color: #fff6a9;
   text-shadow: 2px 4px 6px #4a0a39, 1px 0 5px #ffa500, 0 0 108px #ffa500, 0 0 40px #ffa500, 0 0 60px #ff0000, 0 0 10px #ff8d00, 0 0 98px #ff0000, -1px 1px 0 rgba(255, 255, 255, 0.6666666667);
-}
-
-.score::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
-}
-
-.score::-webkit-scrollbar-track {
-  background: #333;
-  border-radius: 10px;
-}
-
-.score::-webkit-scrollbar-thumb {
-  background-color: #888;
-  border-radius: 10px;
-  border: 2px solid #333;
-}
-
-.score::-webkit-scrollbar-thumb:hover {
-  background-color: #aaa;
 }
 
 /*# sourceMappingURL=index.css.map */

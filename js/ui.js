@@ -34,6 +34,10 @@ export const UI = {
       });
    },
 
+   toggleMobileState: () => {
+      document.body.classList.toggle('is-mobile');
+   },
+
    renderInfoBar: (settings) => {
       View('gameInfo').innerHTML = `
         <div class="name">#${settings.current} ${settings.toFinish}</div>
@@ -171,8 +175,10 @@ export const UI = {
 
 export const selector = new Selector();
 
-const isTouchDevice = false;
+// const isTouchDevice = false;
+const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
 if(isTouchDevice){
+   UI.toggleMobileState();
    UI.drawBoard();
 } else {
    selector.drawDeck();
