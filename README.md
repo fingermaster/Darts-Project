@@ -48,7 +48,11 @@ The game supports full keyboard control for selecting segments, making throws, a
 > When **Num Lock is ON**, Windows suppresses the `Shift` signal for Numpad keys to provide legacy navigation (e.g., treating `Shift + Numpad 1` as `End`). To use Numpad shortcuts with Shift in this application, please ensure **Num Lock is OFF**.
 
 ## 🚀 Live Demo
-You can try the application here: **[Launch App](https://fingermaster.github.io/Darts-Project/)**
+The application is built with zero dependencies and is ready to run directly in your browser.
+
+**[Launch Advanced Darts Scorer](https://fingermaster.github.io/Darts-Project/)**
+
+*Optimized for both Desktop (Keyboard) and Mobile (Touch) interfaces.*
 
 ## 🛠 How to Run Locally
 1. Clone the repository.
