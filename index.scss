@@ -267,11 +267,7 @@ body {
       transition-timing-function: ease-out;
       user-select: none;
 
-      .active {
-         font-weight: bold;
-         text-shadow: 2px 1px 2px black;
-         color: rgb(250, 208, 1);
-      }
+
 
 
 
@@ -328,6 +324,11 @@ body {
 
          .fifty {
             font-size: 36px;
+         }
+         .active {
+            font-weight: bold;
+            text-shadow: 2px 1px 2px black;
+            color: rgb(250, 208, 1) !important;
          }
       }
    }
@@ -643,18 +644,20 @@ body {
    h1 {
       font-family: Hobo Std, serif;
       font-weight: normal;
-      font-size: calc(45px + 10vh);
-      line-height: calc(20px + 16vh);
+      font-size: 100px;
       text-shadow: 2px 4px 6px #4a0a39, 1px 0 5px #ffa500, 0 0 108px #ffa500, 0 0 40px #ffa500, 0 0 60px #ff0000, 0 0 10px #ff8d00, 0 0 98px #ff0000, -1px 1px 0 #fffa;
       color: #fff4a9;
       text-align: center;
+      .is-mobile & {
+         font-size: 50px;
+      }
    }
 
    button {
       font-family: Hobo Std, serif;
       border: none;
       cursor: pointer;
-      font-size: calc(2px + 3vh);
+      font-size: 32px;
       font-weight: 400;
       box-sizing: border-box;
       text-shadow: 0 0 5px #000000, 0 0 15px #ff0000, 0 0 20px #0027ff, 0 0 40px #ff00eb;
@@ -663,6 +666,9 @@ body {
       padding: 30px;
       background: none;
       box-shadow: none;
+      .is-mobile & {
+         font-size: 16px;
+      }
 
       &:hover {
          opacity: 1;
