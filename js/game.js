@@ -174,57 +174,69 @@ const clearData = () => {
    shotsByPlayer.playerTwo.session = 0;
 }
 
-const calculate = () => {
-   clearData();
-   let shots = Storage.shots;
+const processShot = (playerKey, shot, state, settings) => {
+   const pState = state[playerKey];
+   shot.status = true;
+   pState.all.push(shot);
 
-   if (shots.length > 0) {
-      let playerOneName = Storage.games[Storage.games.length - 1].p1;
+   pState.session += shot.sx;
+   const remaining = settings.toFinish - pState.score - pState.session;
 
-      function shotCheck(player, shot) {
-         shot.status = true;
+   if (remaining === 0) {
+      const isItWon = (settings.x3and25 === 1)
+            ? (shot.x > 1 || [25, 50].includes(shot.sector))
+            : (shot.x === 2 || shot.sector === 50);
 
-         // Упрощаем расчет сессии
-         shotsByPlayer[player].session += shot.sx;
-
-         let remaining = Settings.toFinish - shotsByPlayer[player].score - shotsByPlayer[player].session;
-
-         if (remaining === 0) {
-            const isItWon = (Settings.x3and25 === 1)
-                  ? (shot.x > 1 || shot.sector === 25 || shot.sector === 50)
-                  : (shot.x === 2 || shot.sector === 50);
-
-            if (isItWon) {
-               shotsByPlayer[player].score += shotsByPlayer[player].session;
-               shotsByPlayer[player].session = 0;
-               // ВМЕСТО all[1] используем имя напрямую из объекта shot
-               Game.end(shot.player);
-               shot.status = true;
-            } else {
-               shotsByPlayer[player].session = 0;
-               shot.status = false;
-            }
-         } else if (remaining < 2) {
-            shotsByPlayer[player].session = 0;
-            shot.status = false;
-         }
-
-         if (shot.shotn === 3) {
-            shotsByPlayer[player].score += shotsByPlayer[player].session;
-            shotsByPlayer[player].session = 0;
-         }
-
-         shotsByPlayer[player].all.push(shot);
-         UI.updateTempScore(player, shotsByPlayer[player].session);
+      if (isItWon) {
+         pState.score += pState.session;
+         pState.session = 0;
+         return "WIN";
       }
-
-      shots.forEach((shotItem, index) => {
-         shotItem.shotn = (index + 1) % 3 === 0 ? 3 : (index + 1) % 3;
-         let currentPlayer = shotItem.player === playerOneName ? 'playerOne' : 'playerTwo';
-         shotCheck(currentPlayer, shotItem);
-      });
+      pState.session = 0;
+      shot.status = false;
+   } else if (remaining < 2) {
+      pState.session = 0;
+      shot.status = false;
    }
 
+   if (shot.shotn === 3) {
+      pState.score += pState.session;
+      pState.session = 0;
+   }
+
+   return null;
+};
+
+const calculate = () => {
+   clearData();
+   const shots = Storage.shots;
+   if (shots.length === 0) {
+      finalizeCalculations();
+      return whoseTurn();
+   }
+
+   const lastGame = Storage.games[Storage.games.length - 1];
+   const p1Name = lastGame.p1;
+
+   shots.forEach((shot, i) => {
+      shot.shotn = (i % 3) + 1;
+      const playerKey = shot.player === p1Name ? 'playerOne' : 'playerTwo';
+
+      const result = processShot(playerKey, shot, shotsByPlayer, Settings);
+
+      if (result === "WIN") {
+         Game.end(shot.player);
+      }
+
+      if (i === shots.length - 1) {
+         UI.updateTempScore(playerKey, shotsByPlayer[playerKey].session);
+      }
+   });
+
+   finalizeCalculations();
+};
+
+const finalizeCalculations = () => {
    whoseTurn();
    getPlayerPoints();
    getMainInfo();
