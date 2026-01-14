@@ -50,15 +50,15 @@ const changeActions = {
 };
 
 const keyActions = {
-   Digit1: () => {
-      Game.first = 'p1';
+   Digit1: async () => {
+      await Game.setFirstPlayer('p1');
    },
-   Digit2: () => {
-      Game.first = 'p2';
+   Digit2: async () => {
+      await Game.setFirstPlayer('p2');
    },
-   Space: (event) => {
+   Space: async (event) => {
       event.preventDefault();
-      sendShot(0, 1);
+      await sendShot(0, 1);
       timer.clearTimer();
    },
    Backspace: (event) => {
@@ -66,14 +66,14 @@ const keyActions = {
       Game.cancelLastHit();
       timer.clearTimer();
    },
-   Enter: () => {
+   Enter: async () => {
       let selected = selector.enter();
-      sendShot(selected.sector, selected.x);
+      await sendShot(selected.sector, selected.x);
       timer.clearTimer();
    },
-   NumpadEnter: () => {
+   NumpadEnter: async () => {
       let selected = selector.enter();
-      sendShot(selected.sector, selected.x);
+      await sendShot(selected.sector, selected.x);
       timer.clearTimer();
    },
    Pause: () => {

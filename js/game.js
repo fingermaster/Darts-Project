@@ -10,7 +10,7 @@ const board = {
 };
 
 export const sendShot = async function (sector, x) {
-   const currentPlayerKey = Game.next;
+   const currentPlayerKey = await Game.getNextPlayer();
    const shooter = currentPlayerKey === 'p1' ? 'playerOne' : 'playerTwo';
 
    // ВЫЧИСЛЯЕМ НОМЕР БРОСКА САМИ (1, 2 или 3)
@@ -88,17 +88,17 @@ export const modal = {
 };
 
 export const Game = {
-   get next() {
-      Storage.GetNext();
+   getNextPlayer: async () => {
+      await Storage.GetNext();
       return Settings.next;
    },
-   set next(player) {
-      Storage.SetNext(player);
+   setNextPlayer: async (player) => {
+      await Storage.SetNext(player);
       Game.setActivePlayer(player);
    },
-   set first(player) {
-      Storage.SetNext(player);
-      Storage.SetFirst(player);
+   setFirstPlayer: async (player) => {
+      await Storage.SetNext(player);
+      await Storage.SetFirst(player);
       Game.setActivePlayer(player);
    },
    setActivePlayer: (player) => {
@@ -107,7 +107,7 @@ export const Game = {
    cancelLastHit: async () => {
       UI.hideWinScreen();
       await Storage.CancelShot();
-      calculate();
+      await calculate();
    },
    clearX: () => {
       UI.clearHints();
@@ -118,15 +118,15 @@ export const Game = {
       UI.resetBoard(Settings.toFinish);
       await initGame();
    },
-   end: (winner) => {
-      Storage.EndGame();
+   end: async (winner) => {
+      await Storage.EndGame();
       UI.showWinScreen(winner);
    },
    start: async (p1, p2) => {
       await Storage.NewPlayer([p1, p2]);
       Settings.p1 = p1;
       Settings.p2 = p2;
-      Game.first = 'p1';
+      await Game.setFirstPlayer('p1');
 
       setGameDataNames();
       await Game.new();
@@ -242,18 +242,17 @@ const finalizeCalculations = () => {
    getMainInfo();
 }
 
-const whoseTurn = () => {
+const whoseTurn = async () => {
    const second = Settings.first === 'p1' ? 'p2' : 'p1';
 
    // Математика: 0-2 — первый игрок, 3-5 — второй
    const currentPlayer = (Storage.shots.length % 6 < 3) ? Settings.first : second;
 
-   // 1. Логическое обновление (база и состояние)
-   if (Game.next !== currentPlayer) {
-      Game.next = currentPlayer;
+   const nextInStorage = await Game.getNextPlayer;
+   if (nextInStorage !== currentPlayer) {
+      await Game.setNextPlayer(currentPlayer);
    }
 
-   // 2. Визуальное обновление (всегда, для надежности при инициализации)
    UI.toggleActivePlayer(currentPlayer);
 }
 
