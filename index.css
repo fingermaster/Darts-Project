@@ -64,6 +64,9 @@ body::after {
   transition: 600ms;
   transition-timing-function: ease-out;
   transition-property: background;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
 }
 .btn.active {
   background: #138d4f;
@@ -544,6 +547,11 @@ body::after {
 }
 #gameplay #deck #dartboard {
   z-index: 9;
+}
+#gameplay #deck #dartboard svg {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 #fireworks {

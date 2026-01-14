@@ -68,6 +68,9 @@ body {
    transition: 600ms;
    transition-timing-function: ease-out;
    transition-property: background;
+   -webkit-tap-highlight-color: transparent;
+   -webkit-user-select: none;
+   user-select: none;
 
    &.active {
       background: #138d4f;
@@ -622,6 +625,12 @@ body {
 
       #dartboard {
          z-index: 9;
+
+         svg {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+         }
       }
    }
 }
